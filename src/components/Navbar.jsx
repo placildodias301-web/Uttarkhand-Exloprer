@@ -89,9 +89,9 @@ export default function Navbar() {
                 </button>
                 {packageCategories.map((c) => (
                   <button
-                    key={c.slug}
+                    key={c.path}
                     onClick={() => {
-                      navigate(`/packages/category/${c.slug}`);
+                      navigate(c.path);
                       setPackagesOpen(false);
                     }}
                     className="w-full text-left px-4 py-2.5 text-sm font-body text-mist-300 hover:bg-white/5 hover:text-moss-300"
@@ -190,8 +190,8 @@ export default function Navbar() {
                 </NavLink>
                 {packageCategories.map((c) => (
                   <NavLink
-                    key={c.slug}
-                    to={`/packages/category/${c.slug}`}
+                    key={c.path}
+                    to={c.path}
                     onClick={() => setOpen(false)}
                     className="py-2 px-2 rounded-lg font-body text-sm text-mist-300"
                   >
