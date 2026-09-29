@@ -1,16 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Menu, X, Search, Mountain, MapPinned, ChevronDown } from "lucide-react";
+import { Menu, X, Search, Home, MapPinned, ChevronDown } from "lucide-react";
 import Button from "./Button";
 import SearchBar from "./SearchBar";
+import BrandMark from "./BrandMark";
 import { useItinerary } from "../context/ItineraryContext";
 import { packageCategories } from "../data/packageCategories";
 
-const links = [
-  { to: "/", label: "Home" },
-  { to: "/destinations", label: "Destinations" },
+const primaryLinks = [
   { to: "/itinerary", label: "Itinerary" },
-  { to: "/hotels-food", label: "Hotels & Food" },
+  { to: "/blogs", label: "Blogs" },
   { to: "/gallery", label: "Gallery" },
   { to: "/contact", label: "Contact" },
 ];
@@ -51,13 +50,20 @@ export default function Navbar() {
     >
       <nav className="max-w-[1440px] mx-auto flex items-center justify-between gap-4 px-5 sm:px-8 h-[72px]">
         <NavLink to="/" className="flex items-center gap-2 shrink-0">
-          <Mountain className="text-moss-400" size={26} strokeWidth={2.2} />
-          <span className="font-display text-lg sm:text-xl text-mist-200">
-            Uttarakhand <span className="text-moss-400 italic">Explorer</span>
-          </span>
+          <BrandMark />
         </NavLink>
 
         <div className="hidden lg:flex items-center gap-7 font-body text-[15px]">
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              `relative py-2 flex items-center gap-1.5 transition-colors ${isActive ? "text-moss-400" : "text-mist-300 hover:text-mist-200"}`
+            }
+          >
+            <Home size={15} /> Home
+          </NavLink>
+
           <NavLink
             to="/destinations"
             className={({ isActive }) =>
@@ -103,7 +109,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {links.slice(2).map((l) => (
+          {primaryLinks.map((l) => (
             <NavLink
               key={l.to}
               to={l.to}
@@ -164,6 +170,15 @@ export default function Navbar() {
       {open && (
         <div className="lg:hidden bg-ink-900 border-t border-white/5 px-5 py-4 flex flex-col gap-1 animate-fadeUp">
           <NavLink
+            to="/"
+            end
+            onClick={() => setOpen(false)}
+            className={({ isActive }) => `py-2.5 px-2 rounded-lg font-body flex items-center gap-2 ${isActive ? "text-moss-400 bg-white/5" : "text-mist-300"}`}
+          >
+            <Home size={15} /> Home
+          </NavLink>
+
+          <NavLink
             to="/destinations"
             onClick={() => setOpen(false)}
             className={({ isActive }) => `py-2.5 px-2 rounded-lg font-body ${isActive ? "text-moss-400 bg-white/5" : "text-mist-300"}`}
@@ -202,7 +217,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {links.slice(2).map((l) => (
+          {primaryLinks.map((l) => (
             <NavLink
               key={l.to}
               to={l.to}

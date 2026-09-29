@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { CalendarDays, MapPin, Heart } from "lucide-react";
 import Button from "./Button";
-import { getDestination } from "../data/destinations";
+import { useDestinations } from "../services/content";
 
 export default function PackageCard({ pkg }) {
+  const destinations = useDestinations();
+  const getDestName = (id) => destinations.find((d) => d.id === id)?.name;
   return (
     <div className="group rounded-2xl overflow-hidden border border-white/5 bg-ink-850 shadow-card flex flex-col">
       <div className="relative h-56 overflow-hidden">
@@ -30,7 +32,7 @@ export default function PackageCard({ pkg }) {
 
         <div className="flex items-center gap-1.5 text-xs text-mist-400 font-body mb-4">
           <MapPin size={13} className="text-moss-400" />
-          {pkg.destinations.map((id) => getDestination(id)?.name).join(" · ")}
+          {pkg.destinations.map((id) => getDestName(id)).join(" · ")}
         </div>
 
         <ul className="space-y-1.5 mb-6">

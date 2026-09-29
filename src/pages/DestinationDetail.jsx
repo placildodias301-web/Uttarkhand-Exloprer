@@ -7,12 +7,13 @@ import Button from "../components/Button";
 import SectionHeader from "../components/SectionHeader";
 import DestinationCard from "../components/DestinationCard";
 import WhatsAppContactCard from "../components/WhatsAppContactCard";
-import { destinations, getDestination } from "../data/destinations";
+import { useDestinations } from "../services/content";
 import { useItinerary } from "../context/ItineraryContext";
 
 export default function DestinationDetail() {
   const { id } = useParams();
-  const destination = getDestination(id);
+  const destinations = useDestinations();
+  const destination = destinations.find((d) => d.id === id);
   const { ids, addDestination } = useItinerary();
 
   if (!destination) return <Navigate to="/destinations" replace />;
@@ -46,7 +47,7 @@ export default function DestinationDetail() {
             <Compass size={19} className="text-moss-400" /> Attractions
           </h2>
           <div className="grid sm:grid-cols-2 gap-4 mb-10">
-            {d.attractions.map((a) => (
+            {(d.attractions || []).map((a) => (
               <div key={a.name} className="p-4 rounded-xl border border-white/5 bg-ink-850">
                 <h4 className="font-body font-semibold text-mist-100 text-sm mb-1.5">{a.name}</h4>
                 <p className="text-mist-400 text-[13px] font-body leading-relaxed">{a.desc}</p>
@@ -56,7 +57,7 @@ export default function DestinationDetail() {
 
           <h2 className="font-display text-2xl text-mist-100 mb-5">Things to Do</h2>
           <div className="flex flex-wrap gap-2 mb-10">
-            {d.activities.map((a) => (
+            {(d.activities || []).map((a) => (
               <span key={a} className="px-3.5 py-2 rounded-full bg-ink-850 border border-white/5 text-mist-200 text-sm font-body">
                 {a}
               </span>
@@ -67,7 +68,7 @@ export default function DestinationDetail() {
             <Bed size={19} className="text-moss-400" /> Where to Stay
           </h2>
           <div className="grid sm:grid-cols-3 gap-4 mb-10">
-            {d.hotels.map((h) => (
+            {(d.hotels || []).map((h) => (
               <div key={h.name} className="p-4 rounded-xl border border-white/5 bg-ink-850">
                 <div className="flex items-center justify-between mb-1">
                   <h4 className="font-body font-semibold text-mist-100 text-sm">{h.name}</h4>
@@ -87,7 +88,7 @@ export default function DestinationDetail() {
             <UtensilsCrossed size={19} className="text-moss-400" /> Local Food to Try
           </h2>
           <div className="space-y-3 mb-10">
-            {d.cuisine.map((c) => (
+            {(d.cuisine || []).map((c) => (
               <div key={c.name} className="p-4 rounded-xl border border-white/5 bg-ink-850">
                 <h4 className="font-body font-semibold text-mist-100 text-sm mb-1">{c.name}</h4>
                 <p className="text-mist-400 text-[13px] font-body leading-relaxed">{c.desc}</p>
@@ -97,7 +98,7 @@ export default function DestinationDetail() {
 
           <h2 className="font-display text-2xl text-mist-100 mb-5">Photo Gallery</h2>
           <div className="grid grid-cols-3 gap-3 mb-10">
-            {d.gallery.map((g, i) => (
+            {(d.gallery || []).map((g, i) => (
               <img key={i} src={g} alt={`${d.name} ${i + 1}`} loading="lazy" className="aspect-square object-cover rounded-xl" />
             ))}
           </div>

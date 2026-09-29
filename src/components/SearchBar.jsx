@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, MapPin, Hotel, UtensilsCrossed, Compass, Package } from "lucide-react";
+import { Search, MapPin, Hotel, UtensilsCrossed, Compass, Package, Newspaper } from "lucide-react";
 import Modal from "./Modal";
-import { runSearch } from "../utils/search";
+import { runSearch, buildSearchIndex } from "../utils/search";
+import { useDestinations, usePackages } from "../services/content";
+import { useBlogs } from "../services/blogs";
 
 const icons = {
   Destination: MapPin,
@@ -11,12 +13,17 @@ const icons = {
   Hotel: Hotel,
   Cuisine: UtensilsCrossed,
   Package: Package,
+  Blog: Newspaper,
 };
 
 export default function SearchBar({ open, onClose }) {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
-  const results = useMemo(() => runSearch(query), [query]);
+  const destinations = useDestinations();
+  const packages = usePackages();
+  const { blogs } = useBlogs();
+  const index = useMemo(() => buildSearchIndex(destinations, packages, blogs), [destinations, packages, blogs]);
+  const results = useMemo(() => runSearch(query, index), [query, index]);
 
   useEffect(() => {
     if (!open) setQuery("");

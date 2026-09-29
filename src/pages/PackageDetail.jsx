@@ -2,13 +2,15 @@ import { useParams, Navigate, Link } from "react-router-dom";
 import { CalendarDays, MapPin, Plus, Check } from "lucide-react";
 import Button from "../components/Button";
 import ItineraryTimeline from "../components/ItineraryTimeline";
-import { getPackage } from "../data/packages";
-import { getDestination } from "../data/destinations";
+import { usePackages, useDestinations } from "../services/content";
 import { useItinerary } from "../context/ItineraryContext";
 
 export default function PackageDetail() {
   const { id } = useParams();
-  const pkg = getPackage(id);
+  const packages = usePackages();
+  const destinations = useDestinations();
+  const pkg = packages.find((p) => p.id === id);
+  const getDestination = (destId) => destinations.find((d) => d.id === destId);
   const { ids, addDestination } = useItinerary();
 
   if (!pkg) return <Navigate to="/packages" replace />;

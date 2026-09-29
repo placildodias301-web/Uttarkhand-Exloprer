@@ -1,12 +1,14 @@
 import { useState } from "react";
 import {
   Plus, X, ChevronUp, ChevronDown, Trash2, MapPin, Gauge,
-  CalendarRange, Save, GripVertical, Check, MessageCircle,
+  CalendarRange, Save, GripVertical, Check, MessageCircle, Send,
 } from "lucide-react";
 import Button from "../components/Button";
 import SectionHeader from "../components/SectionHeader";
+import Modal from "../components/Modal";
 import { useItinerary } from "../context/ItineraryContext";
 import { getWhatsAppLink } from "../data/contact";
+import { addInquiry } from "../services/inquiries";
 
 export default function ItineraryBuilder() {
   const {
@@ -15,19 +17,44 @@ export default function ItineraryBuilder() {
   } = useItinerary();
   const [dragIndex, setDragIndex] = useState(null);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [requestOpen, setRequestOpen] = useState(false);
+  const [requestSent, setRequestSent] = useState(false);
+  const [requestForm, setRequestForm] = useState({ name: "", email: "", phone: "" });
 
   const availableDestinations = allDestinations.filter(
     (d) => !items.some((i) => i.id === d.id)
   );
 
+  const itinerarySummary = items.map((i) => i.name).join(" → ");
+
   const whatsAppLink = getWhatsAppLink(
-    `Hi! I've put together a ${days}-day itinerary (${items.map((i) => i.name).join(" → ")}) and would like some help finalizing it.`
+    `Hi! I've put together a ${days}-day itinerary (${itinerarySummary}) and would like some help finalizing it.`
   );
 
   const onSave = () => {
     setSavedFlash(true);
     setTimeout(() => setSavedFlash(false), 1800);
   };
+
+  const submitRequest = (e) => {
+    e.preventDefault();
+    addInquiry({
+      ...requestForm,
+      inquiryType: "Trip Planning",
+      destination: itinerarySummary,
+      message: `Requesting help finalizing a ${days}-day itinerary: ${itinerarySummary}.`,
+    });
+    setRequestSent(true);
+  };
+
+  const closeRequest = () => {
+    setRequestOpen(false);
+    setTimeout(() => {
+      setRequestSent(false);
+      setRequestForm({ name: "", email: "", phone: "" });
+    }, 200);
+  };
+
 
   return (
     <div className="max-w-[1200px] mx-auto px-5 sm:px-8 py-16 sm:py-20">
@@ -116,6 +143,9 @@ export default function ItineraryBuilder() {
               >
                 <MessageCircle size={15} /> Get Help on WhatsApp
               </Button>
+              <Button onClick={() => setRequestOpen(true)} variant="dark">
+                <Send size={15} /> Request a Callback
+              </Button>
             </div>
           )}
         </div>
@@ -157,6 +187,52 @@ export default function ItineraryBuilder() {
           </div>
         </aside>
       </div>
+
+      <Modal open={requestOpen} onClose={closeRequest} className="sm:max-w-sm">
+        <div className="p-6">
+          {requestSent ? (
+            <div className="text-center py-6">
+              <span className="inline-flex h-12 w-12 rounded-full bg-moss-500/15 text-moss-400 items-center justify-center mb-4">
+                <Check size={22} />
+              </span>
+              <p className="font-display text-lg text-mist-100 mb-1.5">Request sent</p>
+              <p className="text-mist-400 text-sm font-body">We'll reach out to help finalize your itinerary.</p>
+            </div>
+          ) : (
+            <form onSubmit={submitRequest} className="space-y-4">
+              <h3 className="font-display text-lg text-mist-100">Request a Callback</h3>
+              <p className="text-mist-400 text-sm font-body">
+                We'll send your {days}-day itinerary to our team and get in touch.
+              </p>
+              <input
+                required
+                value={requestForm.name}
+                onChange={(e) => setRequestForm((f) => ({ ...f, name: e.target.value }))}
+                placeholder="Your Name"
+                className="w-full rounded-lg bg-ink-800 border border-white/10 px-3 py-2.5 text-sm font-body text-mist-100 placeholder:text-mist-400 outline-none focus:border-moss-500/50"
+              />
+              <input
+                required
+                type="email"
+                value={requestForm.email}
+                onChange={(e) => setRequestForm((f) => ({ ...f, email: e.target.value }))}
+                placeholder="Email"
+                className="w-full rounded-lg bg-ink-800 border border-white/10 px-3 py-2.5 text-sm font-body text-mist-100 placeholder:text-mist-400 outline-none focus:border-moss-500/50"
+              />
+              <input
+                type="tel"
+                value={requestForm.phone}
+                onChange={(e) => setRequestForm((f) => ({ ...f, phone: e.target.value }))}
+                placeholder="Phone (optional)"
+                className="w-full rounded-lg bg-ink-800 border border-white/10 px-3 py-2.5 text-sm font-body text-mist-100 placeholder:text-mist-400 outline-none focus:border-moss-500/50"
+              />
+              <button type="submit" className="w-full py-2.5 rounded-full bg-moss-500 text-ink-950 font-body font-semibold hover:bg-moss-400 transition-colors">
+                Send Request
+              </button>
+            </form>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -1,3 +1,5 @@
+// Used by the Navbar's Packages dropdown. Each entry links to its own
+// dedicated page file under src/pages/packages/.
 export const packageCategories = [
   { path: "/packages/spiritual", label: "Spiritual Packages" },
   { path: "/packages/local-tours", label: "Local Tour Packages" },

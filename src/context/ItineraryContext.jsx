@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
-import { destinations, getDestination } from "../data/destinations";
+import { useDestinations } from "../services/content";
 
 const STORAGE_KEY = "uttarakhand-explorer:itinerary";
 
@@ -26,6 +26,12 @@ function estimateDistance(ids) {
 const ItineraryContext = createContext(null);
 
 export function ItineraryProvider({ children }) {
+  const destinations = useDestinations();
+  const getDestination = useCallback(
+    (id) => destinations.find((d) => d.id === id),
+    [destinations]
+  );
+
   const [ids, setIds] = useState(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);

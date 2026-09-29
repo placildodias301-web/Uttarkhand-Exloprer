@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
 import { Clock, Bed, UtensilsCrossed, Car, ArrowUpRight } from "lucide-react";
-import { getDestination } from "../data/destinations";
+import { useDestinations } from "../services/content";
 
 export default function ItineraryTimeline({ days }) {
+  const destinations = useDestinations();
+  const getDestination = (id) => destinations.find((d) => d.id === id);
   return (
     <div className="relative">
       <div className="absolute left-[19px] top-2 bottom-2 w-px bg-white/10 hidden sm:block" />
       <div className="space-y-8">
-        {days.map((day) => {
+        {(days || []).map((day) => {
           const dest = getDestination(day.destinationId);
           return (
             <div key={day.day} className="relative sm:pl-14">
