@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haridwar to Kedarnath & Badrinath — Interactive Route Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.9/babel.min.js"></script>
+<style>
+:root {
+  --ink-950: #080c0b;
+  --ink-900: #0b1210;
+  --ink-800: #111a17;
+  --ink-700: #172a1d;
+  --ink-600: #1e3328;
+  --mist-100: #e8f0ec;
+  --mist-200: #c5d4cc;
+  --mist-300: #9aafa4;
+  --mist-400: #6b8076;
+  --mint: #4fd4a3;
+  --mint-bright: #2fbd8c;
+  --mint-dim: rgba(79, 212, 163, 0.12);
+  --mint-glow: rgba(79, 212, 163, 0.28);
+  --orange: #d9713f;
+  --orange-light: #e28a60;
+  --sage: #8fa98e;
+  --white: #f4f1e8;
+  --line: rgba(255,255,255,0.08);
+  --line-strong: rgba(255,255,255,0.12);
+  --card: #0f1714;
+  --card-hover: #13201b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ink-950);
+  color: var(--mist-200);
+  font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
+  background-size: 22px 22px;
+  overflow-x: hidden;
+}
+::selection { background: var(--mint); color: var(--ink-950); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--ink-900); }
+::-webkit-scrollbar-thumb { background: #26352f; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--mint-bright); }
+
+.serif { font-family: "Fraunces", serif; }
+.wrap { width: min(1180px, calc(100% - 40px)); margin: auto; }
+
+.topnav {
+  border-bottom: 1px solid var(--line);
+  padding: 20px 0;
+  background: rgba(8, 12, 11, 0.92);
+  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 30;
+}
+.topnav-inner { display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+.brand {
+  font-family: "Fraunces", serif; font-size: 16px;
+  display: flex; align-items: center; gap: 12px; white-space: nowrap;
+  color: var(--mist-100);
+}
+.brand-mark {
+  width: 20px; height: 20px; border-radius: 50% 50% 50% 0;
+  background: var(--mint); transform: rotate(-45deg);
+  box-shadow: 0 0 0 4px rgba(79,212,163,0.15), 0 4px 12px rgba(0,0,0,0.4);
+  position: relative;
+}
+.brand-mark::after {
+  content: ""; position: absolute; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--ink-950); top: 6.5px; left: 6.5px;
+}
+.navlinks { display: flex; gap: 28px; }
+.navlinks a {
+  color: var(--mist-400); text-decoration: none; text-transform: uppercase;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.16em; padding-bottom: 5px;
+  border-bottom: 2px solid transparent; transition: color .2s, border-color .2s;
+}
+.navlinks a:hover { color: var(--mist-100); }
+.navlinks a.active { color: var(--mist-100); border-color: var(--mint); }
+
+.hero { padding: 48px 0 20px; }
+.eyebrow {
+  display: block; color: var(--mint); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+}
+.hero h1 {
+  margin: 12px 0 14px; max-width: 28ch;
+  font-size: clamp(28px, 4vw, 42px); line-height: 1.12; font-weight: 500;
+  color: var(--mist-100);
+}
+.hero .lead { color: var(--mist-400); font-size: 15.5px; max-width: 58ch; line-height: 1.65; }
+
+.stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 14px; margin: 28px 0 36px;
+}
+.stat-card {
+  background: var(--card); border-radius: 14px; padding: 16px 18px;
+  border: 1px solid var(--line); box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+.stat-card .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--mist-400); }
+.stat-card .value { font-family: "Fraunces", serif; font-size: 24px; font-weight: 500; margin-top: 5px; color: var(--mist-100); }
+
+.mapshell { padding: 10px 0 60px; }
+.shell-head { margin-bottom: 22px; }
+.shell-head h2 { margin: 10px 0 0; font-size: clamp(22px, 2.8vw, 30px); font-weight: 500; color: var(--mist-100); }
+
+.pills {
+  display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 12px;
+  scrollbar-width: thin; scrollbar-color: #26352f transparent;
+}
+.pill {
+  flex: 0 0 auto; border: 1px solid var(--line);
+  background: rgba(15, 23, 20, 0.8); color: var(--mist-400);
+  border-radius: 999px; padding: 10px 15px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  cursor: pointer; transition: all .2s ease;
+}
+.pill:hover { transform: translateY(-1px); border-color: var(--mint); color: var(--mist-200); }
+.pill.active {
+  background: var(--mint); color: var(--ink-950); border-color: var(--mint);
+  box-shadow: 0 4px 18px var(--mint-glow);
+}
+
+.mapcanvas {
+  position: relative; width: 100%; aspect-ratio: 16/9.2;
+  border-radius: 22px; overflow: hidden;
+  background-color: #0a1210;
+  box-shadow: 0 36px 80px -30px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05) inset;
+  touch-action: manipulation;
+}
+.map-bg {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(180deg, rgba(8,12,11,0.55) 0%, rgba(8,12,11,0.72) 45%, rgba(8,12,11,0.9) 100%),
+    url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1800&q=80');
+  background-size: cover; background-position: center 30%;
+  filter: saturate(0.75) contrast(1.08) brightness(0.85);
+}
+.map-title {
+  position: absolute; left: 5%; top: 5%; z-index: 2;
+  color: rgba(232,240,236,0.95); font-family: "Fraunces", serif; font-style: italic;
+  font-size: clamp(22px, 3vw, 34px); text-shadow: 0 2px 16px rgba(0,0,0,0.6);
+}
+.map-subtitle {
+  position: absolute; left: 5%; top: 12.5%; z-index: 2;
+  color: rgba(232,240,236,0.4); font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase;
+}
+.routes { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+.route-path {
+  fill: none; stroke-linecap: round; stroke-linejoin: round;
+  transition: opacity .4s ease, stroke-width .3s ease, filter .4s ease;
+}
+.route-path.dim { opacity: 0.12; stroke-width: 2.5; }
+.route-path.glow { filter: drop-shadow(0 0 10px currentColor); opacity: 1; }
+.route-path.animated { stroke-dasharray: 7 13; animation: dashMove 32s linear infinite; }
+@keyframes dashMove { to { stroke-dashoffset: -440; } }
+
+.pin {
+  position: absolute; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer; z-index: 5;
+  transition: opacity .3s, transform .2s, filter .3s;
+  min-width: 44px; min-height: 44px; touch-action: manipulation;
+}
+.pin:hover, .pin:focus-visible { transform: translate(-50%, -50%) scale(1.06); z-index: 8; }
+.pin.dim { opacity: 0.18; filter: grayscale(0.7); pointer-events: none; }
+.pin .marker {
+  width: 22px; height: 22px; border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg); position: relative;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.4), 0 5px 14px rgba(0,0,0,0.5);
+  transition: box-shadow .2s, transform .2s;
+}
+.pin:hover .marker { box-shadow: 0 0 0 4px var(--mint), 0 7px 18px rgba(0,0,0,0.5); }
+.pin .marker::after {
+  content: ""; position: absolute; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--ink-950); top: 7px; left: 7px;
+}
+.pin[data-group="start"] .marker { background: var(--white); }
+.pin[data-group="transfer"] .marker { background: var(--orange); }
+.pin[data-group="sight"] .marker { background: var(--mint); }
+.pin .badge {
+  margin-top: 8px; padding: 5px 10px; border-radius: 7px;
+  background: rgba(7,17,11,0.94); color: #fff; white-space: nowrap;
+  font-size: 11px; font-weight: 600;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06);
+}
+.pin .badge .alt { color: var(--mint); margin-left: 4px; font-size: 10px; }
+.pin .role-tag {
+  margin-top: 5px; padding: 3px 8px; border-radius: 5px;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.pin.role-start .role-tag { background: #fff; color: var(--ink-950); }
+.pin.role-end .role-tag { background: var(--mint); color: var(--ink-950); }
+.pin.role-via .role-tag { background: rgba(79,212,163,0.9); color: var(--ink-950); }
+.pin.role-start .marker {
+  box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(255,255,255,0.2), 0 6px 16px rgba(0,0,0,0.5);
+}
+.pin.role-end .marker {
+  box-shadow: 0 0 0 4px var(--mint), 0 0 0 7px var(--mint-glow), 0 6px 16px rgba(0,0,0,0.5);
+}
+.view-link { display: none !important; }
+
+.popover {
+  position: absolute; width: 240px; background: var(--ink-700);
+  border: 1px solid var(--line-strong); border-radius: 14px; padding: 14px;
+  box-shadow: 0 28px 60px rgba(0,0,0,0.55);
+  opacity: 0; pointer-events: none; transform: translate(-50%, 4px);
+  transition: opacity .2s ease, transform .2s ease; z-index: 25;
+  max-height: min(70vh, 420px); overflow-y: auto; -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+.popover.show { opacity: 1; pointer-events: auto; transform: translate(-50%, -8px); }
+.popover .thumb { width: 100%; height: 110px; border-radius: 9px; margin-bottom: 12px; overflow: hidden; background: var(--ink-800); }
+.popover .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.popover .pv-title { color: #fff; font-family: "Fraunces", serif; font-size: 16.5px; }
+.popover .pv-title .alt { color: var(--mint); font-family: "Inter", sans-serif; font-weight: 700; font-size: 12.5px; margin-left: 6px; }
+.popover .pv-blurb { color: rgba(232,240,236,0.7); font-size: 12.5px; line-height: 1.55; margin-top: 7px; }
+.popover .pv-link {
+  display: inline-block; margin-top: 11px; color: var(--mint); font-size: 12px; font-weight: 700;
+  text-decoration: none; cursor: pointer;
+}
+.popover .pv-link:hover { text-decoration: underline; }
+
+.legend {
+  display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+  margin-top: 16px; color: var(--mist-400); font-size: 11.5px;
+}
+.legend .item { display: flex; align-items: center; gap: 7px; }
+.legend .dot { width: 8px; height: 8px; border-radius: 50%; }
+.legend .hint { margin-left: auto; font-size: 10.5px; }
+
+.day-flow {
+  display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
+  margin-top: 14px; padding: 14px 18px; border-radius: 14px;
+  background: var(--card); border: 1px solid var(--line);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+.day-flow .flow-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mist-400);
+  width: 100%; text-align: center; margin-bottom: 2px;
+}
+.day-flow .flow-stop {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  min-width: 90px; padding: 8px 12px; border-radius: 10px; background: var(--ink-800);
+}
+.day-flow .flow-stop.start { background: rgba(255,255,255,0.06); border: 2px solid var(--mist-200); }
+.day-flow .flow-stop.end { background: var(--mint-dim); border: 2px solid var(--mint); }
+.day-flow .flow-stop .role { font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mist-400); }
+.day-flow .flow-stop.start .role { color: var(--mist-200); }
+.day-flow .flow-stop.end .role { color: var(--mint); }
+.day-flow .flow-stop .name { font-family: "Fraunces", serif; font-size: 15px; font-weight: 500; color: var(--mist-100); }
+.day-flow .flow-arrow { font-size: 22px; color: var(--mint); font-weight: 700; line-height: 1; }
+.day-flow .flow-note { width: 100%; text-align: center; font-size: 11.5px; color: var(--mist-400); margin-top: 4px; }
+
+.day-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px; margin: 40px 0;
+}
+.day-card {
+  background: var(--card); border-radius: 16px; overflow: hidden;
+  border: 1px solid var(--line); box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  cursor: pointer; transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+.day-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+  border-color: rgba(79,212,163,0.25);
+}
+.day-card .card-photo { height: 140px; position: relative; overflow: hidden; background: var(--ink-800); }
+.day-card .card-photo img { width: 100%; height: 100%; object-fit: cover; }
+.day-card .card-photo .day-tag {
+  position: absolute; top: 11px; left: 11px;
+  background: rgba(8,12,11,0.88); color: #fff;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 9px; border-radius: 6px;
+}
+.day-card .card-body { padding: 16px 18px 20px; }
+.day-card h3 { font-family: "Fraunces", serif; font-size: 18px; font-weight: 500; margin-bottom: 4px; color: var(--mist-100); }
+.day-card .card-meta { font-size: 12px; color: var(--mist-400); margin-bottom: 8px; }
+.day-card p { font-size: 13px; color: var(--mist-400); line-height: 1.5; }
+.day-card .open-btn {
+  margin-top: 12px; font-size: 12px; font-weight: 700; color: var(--mint);
+  background: none; border: none; cursor: pointer;
+}
+
+.elevation-section { margin: 10px 0 50px; }
+.elevation-section h2 { font-size: clamp(22px, 2.6vw, 28px); font-weight: 500; margin-bottom: 6px; color: var(--mist-100); }
+.elevation-section .sub { color: var(--mist-400); font-size: 14.5px; margin-bottom: 22px; }
+.elev-card {
+  background: var(--card); border-radius: 18px; border: 1px solid var(--line);
+  padding: 28px 24px 20px; box-shadow: 0 4px 18px rgba(0,0,0,0.2); overflow: hidden;
+}
+.elev-chart { position: relative; width: 100%; height: 220px; }
+.elev-chart svg { width: 100%; height: 100%; display: block; }
+.elev-y-labels {
+  position: absolute; left: 0; top: 0; bottom: 28px; width: 52px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  font-size: 11px; color: var(--mist-400); pointer-events: none;
+}
+.elev-x-labels {
+  display: flex; justify-content: space-between; padding: 10px 8px 0 52px;
+  font-size: 11.5px; color: var(--mist-200); font-weight: 500;
+}
+.elev-x-labels span { text-align: center; flex: 1; white-space: nowrap; }
+.elev-note { margin-top: 14px; font-size: 12px; color: var(--mist-400); text-align: center; }
+
+.tips-section { margin: 48px 0 60px; }
+.tips-section h2 { font-size: clamp(22px, 2.6vw, 28px); font-weight: 500; margin-bottom: 6px; color: var(--mist-100); }
+.tips-section .sub { color: var(--mist-400); font-size: 14.5px; margin-bottom: 22px; }
+.tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.tip {
+  background: var(--card); border-radius: 14px; padding: 16px 18px; border: 1px solid var(--line);
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.tip .icon {
+  width: 34px; height: 34px; border-radius: 9px; background: var(--mint-dim);
+  color: var(--mint); display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.tip h4 { font-size: 13.5px; font-weight: 600; margin-bottom: 3px; color: var(--mist-100); }
+.tip p { font-size: 12.5px; color: var(--mist-400); line-height: 1.45; }
+
+.scrim {
+  position: fixed; inset: 0; background: rgba(8,12,11,0.7);
+  opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 40;
+}
+.scrim.show { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; right: 0; width: min(430px, 94vw); height: 100%;
+  background: var(--ink-800); color: #fff;
+  transform: translateX(100%); transition: transform .38s cubic-bezier(.22,1,.36,1);
+  z-index: 50; overflow-y: auto; display: flex; flex-direction: column;
+  max-width: 100vw;
+}
+.drawer.open { transform: translateX(0); }
+.drawer-photo {
+  height: 200px; width: 100%; background: var(--ink-700); position: relative; flex-shrink: 0; overflow: hidden;
+}
+.drawer-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.drawer-close {
+  position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(7,17,11,0.7); border: none; color: #fff; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.drawer-body { padding: 26px 26px 48px; }
+.drawer-eyebrow { color: var(--mint); font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+.drawer-title { margin-top: 10px; font-family: "Fraunces", serif; font-style: italic; font-size: 28px; line-height: 1.15; color: var(--mist-100); }
+.drawer-sub { margin-top: 6px; color: rgba(232,240,236,0.5); font-size: 13px; line-height: 1.5; }
+.moments { margin-top: 28px; }
+.moment {
+  position: relative; margin-left: 4px; padding: 0 0 22px 26px;
+  border-left: 1px solid rgba(255,255,255,0.1);
+}
+.moment:last-child { border-color: transparent; padding-bottom: 0; }
+.moment .dot {
+  position: absolute; left: -5px; top: 3px; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--mint); border: 2px solid var(--ink-800);
+}
+.moment .time { color: var(--mint); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+.moment .m-title { margin-top: 3px; font-size: 15.5px; font-family: "Fraunces", serif; color: var(--mist-100); }
+.moment .m-desc { margin-top: 3px; color: rgba(232,240,236,0.55); font-size: 12.5px; line-height: 1.5; }
+
+footer {
+  border-top: 1px solid var(--line); padding: 28px 0 40px;
+  text-align: center; font-size: 13px; color: var(--mist-400);
+}
+
+img { max-width: 100%; height: auto; object-fit: cover; }
+.mapcanvas { touch-action: manipulation; max-width: 100%; }
+
+@media (max-width: 900px) {
+  .topnav-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .navlinks { width: 100%; flex-wrap: wrap; gap: 10px 14px; justify-content: flex-start; }
+  .mapcanvas { aspect-ratio: 3/4; border-radius: 16px; overflow: visible !important; }
+  .map-bg { border-radius: 16px; }
+  .legend { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .legend .hint { margin-left: 0; width: 100%; }
+  .day-flow { padding: 12px 12px; gap: 8px; }
+  .day-flow .flow-stop { min-width: 72px; padding: 8px 10px; }
+  .day-flow .flow-stop .name { font-size: 13px; }
+  .elev-chart { height: 200px; }
+  .elev-x-labels {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: 0; padding: 8px 2px 0 40px !important;
+    font-size: 8px !important; line-height: 1.15; min-height: 64px;
+    align-items: flex-start;
+  }
+  .elev-x-labels span {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    white-space: nowrap; text-align: left; height: 52px;
+    overflow: hidden; text-overflow: ellipsis; flex: none !important;
+  }
+  .elev-y-labels { width: 40px; font-size: 9px; bottom: 48px; }
+  .elev-note { font-size: 10.5px; text-align: left; padding: 0 2px; }
+  .elev-card { padding: 20px 12px 16px; padding-bottom: 12px !important; }
+  .popover { width: min(260px, calc(100vw - 24px)); max-width: calc(100% - 16px); }
+  .drawer { width: min(100vw, 430px); }
+  .wrap { width: calc(100% - 24px); max-width: 100%; }
+  .hero { padding: 32px 0 16px; }
+  .hero h1 { max-width: 100%; }
+  .pills { -webkit-overflow-scrolling: touch; }
+  .pill { min-height: 44px; padding: 10px 14px; display: inline-flex; align-items: center; }
+  .pin { min-width: 44px; min-height: 44px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .day-grid { grid-template-columns: 1fr !important; }
+  .tips-grid { grid-template-columns: 1fr !important; }
+  .pin .badge {
+    font-size: 9px !important; padding: 3px 7px !important;
+    max-width: 72px !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .pin .badge .alt { display: none !important; }
+  .pin .role-tag { font-size: 7.5px; padding: 2px 5px; }
+  .map-title { font-size: clamp(18px, 5vw, 28px); left: 4%; top: 4%; }
+  .map-subtitle { font-size: 8.5px; left: 4%; top: 11%; letter-spacing: 0.12em; max-width: 90%; }
+}
+@media (min-width: 901px) {
+  .mapcanvas { overflow: hidden; }
+}
+@media (max-width: 600px) {
+  .mapcanvas { aspect-ratio: 2/3; }
+  .pin .badge { opacity: 0.92; max-width: 64px !important; font-size: 8.5px !important; }
+  .pin.dim .badge { opacity: 0.35; }
+  .brand { font-size: 14px; }
+  .navlinks a { font-size: 9px; letter-spacing: 0.08em; padding: 6px 0; min-height: 36px; display: inline-flex; align-items: center; }
+  .stat-card .value { font-size: 18px; }
+  .day-card .card-photo { height: 140px; }
+  .topnav { padding: 14px 0; }
+  .hero .lead { font-size: 14.5px; }
+  .shell-head h2 { font-size: clamp(20px, 5vw, 26px); }
+  .popover {
+    width: min(220px, calc(100% - 20px)) !important;
+    max-width: calc(100% - 20px); padding: 12px;
+  }
+  .popover .thumb { height: 90px; }
+  .popover .pv-title { font-size: 15px; }
+  .popover .pv-blurb { font-size: 12px; }
+}
+@media (max-width: 480px) {
+  .mapcanvas { aspect-ratio: 3/5; }
+  .pin .badge { max-width: 56px !important; font-size: 8px !important; padding: 2px 5px !important; }
+  .wrap { width: calc(100% - 16px); }
+  .stats { gap: 10px; }
+  .stat-card { padding: 12px 14px; }
+  .popover { width: min(200px, calc(100% - 16px)) !important; padding: 10px; }
+  .popover .thumb { height: 80px; margin-bottom: 8px; }
+  .navlinks { gap: 8px 12px; }
+  .hero { padding: 24px 0 12px; }
+  .mapshell { padding-bottom: 40px; }
+  .elev-x-labels span { height: 58px; font-size: 7.5px !important; }
+}
+@media (max-width: 360px) {
+  .mapcanvas { aspect-ratio: 9/16; }
+  .hero h1 { font-size: clamp(22px, 8vw, 28px); }
+  .pill { padding: 8px 10px; font-size: 9px; min-height: 40px; }
+  .brand { font-size: 13px; gap: 8px; }
+  .stat-card .value { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// Plain image paths only — no IMG object
+// Each location: image = map/popover, scheduleImage = day-schedule drawer
+const LOCATIONS = [
+  { id: "haridwar", name: "Haridwar", alt: "Start / End", x: 82, y: 86, group: "start", image: "/itineraries/spiritual/images/haridwar.jpg", scheduleImage: "/itineraries/spiritual/images/haridwar.jpg", blurb: "Pickup and final drop. Gateway to the Char Dham circuit." },
+  { id: "rishikesh", name: "Rishikesh", alt: "Ghats", x: 76, y: 74, group: "sight", image: "/itineraries/spiritual/images/RishikeshGhats.jpg", scheduleImage: "/itineraries/spiritual/images/RishikeshGhats.jpg", blurb: "Triveni Ghat, Ram Jhula & Laxman Jhula on the return to Haridwar." },
+  { id: "rudraprayag", name: "Rudraprayag", alt: "Confluence", x: 68, y: 58, group: "transfer", image: "/itineraries/spiritual/images/RudraprayagSangam.jpg", scheduleImage: "/itineraries/spiritual/images/RudraprayagSangam.jpg", blurb: "Sacred confluence of Alaknanda & Mandakini. Key halt on transfer days." },
+  { id: "karanprayag", name: "Karanprayag", alt: "Prayag", x: 58, y: 46, group: "sight", image: "/itineraries/spiritual/images/KaranprayagPrayag.jpg", scheduleImage: "/itineraries/spiritual/images/KaranprayagPrayag.jpg", blurb: "One of the Panch Prayag. Passed on Day 1 and Day 7 routes." },
+  { id: "guptkashi", name: "Guptkashi", alt: "~1,350 m", x: 48, y: 52, group: "transfer", image: "/itineraries/spiritual/images/Guptkashi.webp", scheduleImage: "/itineraries/spiritual/images/Guptkashi.webp", blurb: "Base for Kedarnath. Multiple overnights (Days 3, 5)." },
+  { id: "gaurikund", name: "Gaurikund", alt: "Trek base", x: 40, y: 38, group: "sight", image: "/itineraries/spiritual/images/GaurikundTrek.avif", scheduleImage: "/itineraries/spiritual/images/GaurikundTrek.avif", blurb: "Start of the 16 km trek to Kedarnath. Hot spring & Parvati legend." },
+  { id: "kedarnath", name: "Kedarnath", alt: "3,583 m", x: 36, y: 16, group: "sight", image: "/itineraries/spiritual/images/Kedarnath.jpg", scheduleImage: "/itineraries/spiritual/images/Kedarnath.jpg", blurb: "Jyotirlinga temple at the foot of Kedarnath peak. Trek required." },
+  { id: "uttarkashi", name: "Uttarkashi", alt: "~1,150 m", x: 30, y: 48, group: "transfer", image: "/itineraries/spiritual/images/Uttarkashi.avif", scheduleImage: "/itineraries/spiritual/images/Uttarkashi.avif", blurb: "Gateway town. Overnight after Gangotri visit." },
+  { id: "harsil", name: "Harsil", alt: "~2,620 m", x: 20, y: 34, group: "transfer", image: "/itineraries/spiritual/images/Harsil.jpg", scheduleImage: "/itineraries/spiritual/images/Harsil.jpg", blurb: "Quiet valley town on the Bhagirathi. Overnight on Day 1." },
+  { id: "gangotri", name: "Gangotri", alt: "~3,100 m", x: 12, y: 20, group: "sight", image: "/itineraries/spiritual/images/Gangotri.jpg", scheduleImage: "/itineraries/spiritual/images/Gangotri.jpg", blurb: "Sacred source of the Ganga. Temple & holy dip in Bhagirathi." },
+  { id: "badrinath", name: "Badrinath", alt: "~3,130 m", x: 74, y: 20, group: "sight", image: "/itineraries/spiritual/images/Badrinath.webp", scheduleImage: "/itineraries/spiritual/images/Badrinath.webp", blurb: "One of the Char Dham. Temple of Lord Vishnu." },
+  { id: "mana", name: "Mana Village", alt: "Last village", x: 80, y: 12, group: "sight", image: "/itineraries/spiritual/images/ManaVillageLastvillage.jpg", scheduleImage: "/itineraries/spiritual/images/ManaVillageLastvillage.jpg", blurb: "India’s last village before Tibet. Vyas Gufa, Bheem Pul, Vasudhara." }
+];
+
+const DAYINFO = {
+  day1: {
+    eyebrow: "DAY 01 · HARIDWAR → HARSIL",
+    title: "Arrival & long transfer",
+    subtitle: "Pickup in Haridwar and scenic 8-hour drive to Harsil via the Prayags",
+    photo: "/itineraries/spiritual/images/Harsil.jpg",
+    moments: [
+      { time: "Morning", title: "Pickup in Haridwar", desc: "Meet at hotel, railway station or designated point" },
+      { time: "Day", title: "Drive via NH 34", desc: "Approx 269 km · 8 hours via Rudraprayag, Karanprayag & en-route stops" },
+      { time: "En route", title: "Prayag views", desc: "Rudraprayag confluence, Karanprayag and short breaks" },
+      { time: "Afternoon", title: "Arrive Harsil", desc: "Check in and lunch in the quiet Bhagirathi valley" },
+      { time: "Evening", title: "Dinner & overnight", desc: "Overnight stay in Harsil" }
+    ]
+  },
+  day2: {
+    eyebrow: "DAY 02 · HARSIL → GANGOTRI → UTTARKASHI",
+    title: "Gangotri darshan",
+    subtitle: "Early start to Gangotri temple, holy dip, then return to Uttarkashi",
+    photo: "/itineraries/spiritual/images/Gangotri.jpg",
+    moments: [
+      { time: "Early morning", title: "Depart Harsil", desc: "Start early to avoid traffic · ~3 hours to Gangotri along Bhagirathi" },
+      { time: "Morning", title: "Gangotri Temple", desc: "Darshan at the sacred temple dedicated to Goddess Ganga" },
+      { time: "Morning", title: "Holy dip", desc: "Immerse in the serene Bhagirathi River surroundings" },
+      { time: "Afternoon", title: "Return drive", desc: "Late afternoon / early evening drive back toward Uttarkashi" },
+      { time: "Evening", title: "Overnight Uttarkashi", desc: "Check in and overnight stay in Uttarkashi" }
+    ]
+  },
+  day3: {
+    eyebrow: "DAY 03 · UTTARKASHI → GUPTKASHI",
+    title: "Cross the Garhwal",
+    subtitle: "Long scenic transfer through valleys and hill towns (~200 km / 7.5 hrs)",
+    photo: "/itineraries/spiritual/images/Uttarkashi.avif",
+    moments: [
+      { time: "Morning", title: "Breakfast & depart", desc: "Leave Uttarkashi after breakfast" },
+      { time: "Day", title: "Scenic drive", desc: "Approx 200 km · 7.5 hours through picturesque valleys, towns and forests" },
+      { time: "Afternoon", title: "Arrive Guptkashi", desc: "Reach by evening and relax after the long drive" },
+      { time: "Evening", title: "Dinner & overnight", desc: "Overnight stay in Guptkashi" }
+    ]
+  },
+  day4: {
+    eyebrow: "DAY 04 · GUPTKASHI → KEDARNATH",
+    title: "Trek to Kedarnath",
+    subtitle: "Drive to Sonprayag / Gaurikund then 15–20 km trek to the temple",
+    photo: "/itineraries/spiritual/images/guptkashi11.webp",
+    moments: [
+      { time: "Early morning", title: "Depart Guptkashi", desc: "Move to Sonprayag parking (car drop). Shared cab to Gaurikund (fare not included)" },
+      { time: "Morning", title: "Gaurikund", desc: "Sacred spot where Mata Parvati is believed to have bathed. Natural hot spring" },
+      { time: "Day", title: "Trek begins", desc: "15–20 km trek from Gaurikund to Kedarnath (ponies / palki / helicopter optional)" },
+      { time: "Evening", title: "Arrive Kedarnath", desc: "Reach stay by late evening. Temple visit if time permits" },
+      { time: "Night", title: "Overnight Kedarnath", desc: "Overnight stay at Kedarnath" }
+    ]
+  },
+  day5: {
+    eyebrow: "DAY 05 · KEDARNATH → GUPTKASHI",
+    title: "Temple & descent",
+    subtitle: "Morning darshan, then downhill trek and drive back to Guptkashi",
+    photo: "/itineraries/spiritual/images/DescenttoGuptkashi.jpg",
+    moments: [
+      { time: "Morning", title: "Kedarnath Temple", desc: "Visit the Jyotirlinga and explore the high-altitude surroundings" },
+      { time: "Day", title: "Downward trek", desc: "Return trek to Gaurikund (usually faster than the ascent)" },
+      { time: "Afternoon", title: "Pickup Sonprayag", desc: "Driver picks you up and transfers back to Guptkashi hotel" },
+      { time: "Evening", title: "Dinner & overnight", desc: "Dinner and overnight stay in Guptkashi" }
+    ]
+  },
+  day6: {
+    eyebrow: "DAY 06 · GUPTKASHI → BADRINATH",
+    title: "To Badrinath",
+    subtitle: "6–7 hour drive to Badrinath and evening temple visit",
+    photo: "/itineraries/spiritual/images/Badrinath.webp",
+    moments: [
+      { time: "Morning", title: "Breakfast & depart", desc: "Leave Guptkashi after breakfast" },
+      { time: "Day", title: "Drive to Badrinath", desc: "Approx 6–7 hours through the Garhwal Himalayas" },
+      { time: "Afternoon", title: "Check-in", desc: "Arrive and check into your hotel" },
+      { time: "Evening", title: "Badrinath Temple", desc: "Visit the sacred Char Dham temple of Lord Vishnu" },
+      { time: "Night", title: "Overnight Badrinath", desc: "Dinner and overnight stay in Badrinath" }
+    ]
+  },
+  day7: {
+    eyebrow: "DAY 07 · BADRINATH → RUDRAPRAYAG",
+    title: "Local sights & transfer",
+    subtitle: "Mana Village circuit then drive to Rudraprayag with en-route stops",
+    photo: "/itineraries/spiritual/images/RudraprayagSangam.jpg",
+    moments: [
+      { time: "Morning", title: "Local sightseeing", desc: "Mana Village, Bheem Pul, Vasudhara Falls, Saraswati River, Vyas Gufa, Ganesh Temple" },
+      { time: "Day", title: "Depart for Rudraprayag", desc: "Drive via Karanprayag, Rudraprayag and Dhari Devi Temple (Srinagar)" },
+      { time: "Evening", title: "Arrive Rudraprayag", desc: "Check in by evening" },
+      { time: "Night", title: "Overnight Rudraprayag", desc: "Dinner and overnight stay" }
+    ]
+  },
+  day8: {
+    eyebrow: "DAY 08 · RUDRAPRAYAG → HARIDWAR",
+    title: "Return via Rishikesh",
+    subtitle: "Final drive with Rishikesh ghats and drop in Haridwar",
+    photo: "/itineraries/spiritual/images/haridwar.jpg",
+    moments: [
+      { time: "Morning", title: "Breakfast & checkout", desc: "Leave Rudraprayag after breakfast" },
+      { time: "Day", title: "Rishikesh stop", desc: "Triveni Ghat, Ram Jhula and Laxman Jhula" },
+      { time: "Afternoon", title: "Continue to Haridwar", desc: "Final stretch to Haridwar" },
+      { time: "Evening", title: "Drop & tour ends", desc: "Reach by afternoon or early evening. Safe onward journey" }
+    ]
+  }
+};
+
+const DAY_CARDS = [
+  { key: "day1", tag: "Day 1", title: "Haridwar → Harsil", meta: "Pickup · ~269 km · 8 hrs", desc: "Long scenic drive via Rudraprayag & Karanprayag to the quiet Harsil valley.", photo: "/itineraries/spiritual/images/Harsil.jpg" },
+  { key: "day2", tag: "Day 2", title: "Gangotri darshan", meta: "Harsil · Gangotri · Uttarkashi", desc: "Early start to Gangotri Temple, holy dip, then overnight in Uttarkashi.", photo: "/itineraries/spiritual/images/Gangotri.jpg" },
+  { key: "day3", tag: "Day 3", title: "To Guptkashi", meta: "~200 km · 7.5 hrs", desc: "Scenic transfer through Garhwal valleys to the Kedarnath base town.", photo: "/itineraries/spiritual/images/Uttarkashi.avif" },
+  { key: "day4", tag: "Day 4", title: "Trek to Kedarnath", meta: "Gaurikund · 15–20 km trek", desc: "Drive to Sonprayag/Gaurikund then trek to the high-altitude Jyotirlinga.", photo: "/itineraries/spiritual/images/guptkashi11.webp" },
+  { key: "day5", tag: "Day 5", title: "Descent to Guptkashi", meta: "Temple · downhill trek", desc: "Morning darshan then return trek and drive back to Guptkashi.", photo: "/itineraries/spiritual/images/DescenttoGuptkashi.jpg" },
+  { key: "day6", tag: "Day 6", title: "Guptkashi → Badrinath", meta: "6–7 hrs drive", desc: "Transfer to Badrinath and evening visit to the Vishnu temple.", photo: "/itineraries/spiritual/images/Badrinath.webp" },
+  { key: "day7", tag: "Day 7", title: "Mana & to Rudraprayag", meta: "Sightseeing · transfer", desc: "Mana Village circuit then drive via the Prayags to Rudraprayag.", photo: "/itineraries/spiritual/images/RudraprayagSangam.jpg" },
+  { key: "day8", tag: "Day 8", title: "Return to Haridwar", meta: "Via Rishikesh · drop", desc: "Final drive with Rishikesh stops and drop in Haridwar.", photo: "/itineraries/spiritual/images/haridwar.jpg" }
+];
+
+const TIPS = [
+  { icon: "🚗", title: "Long transfer days", text: "Day 1 (~8 hrs) and Day 3 (~7.5 hrs) are long drives. Start early and keep layers handy." },
+  { icon: "🥾", title: "Kedarnath trek", text: "15–20 km one way. Wear proper shoes; ponies, palki and helicopter options exist." },
+  { icon: "🧥", title: "Altitude & cold", text: "Kedarnath 3,583 m and Badrinath ~3,130 m. Evenings are cold even in summer." },
+  { icon: "🔦", title: "Early starts", text: "Gangotri and Kedarnath days benefit from very early departures to beat traffic and weather." },
+  { icon: "📅", title: "Best season", text: "May–June and September–October. Monsoon roads can be landslide-prone." },
+  { icon: "🙏", title: "Temple timings", text: "Check current darshan and aarti schedules; high-altitude temples close for winter." }
+];
+
+const DAY_PATHS = {
+  day1: {
+    d: "M984 550 C920 520 860 480 816 371 C760 340 720 320 696 294 C600 280 480 250 360 307 C300 280 260 250 240 218",
+    color: "var(--orange)", from: "Haridwar", to: "Harsil",
+    fromId: "haridwar", toId: "harsil", viaIds: ["rudraprayag", "karanprayag"], order: { rudraprayag: 1, karanprayag: 2 },
+    label: "Haridwar → Harsil (~269 km)"
+  },
+  day2: {
+    d: "M240 218 C200 190 170 160 144 128 C170 160 200 190 240 218 C280 250 320 280 360 307",
+    color: "var(--mint)", from: "Harsil", to: "Uttarkashi",
+    fromId: "harsil", toId: "uttarkashi", viaIds: ["gangotri"], order: { gangotri: 1 },
+    label: "Harsil → Gangotri → Uttarkashi"
+  },
+  day3: {
+    d: "M360 307 C400 320 460 340 520 350 C540 345 560 340 576 333",
+    color: "var(--orange)", from: "Uttarkashi", to: "Guptkashi",
+    fromId: "uttarkashi", toId: "guptkashi",
+    label: "Uttarkashi → Guptkashi (~200 km)"
+  },
+  day4: {
+    d: "M576 333 C540 300 500 270 480 243 C460 210 450 160 432 102",
+    color: "var(--mint)", from: "Guptkashi", to: "Kedarnath",
+    fromId: "guptkashi", toId: "kedarnath", viaIds: ["gaurikund"], order: { gaurikund: 1 },
+    label: "Guptkashi → Gaurikund → Kedarnath (trek)"
+  },
+  day5: {
+    d: "M432 102 C450 160 460 210 480 243 C500 270 540 300 576 333",
+    color: "var(--mint)", from: "Kedarnath", to: "Guptkashi",
+    fromId: "kedarnath", toId: "guptkashi", viaIds: ["gaurikund"], order: { gaurikund: 1 },
+    label: "Kedarnath → Gaurikund → Guptkashi"
+  },
+  day6: {
+    d: "M576 333 C620 290 700 230 780 170 C820 150 860 140 888 128",
+    color: "var(--orange)", from: "Guptkashi", to: "Badrinath",
+    fromId: "guptkashi", toId: "badrinath",
+    label: "Guptkashi → Badrinath (6–7 hrs)"
+  },
+  day7: {
+    d: "M888 128 C920 110 940 90 960 77 C920 120 860 200 780 280 C740 320 700 350 696 294 C740 320 780 350 816 371",
+    color: "var(--mint)", from: "Badrinath", to: "Rudraprayag",
+    fromId: "badrinath", toId: "rudraprayag", viaIds: ["mana", "karanprayag"], order: { mana: 1, karanprayag: 2 },
+    label: "Badrinath · Mana · Rudraprayag"
+  },
+  day8: {
+    d: "M816 371 C840 420 880 460 912 474 C940 500 960 530 984 550",
+    color: "var(--orange)", from: "Rudraprayag", to: "Haridwar",
+    fromId: "rudraprayag", toId: "haridwar", viaIds: ["rishikesh"], order: { rishikesh: 1 },
+    label: "Rudraprayag → Rishikesh → Haridwar"
+  }
+};
+
+const DAY_ACTIVE_LOCATIONS = {
+  day1: ["haridwar", "rudraprayag", "karanprayag", "harsil"],
+  day2: ["harsil", "gangotri", "uttarkashi"],
+  day3: ["uttarkashi", "guptkashi"],
+  day4: ["guptkashi", "gaurikund", "kedarnath"],
+  day5: ["kedarnath", "gaurikund", "guptkashi"],
+  day6: ["guptkashi", "badrinath"],
+  day7: ["badrinath", "mana", "karanprayag", "rudraprayag"],
+  day8: ["rudraprayag", "rishikesh", "haridwar"]
+};
+
+function Popover({ loc, style, onEnter, onLeave, onOpen }) {
+  const openKey = () => {
+    if (loc.id === "haridwar") onOpen("day1", loc.scheduleImage || loc.image);
+    else if (loc.id === "harsil" || loc.id === "gangotri" || loc.id === "uttarkashi") onOpen("day2", loc.scheduleImage || loc.image);
+    else if (loc.id === "guptkashi") onOpen("day3", loc.scheduleImage || loc.image);
+    else if (loc.id === "kedarnath" || loc.id === "gaurikund") onOpen("day4", loc.scheduleImage || loc.image);
+    else if (loc.id === "badrinath" || loc.id === "mana") onOpen("day6", loc.scheduleImage || loc.image);
+    else if (loc.id === "rudraprayag" || loc.id === "karanprayag") onOpen("day7", loc.scheduleImage || loc.image);
+    else if (loc.id === "rishikesh") onOpen("day8", loc.scheduleImage || loc.image);
+    else onOpen("day1", loc.scheduleImage || loc.image);
+  };
+  return (
+    <div className="popover show" style={style} onMouseEnter={onEnter} onMouseLeave={onLeave}>
+      <div className="thumb"><img src={loc.image} alt={loc.name} /></div>
+      <div className="pv-title">{loc.name}<span className="alt">{loc.alt}</span></div>
+      <div className="pv-blurb">{loc.blurb}</div>
+      <a className="pv-link" onClick={openKey} onDoubleClick={openKey}>Open day schedule →</a>
+    </div>
+  );
+}
+
+function MapCanvas({ filter, onOpenDrawer }) {
+  const [popover, setPopover] = useState(null);
+  const hideTimer = useRef(null);
+  const lastTap = useRef({ id: null, time: 0 });
+
+  const showPopover = useCallback((loc) => {
+    clearTimeout(hideTimer.current);
+    const x = Number(loc.x) || 50;
+    const y = Number(loc.y) || 50;
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 900;
+    let leftPct = x;
+    let above = y > 52;
+
+    if (isMobile) {
+      // Mobile: keep full 220-240px card inside the map / screen
+      if (x < 34) leftPct = 34;
+      else if (x > 66) leftPct = 66;
+      if (y < 20) above = false;
+      if (y > 78) above = true;
+    } else {
+      // Desktop: gentle nudge only when very close to edge (looks natural next to pin)
+      if (x < 12) leftPct = 12;
+      else if (x > 88) leftPct = 88;
+      if (y < 15) above = false;
+      if (y > 85) above = true;
+    }
+
+    setPopover({
+      loc,
+      left: leftPct + "%",
+      top: `calc(${y}% - 12px)`,
+      above
+    });
+  }, []);
+
+  const scheduleHide = () => {
+    clearTimeout(hideTimer.current);
+    hideTimer.current = setTimeout(() => setPopover(null), 220);
+  };
+
+  const openInfo = useCallback((loc) => {
+    clearTimeout(hideTimer.current);
+    setPopover(null);
+    let key = filter !== "full" && filter ? filter : "day1";
+    if (filter === "full") {
+      if (loc.id === "haridwar") key = "day1";
+      else if (["harsil","gangotri","uttarkashi"].includes(loc.id)) key = "day2";
+      else if (loc.id === "guptkashi") key = "day3";
+      else if (["kedarnath","gaurikund"].includes(loc.id)) key = "day4";
+      else if (["badrinath","mana"].includes(loc.id)) key = "day6";
+      else if (["rudraprayag","karanprayag"].includes(loc.id)) key = "day7";
+      else if (loc.id === "rishikesh") key = "day8";
+      else key = "day1";
+    }
+    onOpenDrawer(key, loc.scheduleImage || loc.image);
+  }, [onOpenDrawer, filter]);
+
+  const handlePinActivate = useCallback((loc, e) => {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    clearTimeout(hideTimer.current);
+    const now = Date.now();
+    const isDouble = lastTap.current.id === loc.id && (now - lastTap.current.time) < 400;
+    lastTap.current = { id: loc.id, time: now };
+
+    if (isDouble) {
+      // Double click / double tap → open full day schedule
+      openInfo(loc);
+    } else {
+      // Single click / single tap → show location overview card
+      showPopover(loc);
+    }
+  }, [openInfo, showPopover]);
+
+  const isFull = filter === "full";
+  const activeDays = isFull ? Object.keys(DAY_PATHS) : [filter];
+
+  useEffect(() => {
+    if (!popover) return;
+    const onDoc = (e) => {
+      // close if click outside pin and popover
+      if (e.target.closest && (e.target.closest('.pin') || e.target.closest('.popover'))) return;
+      setPopover(null);
+    };
+    document.addEventListener('click', onDoc, true);
+    return () => document.removeEventListener('click', onDoc, true);
+  }, [popover]);
+  const activeLocIds = isFull ? null : (DAY_ACTIVE_LOCATIONS[filter] || []);
+  const dayPath = !isFull ? DAY_PATHS[filter] : null;
+
+  const pinRole = (loc) => {
+    if (!dayPath) return null;
+    if (loc.id === dayPath.fromId) return { type: "start" };
+    if (dayPath.viaIds && dayPath.viaIds.includes(loc.id)) {
+      const num = dayPath.order && dayPath.order[loc.id] ? dayPath.order[loc.id] : null;
+      return { type: "via", num };
+    }
+    if (loc.id === dayPath.toId && dayPath.fromId !== dayPath.toId) return { type: "end" };
+    return null;
+  };
+
+  const subtitle = isFull
+    ? "Uttarakhand · Gangotri · Kedarnath · Badrinath · 8-day circuit"
+    : (dayPath
+        ? `${dayPath.from}  →  ${dayPath.to}`
+        : "Day route");
+
+  return (
+    <>
+    <div className="mapcanvas">
+      <div className="map-bg" />
+      <div className="map-title">Haridwar → Char Dham Circuit</div>
+      <div className="map-subtitle">{subtitle}</div>
+
+      <svg className="routes" viewBox="0 0 1200 640" preserveAspectRatio="none">
+        <defs>
+          <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#d9713f" />
+          </marker>
+          <marker id="arrowMint" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#4fd4a3" />
+          </marker>
+          <marker id="arrowWhite" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(255,255,255,0.7)" />
+          </marker>
+        </defs>
+
+        {!isFull && (
+          <g opacity="0.12">
+            {Object.values(DAY_PATHS).map((p, i) => (
+              <path key={"ghost"+i} d={p.d} fill="none" stroke="#fff" strokeWidth="2.5"
+                strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 10"
+                markerEnd="url(#arrowWhite)" />
+            ))}
+          </g>
+        )}
+
+        {activeDays.map(dayKey => {
+          const p = DAY_PATHS[dayKey];
+          if (!p) return null;
+          const marker = p.color.includes("mint") ? "url(#arrowMint)" : "url(#arrowOrange)";
+          return (
+            <path
+              key={dayKey}
+              className="route-path glow animated"
+              stroke={p.color}
+              strokeWidth={isFull ? 3 : 5}
+              d={p.d}
+              markerEnd={marker}
+            />
+          );
+        })}
+      </svg>
+
+      {LOCATIONS.map(loc => {
+        const isDim = !isFull && activeLocIds && !activeLocIds.includes(loc.id);
+        const role = pinRole(loc);
+        const roleType = role && role.type ? role.type : role;
+        const roleClass = roleType ? `role-${roleType}` : "";
+        return (
+          <div
+            key={loc.id}
+            className={`pin ${isDim ? "dim" : ""} ${roleClass}`}
+            data-group={loc.group}
+            style={{ left: loc.x + "%", top: loc.y + "%" }}
+            tabIndex={isDim ? -1 : 0}
+            role="button"
+            aria-label={loc.name + ". Open day schedule"}
+            onMouseEnter={() => !isDim && showPopover(loc)}
+            onMouseLeave={scheduleHide}
+            onClick={(e) => handlePinActivate(loc, e)}
+            onDoubleClick={(e) => handlePinActivate(loc, e)}
+            
+            onKeyDown={e => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                openInfo(loc);
+              }
+            }}
+          >
+            <div className="marker" />
+            <div className="badge">{loc.name} <span className="alt">{loc.alt}</span></div>
+            {roleType === "start" && <div className="role-tag">Leave from</div>}
+            {roleType === "end" && <div className="role-tag">Arrive</div>}
+            {roleType === "via" && (
+              <div className="role-tag">
+                {role && role.num ? `Visit ${role.num}` : "Visit"}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {popover && (
+        <Popover loc={popover.loc} style={{
+            left: popover.left,
+            top: popover.top,
+            ...(popover.above ? { transform: "translate(-50%, calc(-100% - 16px))" } : {})
+          }}
+          onEnter={() => clearTimeout(hideTimer.current)} onLeave={scheduleHide} onOpen={onOpenDrawer} />
+      )}
+    </div>
+
+    {dayPath && (
+      <div className="day-flow">
+        <div className="flow-label">This day’s movement</div>
+        <div className="flow-stop start">
+          <span className="role">Leave from</span>
+          <span className="name">{dayPath.from}</span>
+        </div>
+        <div className="flow-arrow" aria-hidden="true">→</div>
+        <div className="flow-stop end">
+          <span className="role">Arrive at</span>
+          <span className="name">{dayPath.to}</span>
+        </div>
+        {filter === "day1" && (
+          <div className="flow-note">Via Rudraprayag · Karanprayag · ~269 km · 8 hrs</div>
+        )}
+        {filter === "day2" && (
+          <div className="flow-note">Harsil → Gangotri Temple → Uttarkashi</div>
+        )}
+        {filter === "day3" && (
+          <div className="flow-note">~200 km · 7.5 hrs through Garhwal valleys</div>
+        )}
+        {filter === "day4" && (
+          <div className="flow-note">Sonprayag parking · shared cab to Gaurikund · 15–20 km trek</div>
+        )}
+        {filter === "day5" && (
+          <div className="flow-note">Morning darshan · downhill trek · pickup at Sonprayag</div>
+        )}
+        {filter === "day6" && (
+          <div className="flow-note">6–7 hrs drive · evening Badrinath Temple</div>
+        )}
+        {filter === "day7" && (
+          <div className="flow-note">Mana · Bheem Pul · Vasudhara · Karanprayag · Dhari Devi</div>
+        )}
+        {filter === "day8" && (
+          <div className="flow-note">Rishikesh (Triveni · Ram Jhula · Laxman Jhula) · Haridwar drop</div>
+        )}
+      </div>
+    )}
+    </>
+  );
+}
+
+function Drawer({ dayKey, onClose, imageOverride }) {
+  if (!dayKey || !DAYINFO[dayKey]) return null;
+  const info = DAYINFO[dayKey];
+  const imageSrc = imageOverride || info.photo;
+  return (
+    <>
+      <div className={`scrim ${dayKey ? "show" : ""}`} onClick={onClose} />
+      <div className={`drawer ${dayKey ? "open" : ""}`}>
+        <div className="drawer-photo">
+          <img src={imageSrc} alt={info.title} />
+          <button className="drawer-close" onClick={onClose} aria-label="Close">✕</button>
+        </div>
+        <div className="drawer-body">
+          <div className="drawer-eyebrow">{info.eyebrow}</div>
+          <div className="drawer-title">{info.title}</div>
+          <div className="drawer-sub">{info.subtitle}</div>
+          <div className="moments">
+            {info.moments.map((m, i) => (
+              <div className="moment" key={i}>
+                <span className="dot" />
+                <div className="time">{m.time}</div>
+                <div className="m-title">{m.title}</div>
+                <div className="m-desc">{m.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function App() {
+  const [filter, setFilter] = useState("full");
+  const [drawerKey, setDrawerKey] = useState(null);
+  const [drawerImage, setDrawerImage] = useState(null);
+
+  useEffect(() => {
+    const onKey = e => {
+      if (e.key === "Escape") {
+        setDrawerKey(null);
+        setDrawerImage(null);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  const openDrawer = (key, image = null) => {
+    setDrawerKey(key);
+    setDrawerImage(image);
+  };
+
+  return (
+    <>
+      <nav className="topnav">
+        <div className="wrap topnav-inner">
+          <div className="brand">
+            <span className="brand-mark" aria-hidden="true" />
+            Haridwar → Kedarnath · Badrinath
+          </div>
+          <div className="navlinks">
+            <a href="#overview">Overview</a>
+            <a href="#map" className="active">Route Map</a>
+            <a href="#itinerary">Itinerary</a>
+            <a href="#tips">Tips</a>
+          </div>
+        </div>
+      </nav>
+
+      <header className="hero" id="overview">
+        <div className="wrap">
+          <span className="eyebrow">Uttarakhand · Gangotri · Kedarnath · Badrinath</span>
+          <h1 className="serif">Eight days from Haridwar through the sacred high valleys.</h1>
+          <p className="lead">
+            Pickup in Haridwar, drive to Harsil and Gangotri, then Guptkashi for the Kedarnath trek,
+            onward to Badrinath and Mana, returning via Rudraprayag and Rishikesh.
+          </p>
+          <div className="stats">
+            <div className="stat-card"><div className="label">Duration</div><div className="value">8 days</div></div>
+            <div className="stat-card"><div className="label">Key drives</div><div className="value">~269 + 200 km</div></div>
+            <div className="stat-card"><div className="label">Highest</div><div className="value">3,583 m</div></div>
+            <div className="stat-card"><div className="label">Best season</div><div className="value" style={{fontSize:17}}>May–Jun · Sep–Oct</div></div>
+          </div>
+        </div>
+      </header>
+
+      <section className="mapshell" id="map">
+        <div className="wrap">
+          <div className="shell-head">
+            <span className="eyebrow">The journey, on one map</span>
+            <h2 className="serif">Filter by day to see where you leave from and where you arrive.</h2>
+          </div>
+
+          <div className="pills">
+            {[
+              { id: "full", label: "Full Journey" },
+              { id: "day1", label: "Day 1 · Harsil" },
+              { id: "day2", label: "Day 2 · Gangotri" },
+              { id: "day3", label: "Day 3 · Guptkashi" },
+              { id: "day4", label: "Day 4 · Kedarnath" },
+              { id: "day5", label: "Day 5 · Descent" },
+              { id: "day6", label: "Day 6 · Badrinath" },
+              { id: "day7", label: "Day 7 · Rudraprayag" },
+              { id: "day8", label: "Day 8 · Haridwar" }
+            ].map(p => (
+              <button key={p.id} className={`pill ${filter === p.id ? "active" : ""}`}
+                onClick={() => setFilter(p.id)}>{p.label}</button>
+            ))}
+          </div>
+
+          <MapCanvas filter={filter} onOpenDrawer={openDrawer} />
+
+          <div className="legend">
+            <div className="item"><span className="dot" style={{background:"var(--white)"}} />Haridwar</div>
+            <div className="item"><span className="dot" style={{background:"var(--orange)"}} />Transfer days</div>
+            <div className="item"><span className="dot" style={{background:"var(--mint)"}} />Sightseeing / trek stops</div>
+            <div className="hint">Select a day → START & END light up · arrows show direction · tap pin for overview · double-tap for schedule</div>
+          </div>
+        </div>
+      </section>
+
+      <section className="elevation-section" id="elevation">
+        <div className="wrap">
+          <h2 className="serif">Elevation profile</h2>
+          <p className="sub">Approximate height gain across the main points of the route.</p>
+          <div className="elev-card">
+            <div className="elev-chart">
+              <div className="elev-y-labels">
+                <span>3600 m</span>
+                <span>3000 m</span>
+                <span>2400 m</span>
+                <span>1800 m</span>
+                <span>1200 m</span>
+                <span>600 m</span>
+              </div>
+              <svg viewBox="0 0 700 200" preserveAspectRatio="none" aria-hidden="true">
+                <line x1="60" y1="10" x2="680" y2="10" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="42" x2="680" y2="42" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="74" x2="680" y2="74" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="106" x2="680" y2="106" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="138" x2="680" y2="138" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="170" x2="680" y2="170" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <defs>
+                  <linearGradient id="elevFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#4fd4a3" stopOpacity="0.28" />
+                    <stop offset="100%" stopColor="#4fd4a3" stopOpacity="0.02" />
+                  </linearGradient>
+                </defs>
+                {/* y ≈ 170 - ((elev-300)/3300)*160
+                    Haridwar 300→170, Harsil 2620→58, Gangotri 3100→35, Uttarkashi 1150→129,
+                    Guptkashi 1350→119, Kedarnath 3583→12, Badrinath 3130→34, Rudraprayag 700→150, Haridwar 300→170 */}
+                <path
+                  d="M60 170 L130 58 L200 35 L270 129 L340 119 L410 12 L480 34 L550 150 L680 170"
+                  fill="url(#elevFill)"
+                  stroke="none"
+                />
+                <path
+                  d="M60 170 L130 58 L200 35 L270 129 L340 119 L410 12 L480 34 L550 150 L680 170"
+                  fill="none"
+                  stroke="#4fd4a3"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <circle cx="60" cy="170" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="130" cy="58" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="200" cy="35" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="270" cy="129" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="340" cy="119" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="410" cy="12" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="480" cy="34" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="550" cy="150" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="680" cy="170" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+              </svg>
+            </div>
+            <div className="elev-x-labels">
+              <span>Haridwar</span>
+              <span>Harsil</span>
+              <span>Gangotri</span>
+              <span>Uttarkashi</span>
+              <span>Guptkashi</span>
+              <span>Kedarnath</span>
+              <span>Badrinath</span>
+              <span>Rudraprayag</span>
+              <span>Haridwar</span>
+            </div>
+            <p className="elev-note">Approx. elevations · Haridwar ~300 m · Harsil ~2,620 m · Gangotri ~3,100 m · Kedarnath 3,583 m · Badrinath ~3,130 m · return to Haridwar</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="itinerary">
+        <div className="wrap">
+          <h2 className="serif" style={{fontSize:"clamp(22px,2.6vw,28px)", marginBottom:8, color:"var(--mist-100)"}}>Day-by-day overview</h2>
+          <p style={{color:"var(--mist-400)", fontSize:14.5, marginBottom:22}}>Click any card to open the detailed schedule.</p>
+          <div className="day-grid">
+            {DAY_CARDS.map(card => (
+              <div className="day-card" key={card.key} onClick={() => openDrawer(card.key)}>
+                <div className="card-photo">
+                  <img src={card.photo} alt={card.title} />
+                  <span className="day-tag">{card.tag}</span>
+                </div>
+                <div className="card-body">
+                  <h3>{card.title}</h3>
+                  <div className="card-meta">{card.meta}</div>
+                  <p>{card.desc}</p>
+                  <button className="open-btn">Open schedule →</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="tips-section" id="tips">
+        <div className="wrap">
+          <h2 className="serif">Practical tips</h2>
+          <p className="sub">Small things that make the high-altitude circuit smoother.</p>
+          <div className="tips-grid">
+            {TIPS.map((t, i) => (
+              <div className="tip" key={i}>
+                <div className="icon">{t.icon}</div>
+                <div>
+                  <h4>{t.title}</h4>
+                  <p>{t.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <div className="wrap">
+          Haridwar → Harsil → Gangotri → Uttarkashi → Guptkashi → Kedarnath → Badrinath → Mana → Rudraprayag → Rishikesh → Haridwar
+        </div>
+      </footer>
+
+      <Drawer
+        dayKey={drawerKey}
+        onClose={() => {
+          setDrawerKey(null);
+          setDrawerImage(null);
+        }}
+        imageOverride={drawerImage}
+      />
+    </>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>

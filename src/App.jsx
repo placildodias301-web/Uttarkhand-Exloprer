@@ -14,9 +14,8 @@ import Packages from "./pages/Packages";
 import PackageDetail from "./pages/PackageDetail";
 import SpiritualPackages from "./pages/packages/SpiritualPackages";
 import LocalTourPackages from "./pages/packages/LocalTourPackages";
-import MostPopularPackages from "./pages/packages/MostPopularPackages";
-import LuxuryPackages from "./pages/packages/LuxuryPackages";
-import BudgetFriendlyPackages from "./pages/packages/BudgetFriendlyPackages";
+import HoneymoonPackages from "./pages/packages/HoneymoonPackages";
+import UttarakhandTourPackages from "./pages/packages/UttarakhandTourPackages";
 import ItineraryBuilder from "./pages/ItineraryBuilder";
 import Blogs from "./pages/blogs/Blogs";
 import BlogDetail from "./pages/blogs/BlogDetail";
@@ -73,11 +72,13 @@ export default function App() {
           <Route path="/destinations" element={<Destinations />} />
           <Route path="/destinations/:id" element={<DestinationDetail />} />
           <Route path="/packages" element={<Packages />} />
+
+          {/* Only your 4 itinerary folders */}
           <Route path="/packages/spiritual" element={<SpiritualPackages />} />
           <Route path="/packages/local-tours" element={<LocalTourPackages />} />
-          <Route path="/packages/most-popular" element={<MostPopularPackages />} />
-          <Route path="/packages/luxury" element={<LuxuryPackages />} />
-          <Route path="/packages/budget-friendly" element={<BudgetFriendlyPackages />} />
+          <Route path="/packages/honeymoon" element={<HoneymoonPackages />} />
+          <Route path="/packages/uttarakhand-tours" element={<UttarakhandTourPackages />} />
+
           <Route path="/packages/:id" element={<PackageDetail />} />
           <Route path="/itinerary" element={<ItineraryBuilder />} />
           <Route path="/blogs" element={<Blogs />} />

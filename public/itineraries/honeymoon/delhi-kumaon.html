@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delhi → Binsar · Munsiyari · Kausani · Nainital — Interactive Route Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.9/babel.min.js"></script>
+<style>
+
+:root {
+  --ink-950: #080c0b;
+  --ink-900: #0b1210;
+  --ink-800: #111a17;
+  --ink-700: #172a1d;
+  --ink-600: #1e3328;
+  --mist-100: #e8f0ec;
+  --mist-200: #c5d4cc;
+  --mist-300: #9aafa4;
+  --mist-400: #6b8076;
+  --mint: #4fd4a3;
+  --mint-bright: #2fbd8c;
+  --mint-dim: rgba(79, 212, 163, 0.12);
+  --mint-glow: rgba(79, 212, 163, 0.28);
+  --orange: #d9713f;
+  --orange-light: #e28a60;
+  --sage: #8fa98e;
+  --white: #f4f1e8;
+  --line: rgba(255,255,255,0.08);
+  --line-strong: rgba(255,255,255,0.12);
+  --card: #0f1714;
+  --card-hover: #13201b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ink-950);
+  color: var(--mist-200);
+  font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
+  background-size: 22px 22px;
+  overflow-x: hidden;
+}
+::selection {
+  background: var(--mint);
+  color: var(--ink-950);
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--ink-900); }
+::-webkit-scrollbar-thumb { background: #26352f; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--mint-bright); }
+
+.serif { font-family: "Fraunces", serif; }
+.wrap { width: min(1180px, calc(100% - 40px)); margin: auto; }
+
+.topnav {
+  border-bottom: 1px solid var(--line);
+  padding: 20px 0;
+  background: rgba(8, 12, 11, 0.92);
+  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 30;
+}
+.topnav-inner {
+  display: flex; align-items: center; justify-content: space-between; gap: 30px;
+}
+.brand {
+  font-family: "Fraunces", serif; font-size: 16px;
+  display: flex; align-items: center; gap: 12px; white-space: nowrap;
+  color: var(--mist-100);
+}
+.brand-mark {
+  width: 20px; height: 20px; border-radius: 50% 50% 50% 0;
+  background: var(--mint);
+  transform: rotate(-45deg);
+  box-shadow: 0 0 0 4px rgba(79,212,163,0.15), 0 4px 12px rgba(0,0,0,0.4);
+  position: relative;
+}
+.brand-mark::after {
+  content: ""; position: absolute; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--ink-950); top: 6.5px; left: 6.5px;
+}
+.navlinks { display: flex; gap: 28px; }
+.navlinks a {
+  color: var(--mist-400); text-decoration: none; text-transform: uppercase;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.16em; padding-bottom: 5px;
+  border-bottom: 2px solid transparent; transition: color .2s, border-color .2s;
+}
+.navlinks a:hover { color: var(--mist-100); }
+.navlinks a.active { color: var(--mist-100); border-color: var(--mint); }
+
+.hero { padding: 48px 0 20px; }
+.eyebrow {
+  display: block; color: var(--mint); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+}
+.hero h1 {
+  margin: 12px 0 14px; max-width: 28ch;
+  font-size: clamp(28px, 4vw, 42px); line-height: 1.12; font-weight: 500;
+  color: var(--mist-100);
+}
+.hero .lead { color: var(--mist-400); font-size: 15.5px; max-width: 58ch; line-height: 1.65; }
+
+.stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 14px; margin: 28px 0 36px;
+}
+.stat-card {
+  background: var(--card); border-radius: 14px; padding: 16px 18px;
+  border: 1px solid var(--line); box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+.stat-card .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--mist-400); }
+.stat-card .value { font-family: "Fraunces", serif; font-size: 24px; font-weight: 500; margin-top: 5px; color: var(--mist-100); }
+
+.mapshell { padding: 10px 0 60px; }
+.shell-head { margin-bottom: 22px; }
+.shell-head h2 { margin: 10px 0 0; font-size: clamp(22px, 2.8vw, 30px); font-weight: 500; color: var(--mist-100); }
+
+.pills {
+  display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 12px;
+  scrollbar-width: thin; scrollbar-color: #26352f transparent;
+}
+.pill {
+  flex: 0 0 auto; border: 1px solid var(--line);
+  background: rgba(15, 23, 20, 0.8); color: var(--mist-400);
+  border-radius: 999px; padding: 10px 15px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  cursor: pointer; transition: all .2s ease;
+}
+.pill:hover { transform: translateY(-1px); border-color: var(--mint); color: var(--mist-200); }
+.pill.active {
+  background: var(--mint); color: var(--ink-950); border-color: var(--mint);
+  box-shadow: 0 4px 18px var(--mint-glow);
+}
+
+.mapcanvas {
+  position: relative; width: 100%; aspect-ratio: 16/9.2;
+  border-radius: 22px; overflow: visible;
+  background-color: #0a1210;
+  box-shadow: 0 36px 80px -30px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05) inset;
+}
+.map-bg {
+  position: absolute; inset: 0;
+  border-radius: 22px;
+  overflow: hidden;
+  background-image:
+    linear-gradient(180deg, rgba(8,12,11,0.55) 0%, rgba(8,12,11,0.72) 45%, rgba(8,12,11,0.9) 100%),
+    url('/itineraries/honeymoon/images/Kumaon.png');
+  background-size: cover; background-position: center 30%;
+  filter: saturate(0.75) contrast(1.08) brightness(0.85);
+  pointer-events: none;
+}
+.map-title {
+  position: absolute; left: 5%; top: 5%; z-index: 2;
+  color: rgba(232,240,236,0.95); font-family: "Fraunces", serif; font-style: italic;
+  font-size: clamp(22px, 3vw, 34px); text-shadow: 0 2px 16px rgba(0,0,0,0.6);
+}
+.map-subtitle {
+  position: absolute; left: 5%; top: 12.5%; z-index: 2;
+  color: rgba(232,240,236,0.4); font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase;
+}
+.routes {
+  position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1;
+  pointer-events: none; border-radius: 22px; overflow: hidden;
+}
+.route-path {
+  fill: none; stroke-linecap: round; stroke-linejoin: round;
+  transition: opacity .4s ease, stroke-width .3s ease, filter .4s ease;
+}
+.route-path.dim { opacity: 0.12; stroke-width: 2.5; }
+.route-path.glow { filter: drop-shadow(0 0 10px currentColor); opacity: 1; }
+.route-path.animated { stroke-dasharray: 7 13; animation: dashMove 32s linear infinite; }
+@keyframes dashMove { to { stroke-dashoffset: -440; } }
+
+.pin {
+  position: absolute; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer; z-index: 5;
+  transition: opacity .3s, transform .2s, filter .3s;
+  touch-action: manipulation;
+}
+.pin:hover, .pin:focus-visible { transform: translate(-50%, -50%) scale(1.06); z-index: 8; }
+.pin.dim { opacity: 0.18; filter: grayscale(0.7); pointer-events: none; }
+.pin .marker {
+  width: 22px; height: 22px; border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg); position: relative;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.4), 0 5px 14px rgba(0,0,0,0.5);
+  transition: box-shadow .2s, transform .2s;
+}
+.pin:hover .marker { box-shadow: 0 0 0 4px var(--mint), 0 7px 18px rgba(0,0,0,0.5); }
+.pin .marker::after {
+  content: ""; position: absolute; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--ink-950); top: 7px; left: 7px;
+}
+.pin[data-group="start"] .marker { background: var(--white); }
+.pin[data-group="transfer"] .marker { background: var(--orange); }
+.pin[data-group="sight"] .marker { background: var(--sage); }
+.pin .badge {
+  margin-top: 8px; padding: 5px 10px; border-radius: 7px;
+  background: rgba(7,17,11,0.94); color: #fff;
+  font-size: 11px; font-weight: 600;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06);
+  max-width: 140px; text-align: center; line-height: 1.25;
+  white-space: normal;
+}
+.pin .badge .alt { color: var(--mint); margin-left: 4px; font-size: 10px; white-space: nowrap; }
+.pin .role-tag {
+  margin-top: 5px; padding: 3px 8px; border-radius: 5px;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.pin.role-start .role-tag { background: #fff; color: var(--ink-950); }
+.pin.role-end .role-tag { background: var(--mint); color: var(--ink-950); }
+.pin.role-via .role-tag { background: rgba(79,212,163,0.9); color: var(--ink-950); }
+.pin.role-start .marker {
+  box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(255,255,255,0.2), 0 6px 16px rgba(0,0,0,0.5);
+}
+.pin.role-end .marker {
+  box-shadow: 0 0 0 4px var(--mint), 0 0 0 7px var(--mint-glow), 0 6px 16px rgba(0,0,0,0.5);
+}
+.view-link { display: none !important; }
+
+.popover {
+  position: absolute; width: 260px; max-width: min(260px, calc(100vw - 24px));
+  background: var(--ink-700);
+  border: 1px solid var(--line-strong); border-radius: 14px; padding: 14px;
+  box-shadow: 0 28px 60px rgba(0,0,0,0.55);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease; z-index: 40;
+  box-sizing: border-box;
+  max-height: min(70vh, 420px); overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+.popover.show { opacity: 1; pointer-events: auto; }
+.popover .thumb { width: 100%; height: 110px; border-radius: 9px; margin-bottom: 12px; overflow: hidden; background: var(--ink-800); }
+.popover .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.popover .pv-title {
+  color: #fff; font-family: "Fraunces", serif; font-size: 16.5px;
+  line-height: 1.3; word-wrap: break-word; overflow-wrap: break-word;
+}
+.popover .pv-title .alt {
+  color: var(--mint); font-family: "Inter", sans-serif; font-weight: 700;
+  font-size: 12.5px; margin-left: 6px; white-space: nowrap;
+}
+.popover .pv-blurb {
+  color: rgba(232,240,236,0.7); font-size: 12.5px; line-height: 1.55; margin-top: 7px;
+  word-wrap: break-word; overflow-wrap: break-word;
+}
+.popover .pv-link {
+  display: inline-block; margin-top: 11px; color: var(--mint); font-size: 12px; font-weight: 700;
+  text-decoration: none; cursor: pointer;
+}
+.popover .pv-link:hover { text-decoration: underline; }
+
+.legend {
+  display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+  margin-top: 16px; color: var(--mist-400); font-size: 11.5px;
+}
+.legend .item { display: flex; align-items: center; gap: 7px; }
+.legend .dot { width: 8px; height: 8px; border-radius: 50%; }
+.legend .hint { margin-left: auto; font-size: 10.5px; }
+
+.day-flow {
+  display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
+  margin-top: 14px; padding: 14px 18px; border-radius: 14px;
+  background: var(--card); border: 1px solid var(--line);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+.day-flow .flow-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mist-400);
+  width: 100%; text-align: center; margin-bottom: 2px;
+}
+.day-flow .flow-stop {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  min-width: 90px; padding: 8px 12px; border-radius: 10px; background: var(--ink-800);
+}
+.day-flow .flow-stop.start { background: rgba(255,255,255,0.06); border: 2px solid var(--mist-200); }
+.day-flow .flow-stop.end { background: var(--mint-dim); border: 2px solid var(--mint); }
+.day-flow .flow-stop .role { font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mist-400); }
+.day-flow .flow-stop.start .role { color: var(--mist-200); }
+.day-flow .flow-stop.end .role { color: var(--mint); }
+.day-flow .flow-stop .name { font-family: "Fraunces", serif; font-size: 15px; font-weight: 500; color: var(--mist-100); }
+.day-flow .flow-arrow { font-size: 22px; color: var(--mint); font-weight: 700; line-height: 1; }
+.day-flow .flow-note { width: 100%; text-align: center; font-size: 11.5px; color: var(--mist-400); margin-top: 4px; }
+
+.day-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px; margin: 40px 0;
+}
+.day-card {
+  background: var(--card); border-radius: 16px; overflow: hidden;
+  border: 1px solid var(--line); box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  cursor: pointer; transition: transform .2s, box-shadow .2s, border-color .2s;
+  display: flex; flex-direction: column; height: 100%;
+}
+.day-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+  border-color: rgba(79,212,163,0.25);
+}
+.day-card .card-photo { height: 140px; position: relative; overflow: hidden; background: var(--ink-800); }
+.day-card .card-photo img { width: 100%; height: 100%; object-fit: cover; }
+.day-card .card-photo .day-tag {
+  position: absolute; top: 11px; left: 11px;
+  background: rgba(8,12,11,0.88); color: #fff;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 9px; border-radius: 6px;
+}
+.day-card .card-body {
+  padding: 16px 18px 20px;
+  display: flex; flex-direction: column;
+  flex: 1;
+}
+.day-card h3 { font-family: "Fraunces", serif; font-size: 18px; font-weight: 500; margin-bottom: 4px; color: var(--mist-100); }
+.day-card .card-meta { font-size: 12px; color: var(--mist-400); margin-bottom: 8px; }
+.day-card p { font-size: 13px; color: var(--mist-400); line-height: 1.5; }
+.day-card .open-btn {
+  margin-top: auto; font-size: 12px; font-weight: 700; color: var(--mint);
+  background: none; border: none; cursor: pointer;
+  align-self: flex-start;
+}
+
+.elevation-section { margin: 10px 0 50px; }
+.elevation-section h2 {
+  font-size: clamp(22px, 2.6vw, 28px); font-weight: 500; margin-bottom: 6px; color: var(--mist-100);
+}
+.elevation-section .sub { color: var(--mist-400); font-size: 14.5px; margin-bottom: 22px; }
+.elev-card {
+  background: var(--card);
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  padding: 28px 24px 20px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+.elev-chart { position: relative; width: 100%; height: 220px; }
+.elev-chart svg { width: 100%; height: 100%; display: block; }
+.elev-y-labels {
+  position: absolute; left: 0; top: 0; bottom: 28px; width: 52px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  font-size: 11px; color: var(--mist-400); pointer-events: none;
+}
+.elev-x-labels {
+  display: flex; justify-content: space-between;
+  padding: 10px 8px 0 52px;
+  font-size: 11.5px; color: var(--mist-200); font-weight: 500;
+}
+.elev-x-labels span { text-align: center; flex: 1; white-space: nowrap; }
+.elev-note { margin-top: 14px; font-size: 12px; color: var(--mist-400); text-align: center; }
+
+.tips-section { margin: 48px 0 60px; }
+.tips-section h2 { font-size: clamp(22px, 2.6vw, 28px); font-weight: 500; margin-bottom: 6px; color: var(--mist-100); }
+.tips-section .sub { color: var(--mist-400); font-size: 14.5px; margin-bottom: 22px; }
+.tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.tip {
+  background: var(--card); border-radius: 14px; padding: 16px 18px; border: 1px solid var(--line);
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.tip .icon {
+  width: 34px; height: 34px; border-radius: 9px; background: var(--mint-dim);
+  color: var(--mint); display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.tip h4 { font-size: 13.5px; font-weight: 600; margin-bottom: 3px; color: var(--mist-100); }
+.tip p { font-size: 12.5px; color: var(--mist-400); line-height: 1.45; }
+
+.scrim {
+  position: fixed; inset: 0; background: rgba(8,12,11,0.7);
+  opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 40;
+}
+.scrim.show { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; right: 0; width: min(430px, 94vw); height: 100%;
+  background: var(--ink-800); color: #fff;
+  transform: translateX(100%); transition: transform .38s cubic-bezier(.22,1,.36,1);
+  z-index: 50; overflow-y: auto; display: flex; flex-direction: column;
+  max-width: 100vw;
+}
+.drawer.open { transform: translateX(0); }
+.drawer-photo {
+  height: 200px; width: 100%; background: var(--ink-700); position: relative; flex-shrink: 0; overflow: hidden;
+}
+.drawer-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.drawer-close {
+  position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(7,17,11,0.7); border: none; color: #fff; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.drawer-body { padding: 26px 26px 48px; }
+.drawer-eyebrow { color: var(--mint); font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+.drawer-title { margin-top: 10px; font-family: "Fraunces", serif; font-style: italic; font-size: 28px; line-height: 1.15; color: var(--mist-100); }
+.drawer-sub { margin-top: 6px; color: rgba(232,240,236,0.5); font-size: 13px; line-height: 1.5; }
+.moments { margin-top: 28px; }
+.moment {
+  position: relative; margin-left: 4px; padding: 0 0 22px 26px;
+  border-left: 1px solid rgba(255,255,255,0.1);
+}
+.moment:last-child { border-color: transparent; padding-bottom: 0; }
+.moment .dot {
+  position: absolute; left: -5px; top: 3px; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--mint); border: 2px solid var(--ink-800);
+}
+.moment .time { color: var(--mint); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+.moment .m-title { margin-top: 3px; font-size: 15.5px; font-family: "Fraunces", serif; color: var(--mist-100); }
+.moment .m-desc { margin-top: 3px; color: rgba(232,240,236,0.55); font-size: 12.5px; line-height: 1.5; }
+
+footer {
+  border-top: 1px solid var(--line); padding: 28px 0 40px;
+  text-align: center; font-size: 13px; color: var(--mist-400);
+}
+
+img { max-width: 100%; height: auto; object-fit: cover; }
+.mapcanvas { touch-action: manipulation; max-width: 100%; }
+
+@media (max-width: 900px) {
+  .topnav-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .navlinks { width: 100%; flex-wrap: wrap; gap: 10px 14px; justify-content: flex-start; }
+  .mapcanvas { aspect-ratio: 3/4; border-radius: 16px; overflow: visible !important; }
+  .map-bg { border-radius: 16px; }
+  .routes { border-radius: 16px; }
+  .legend { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .legend .hint { margin-left: 0; width: 100%; }
+  .day-flow { padding: 12px 12px; gap: 8px; }
+  .day-flow .flow-stop { min-width: 72px; padding: 8px 10px; }
+  .day-flow .flow-stop .name { font-size: 13px; }
+  .elev-chart { height: 200px; }
+  .elev-x-labels {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: 0;
+    padding: 8px 2px 0 40px !important;
+    font-size: 8px !important;
+    line-height: 1.15;
+    min-height: 64px;
+    align-items: flex-start;
+  }
+  .elev-x-labels span {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    text-align: left;
+    height: 52px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: none !important;
+  }
+  .elev-y-labels { width: 40px; font-size: 9px; bottom: 48px; }
+  .elev-note { font-size: 10.5px; text-align: left; padding: 0 2px; }
+  .elev-card { padding: 20px 12px 16px; padding-bottom: 12px !important; }
+  .popover { width: min(260px, calc(100vw - 24px)); max-width: calc(100% - 16px); }
+  .drawer { width: min(100vw, 430px); }
+  .wrap { width: calc(100% - 24px); max-width: 100%; }
+  .hero { padding: 32px 0 16px; }
+  .hero h1 { max-width: 100%; }
+  .pills { -webkit-overflow-scrolling: touch; }
+  .pill { min-height: 44px; padding: 10px 14px; display: inline-flex; align-items: center; }
+  .pin { min-width: 44px; min-height: 44px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .day-grid { grid-template-columns: 1fr !important; }
+  .tips-grid { grid-template-columns: 1fr !important; }
+  .pin .badge {
+    font-size: 9.5px !important; padding: 4px 8px !important;
+    max-width: 110px !important; white-space: normal !important;
+    overflow: visible !important; text-overflow: unset !important; line-height: 1.2;
+  }
+  .pin .badge .alt { display: none !important; }
+  .pin .role-tag { font-size: 7.5px; padding: 2px 5px; }
+  .map-title { font-size: clamp(18px, 5vw, 28px); left: 4%; top: 4%; }
+  .map-subtitle { font-size: 8.5px; left: 4%; top: 11%; letter-spacing: 0.12em; max-width: 90%; }
+}
+
+@media (min-width: 901px) {
+  .mapcanvas { overflow: visible; }
+}
+
+@media (max-width: 600px) {
+  .mapcanvas { aspect-ratio: 2/3; }
+  .pin .badge {
+    opacity: 0.95; max-width: 96px !important; font-size: 9px !important; padding: 3px 7px !important;
+  }
+  .pin.dim .badge { opacity: 0.4; }
+  .brand { font-size: 14px; }
+  .navlinks a { font-size: 9px; letter-spacing: 0.08em; padding: 6px 0; min-height: 36px; display: inline-flex; align-items: center; }
+  .stat-card .value { font-size: 18px; }
+  .day-card .card-photo { height: 140px; }
+  .topnav { padding: 14px 0; }
+  .hero .lead { font-size: 14.5px; }
+  .shell-head h2 { font-size: clamp(20px, 5vw, 26px); }
+  .popover {
+    width: min(220px, calc(100% - 20px)) !important;
+    max-width: calc(100% - 20px);
+    padding: 12px;
+  }
+  .popover .thumb { height: 90px; }
+  .popover .pv-title { font-size: 15px; }
+  .popover .pv-blurb { font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+  .mapcanvas { aspect-ratio: 3/5; }
+  .pin .badge { max-width: 88px !important; font-size: 8.5px !important; padding: 3px 6px !important; }
+  .wrap { width: calc(100% - 16px); }
+  .stats { gap: 10px; }
+  .stat-card { padding: 12px 14px; }
+  .popover { width: min(200px, calc(100% - 16px)) !important; padding: 10px; }
+  .popover .thumb { height: 80px; margin-bottom: 8px; }
+  .navlinks { gap: 8px 12px; }
+  .hero { padding: 24px 0 12px; }
+  .mapshell { padding-bottom: 40px; }
+  .elev-x-labels span { height: 58px; font-size: 7.5px !important; }
+}
+
+@media (max-width: 400px) {
+  .pin .badge { max-width: 88px !important; font-size: 8.5px !important; padding: 3px 6px !important; }
+}
+
+@media (max-width: 360px) {
+  .mapcanvas { aspect-ratio: 9/16; }
+  .hero h1 { font-size: clamp(22px, 8vw, 28px); }
+  .pill { padding: 8px 10px; font-size: 9px; min-height: 40px; }
+  .brand { font-size: 13px; gap: 8px; }
+  .stat-card .value { font-size: 16px; }
+}
+
+@media (max-width: 320px) {
+  .wrap { width: calc(100% - 12px); }
+  .mapcanvas { aspect-ratio: 0.55; }
+}
+
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// Plain filenames only — put image files next to this HTML
+// Each location: image = map/popover, scheduleImage = day-schedule drawer
+const LOCATIONS = [
+  { id: "delhi", name: "Delhi", alt: "Pickup / Drop", x: 8, y: 88, group: "start", image: "/itineraries/honeymoon/images/OIP.webp", scheduleImage: "/itineraries/honeymoon/images/OIP.webp", blurb: "Pickup from railway station or airport. Final drop on Day 8." },
+  { id: "binsar", name: "Binsar", alt: "~2,400 m", x: 30, y: 50, group: "transfer", image: "/itineraries/honeymoon/images/Binsar.jpg", scheduleImage: "/itineraries/honeymoon/images/Binsar.jpg", blurb: "Quiet Kumaon hill station & wildlife sanctuary — base for nights 1–2." },
+  { id: "zeropoint", name: "Zero Point", alt: "Viewpoint", x: 22, y: 34, group: "sight", image: "/itineraries/honeymoon/images/ZeroPointViewpoint.jpg", scheduleImage: "/itineraries/honeymoon/images/ZeroPointViewpoint.jpg", blurb: "Panoramic Himalayan views — Trishul, Nanda Devi & more on a clear day." },
+  { id: "bineshwar", name: "Bineshwar Mahadev", alt: "Temple", x: 18, y: 56, group: "sight", image: "/itineraries/honeymoon/images/BineshwarMahadev.jpg", scheduleImage: "/itineraries/honeymoon/images/BineshwarMahadev.jpg", blurb: "16th-century Shiva temple that gives Binsar its name." },
+  { id: "kasardevi", name: "Kasar Devi", alt: "Temple", x: 40, y: 62, group: "sight", image: "/itineraries/honeymoon/images/KasarDevi.jpg", scheduleImage: "/itineraries/honeymoon/images/KasarDevi.jpg", blurb: "Historic temple and quiet ridge near Almora." },
+  { id: "munsiyari", name: "Munsiyari", alt: "~2,200 m", x: 90, y: 16, group: "transfer", image: "/itineraries/honeymoon/images/Munsiyari.webp", scheduleImage: "/itineraries/honeymoon/images/Munsiyari.webp", blurb: "Gateway to the Johar Valley with views of the Panchachuli peaks." },
+  { id: "thamri", name: "Thamri Kund", alt: "Lake", x: 78, y: 8, group: "sight", image: "/itineraries/honeymoon/images/ThamriKundLake.jpg", scheduleImage: "/itineraries/honeymoon/images/ThamriKundLake.jpg", blurb: "High-altitude lake and serene spot near Munsiyari." },
+  { id: "harkot", name: "Harkot Waterfall", alt: "Falls", x: 96, y: 30, group: "sight", image: "/itineraries/honeymoon/images/HarkotWaterfallFalls.jpg", scheduleImage: "/itineraries/honeymoon/images/HarkotWaterfallFalls.jpg", blurb: "Scenic waterfall on the Munsiyari sightseeing circuit." },
+  { id: "birthi", name: "Birthi Falls", alt: "En route", x: 72, y: 28, group: "sight", image: "/itineraries/honeymoon/images/BirthiFalls.jpg", scheduleImage: "/itineraries/honeymoon/images/BirthiFalls.jpg", blurb: "Beautiful waterfall on the drive between Munsiyari and Kausani." },
+  { id: "kausani", name: "Kausani", alt: "~1,890 m", x: 58, y: 40, group: "transfer", image: "/itineraries/honeymoon/images/Kausani.webp", scheduleImage: "/itineraries/honeymoon/images/Kausani.webp", blurb: "Hill town with 300 km Himalayan panorama — once called ‘Switzerland of India’." },
+  { id: "anashakti", name: "Anashakti Ashram", alt: "Gandhi", x: 64, y: 54, group: "sight", image: "/itineraries/honeymoon/images/AnashaktiAshramGandhi.jpg", scheduleImage: "/itineraries/honeymoon/images/AnashaktiAshramGandhi.jpg", blurb: "Gandhi’s stay here inspired the name ‘Switzerland of India’." },
+  { id: "nainital", name: "Nainital", alt: "~2,084 m", x: 26, y: 74, group: "transfer", image: "/itineraries/honeymoon/images/nainital.jpg", scheduleImage: "/itineraries/honeymoon/images/nainital.jpg", blurb: "Lake town and popular hill station — final overnight before return." },
+  { id: "nainilake", name: "Naini Lake", alt: "Boating", x: 18, y: 82, group: "sight", image: "/itineraries/honeymoon/images/Naini.jpg", scheduleImage: "/itineraries/honeymoon/images/Naini.jpg", blurb: "Iconic lake in the heart of Nainital — boating and lakeside walks." }
+];
+
+const DAYINFO = {
+  day1: {
+    eyebrow: "DAY 01 · DELHI → BINSAR",
+    title: "Arrival & long transfer",
+    subtitle: "Pickup from Delhi and scenic drive to the quiet heights of Binsar",
+    photo: "/itineraries/honeymoon/images/OIP.webp",
+    moments: [
+      { time: "Morning", title: "Pickup in Delhi", desc: "Meet at railway station or airport as per your arrival" },
+      { time: "Day", title: "Drive to Binsar", desc: "Approximately 393 km · ~10 hours via NH9 / Haldwani / Almora" },
+      { time: "En route", title: "Mountain roads", desc: "Gradual climb into the Kumaon hills after the plains" },
+      { time: "Evening", title: "Arrive Binsar", desc: "Check in at the hotel and rest after the long journey" },
+      { time: "Night", title: "Dinner & overnight", desc: "Dinner at the hotel · overnight stay in Binsar" }
+    ]
+  },
+  day2: {
+    eyebrow: "DAY 02 · BINSAR",
+    title: "Local sightseeing",
+    subtitle: "Zero Point, temples, wildlife sanctuary and Khali Estate",
+    photo: "/itineraries/honeymoon/images/Binsarlocal.jpg",
+    moments: [
+      { time: "Morning", title: "Breakfast at hotel", desc: "Leisure start after the previous day’s long drive" },
+      { time: "Day", title: "Zero Point", desc: "Himalayan viewpoint with views of Trishul, Nanda Devi and more" },
+      { time: "Day", title: "Kasar Devi Temple", desc: "Quiet ridge temple near Almora, popular with travellers" },
+      { time: "Afternoon", title: "Binsar Wildlife Sanctuary", desc: "Oak & rhododendron forest — keep an eye out for birds and wildlife" },
+      { time: "Afternoon", title: "Bineshwar Mahadev & Khali Estate", desc: "Historic Shiva temple and colonial-era estate walk" },
+      { time: "Evening", title: "Dinner & overnight", desc: "Dinner and overnight stay at the hotel in Binsar" }
+    ]
+  },
+  day3: {
+    eyebrow: "DAY 03 · BINSAR → MUNSIYARI",
+    title: "Transfer to Munsiyari",
+    subtitle: "Long mountain drive into the Johar Valley and Panchachuli views",
+    photo: "/itineraries/honeymoon/images/Binsar#U2192Munsiyari.jpg",
+    moments: [
+      { time: "Morning", title: "Early breakfast & depart", desc: "Start early for the ~8.5-hour mountain drive" },
+      { time: "Day", title: "Drive to Munsiyari", desc: "Scenic Kumaon roads toward the base of the Greater Himalaya" },
+      { time: "Afternoon", title: "Arrive Munsiyari", desc: "Check in and settle after the journey" },
+      { time: "Evening", title: "Himalaya View Point", desc: "Panoramic views of the Panchachuli and surrounding ranges" },
+      { time: "Night", title: "Dinner & overnight", desc: "Dinner and overnight stay in Munsiyari" }
+    ]
+  },
+  day4: {
+    eyebrow: "DAY 04 · MUNSIYARI",
+    title: "Local sightseeing",
+    subtitle: "Thamri Kund, Tribal Museum, hill-top views and Harkot Waterfall",
+    photo: "/itineraries/honeymoon/images/Munsiyarilocal.webp",
+    moments: [
+      { time: "Morning", title: "Breakfast & depart", desc: "Full day of local exploration by vehicle and short walks" },
+      { time: "Morning", title: "Thamri Kund", desc: "High-altitude lake set in a quiet alpine landscape" },
+      { time: "Mid-day", title: "Tribal Heritage Museum", desc: "Local culture, crafts and history of the Johar Valley" },
+      { time: "Afternoon", title: "Munsiyari Hill Top View Point", desc: "Wide views of the valley and snow peaks" },
+      { time: "Afternoon", title: "Harkot Waterfall", desc: "Scenic falls on the local circuit" },
+      { time: "Evening", title: "Back to hotel", desc: "Dinner and overnight stay in Munsiyari" }
+    ]
+  },
+  day5: {
+    eyebrow: "DAY 05 · MUNSIYARI → KAUSANI",
+    title: "Transfer via Birthi Falls",
+    subtitle: "Drive to Kausani with a stop at Birthi Waterfall and viewpoints",
+    photo: "/itineraries/honeymoon/images/Munsiyari#U2192Kausani.jpg",
+    moments: [
+      { time: "Morning", title: "Breakfast & depart", desc: "Start the ~7-hour drive toward Kausani" },
+      { time: "Day", title: "Birthi Waterfall", desc: "Stop for views and photos of the falls en route" },
+      { time: "Afternoon", title: "Arrive Kausani", desc: "Check in and enjoy the first Himalayan panorama from town" },
+      { time: "Evening", title: "View Point", desc: "Sunset light on the 300 km Himalayan range" },
+      { time: "Night", title: "Dinner & overnight", desc: "Dinner and overnight stay in Kausani" }
+    ]
+  },
+  day6: {
+    eyebrow: "DAY 06 · KAUSANI",
+    title: "Local sightseeing",
+    subtitle: "Anashakti Ashram, tea estate and sunset viewpoint",
+    photo: "/itineraries/honeymoon/images/Kausanilocal.jpg",
+    moments: [
+      { time: "Morning", title: "Breakfast at hotel", desc: "Leisure start in the ‘Switzerland of India’" },
+      { time: "Day", title: "Anashakti Ashram", desc: "Where Gandhi stayed — the origin of the famous nickname" },
+      { time: "Afternoon", title: "Tea Estate", desc: "Gentle walks among tea bushes with mountain backdrop" },
+      { time: "Evening", title: "Sunset at View Point", desc: "Classic Kausani evening light on the Himalayan wall" },
+      { time: "Night", title: "Dinner & overnight", desc: "Dinner and overnight stay at the hotel in Kausani" }
+    ]
+  },
+  day7: {
+    eyebrow: "DAY 07 · KAUSANI → NAINITAL",
+    title: "Transfer & Nainital explore",
+    subtitle: "Drive to Nainital and free time for lake, viewpoints and town",
+    photo: "/itineraries/honeymoon/images/Kausani#U2192Nainital.webp",
+    moments: [
+      { time: "Morning", title: "Breakfast & depart", desc: "Transfer from Kausani to Nainital" },
+      { time: "Day", title: "Arrive Nainital", desc: "Check in and begin exploring at your own pace" },
+      { time: "Afternoon", title: "Snow Point & Lovers Point", desc: "Viewpoint circuit (cable car / ropeway options on own)" },
+      { time: "Afternoon", title: "Nainital Zoo & Khurpatal Lake", desc: "Optional nature and lake stops" },
+      { time: "Evening", title: "Dinner & overnight", desc: "Dinner and overnight stay in Nainital" }
+    ]
+  },
+  day8: {
+    eyebrow: "DAY 08 · NAINITAL → DELHI",
+    title: "Lake morning & return",
+    subtitle: "Naini Lake, local market, then transfer back to Delhi",
+    photo: "/itineraries/honeymoon/images/Nainital#U2192Delhi.webp",
+    moments: [
+      { time: "Morning", title: "Breakfast & checkout", desc: "Check out after breakfast" },
+      { time: "Morning", title: "Naini Lake & market", desc: "Boating on the lake and a short stroll through the local market" },
+      { time: "Afternoon", title: "Drive to Delhi", desc: "Transfer back to Delhi (railway station / airport as booked)" },
+      { time: "Evening", title: "Tour concludes", desc: "Safe onward journey — thank you for travelling with us" }
+    ]
+  }
+};
+
+const DAY_CARDS = [
+  { key: "day1", tag: "Day 1", title: "Delhi → Binsar", meta: "Pickup · ~393 km · ~10 hrs", desc: "Pickup from Delhi and long scenic drive into the Kumaon hills to Binsar.", photo: "/itineraries/honeymoon/images/OIP.webp" },
+  { key: "day2", tag: "Day 2", title: "Binsar local", meta: "Zero Point · temples · sanctuary", desc: "Zero Point, Kasar Devi, Wildlife Sanctuary, Bineshwar Mahadev and Khali Estate.", photo: "/itineraries/honeymoon/images/Binsarlocal.jpg" },
+  { key: "day3", tag: "Day 3", title: "Binsar → Munsiyari", meta: "~8.5 hrs · Himalaya views", desc: "Mountain drive to Munsiyari and evening at Himalaya View Point.", photo: "/itineraries/honeymoon/images/Binsar#U2192Munsiyari.jpg" },
+  { key: "day4", tag: "Day 4", title: "Munsiyari local", meta: "Kund · museum · falls", desc: "Thamri Kund, Tribal Heritage Museum, hill-top viewpoint and Harkot Waterfall.", photo: "/itineraries/honeymoon/images/Munsiyarilocal.webp" },
+  { key: "day6", tag: "Day 6", title: "Kausani local", meta: "Ashram · tea · sunset", desc: "Anashakti Ashram, tea estate and classic Himalayan sunset viewpoint.", photo: "/itineraries/honeymoon/images/Kausanilocal.jpg" },
+  { key: "day7", tag: "Day 7", title: "Kausani → Nainital", meta: "Transfer · lake town", desc: "Drive to Nainital with free time for viewpoints, zoo and Khurpatal.", photo: "/itineraries/honeymoon/images/Kausani#U2192Nainital.webp" },
+  { key: "day8", tag: "Day 8", title: "Nainital → Delhi", meta: "Lake · market · drop", desc: "Morning at Naini Lake and market, then transfer back to Delhi.", photo: "/itineraries/honeymoon/images/Nainital#U2192Delhi.webp" }
+];
+
+const TIPS = [
+  { icon: "🚗", title: "Long transfer days", text: "Day 1 (~10 hrs) and Day 3 (~8.5 hrs) are long. Start early and keep water & snacks handy." },
+  { icon: "🧥", title: "Layer up", text: "Binsar, Munsiyari and Kausani sit between ~1,900–2,400 m. Evenings are cool even in summer." },
+  { icon: "📷", title: "Clear mornings", text: "Himalayan views from Zero Point, Munsiyari and Kausani are best early. Clouds often build later." },
+  { icon: "🥾", title: "Short walks", text: "Most sightseeing involves short walks. Comfortable shoes with grip help on forest and viewpoint paths." },
+  { icon: "🛶", title: "Naini Lake", text: "Boating is usually on your own. Check timings and weather before heading to the lake on Day 8." },
+  { icon: "📅", title: "Best season", text: "March–June and September–November. Monsoon can make mountain roads slower and more unpredictable." }
+];
+
+const DAY_PATHS = {
+  day1: {
+    d: "M96 563 C160 520 240 440 300 360 C330 330 350 320 360 320",
+    color: "var(--orange)", from: "Delhi", to: "Binsar",
+    fromId: "delhi", toId: "binsar", label: "Delhi → Binsar (~393 km)"
+  },
+  day2: {
+    d: "M360 320 C320 260 280 220 264 218 C300 280 360 360 480 397 C420 360 380 340 360 320",
+    color: "var(--sage)", from: "Binsar", to: "Local viewpoints",
+    fromId: "binsar", toId: "binsar", viaIds: ["zeropoint", "kasardevi", "bineshwar"],
+    label: "Binsar local (Zero Point · temples · return)", roundTrip: true
+  },
+  day3: {
+    d: "M360 320 C480 260 620 180 780 130 C860 110 1000 100 1080 102",
+    color: "var(--orange)", from: "Binsar", to: "Munsiyari",
+    fromId: "binsar", toId: "munsiyari", label: "Binsar → Munsiyari (~8.5 hrs)"
+  },
+  day4: {
+    d: "M1080 102 C1020 70 960 55 936 51 C1020 90 1100 150 1152 192 C1120 140 1090 110 1080 102",
+    color: "var(--sage)", from: "Munsiyari", to: "Local circuit",
+    fromId: "munsiyari", toId: "munsiyari", viaIds: ["thamri", "harkot"],
+    label: "Munsiyari local (Thamri · museum · falls · return)", roundTrip: true
+  },
+  day5: {
+    d: "M1080 102 C980 150 860 200 760 220 C720 240 700 250 696 256",
+    color: "var(--orange)", from: "Munsiyari", to: "Kausani",
+    fromId: "munsiyari", toId: "kausani", viaIds: ["birthi"],
+    label: "Munsiyari → Kausani via Birthi Falls (~7 hrs)"
+  },
+  day6: {
+    d: "M696 256 C720 300 760 340 768 346 C740 310 710 280 696 256",
+    color: "var(--sage)", from: "Kausani", to: "Local stops",
+    fromId: "kausani", toId: "kausani", viaIds: ["anashakti"],
+    label: "Kausani local (Ashram · tea · viewpoint · return)", roundTrip: true
+  },
+  day7: {
+    d: "M696 256 C560 340 400 430 312 474",
+    color: "var(--orange)", from: "Kausani", to: "Nainital",
+    fromId: "kausani", toId: "nainital", label: "Kausani → Nainital"
+  },
+  day8: {
+    d: "M312 474 C250 520 160 560 100 570 C80 575 70 570 96 563",
+    color: "var(--orange)", from: "Nainital", to: "Delhi",
+    fromId: "nainital", toId: "delhi", viaIds: ["nainilake"],
+    label: "Nainital → Delhi"
+  }
+};
+
+const DAY_ACTIVE_LOCATIONS = {
+  day1: ["delhi", "binsar"],
+  day2: ["binsar", "zeropoint", "kasardevi", "bineshwar"],
+  day3: ["binsar", "munsiyari"],
+  day4: ["munsiyari", "thamri", "harkot"],
+  day5: ["munsiyari", "birthi", "kausani"],
+  day6: ["kausani", "anashakti"],
+  day7: ["kausani", "nainital"],
+  day8: ["nainital", "nainilake", "delhi"]
+};
+
+function Popover({ loc, style, onEnter, onLeave, onOpen }) {
+  const openKey = () => {
+    if (loc.id === "delhi") onOpen("day1", loc.scheduleImage);
+    else if (loc.id === "binsar" || loc.id === "zeropoint" || loc.id === "kasardevi" || loc.id === "bineshwar") onOpen("day2", loc.scheduleImage);
+    else if (loc.id === "munsiyari" || loc.id === "thamri" || loc.id === "harkot") onOpen("day4", loc.scheduleImage);
+    else if (loc.id === "birthi") onOpen("day5", loc.scheduleImage);
+    else if (loc.id === "kausani" || loc.id === "anashakti") onOpen("day6", loc.scheduleImage);
+    else if (loc.id === "nainital" || loc.id === "nainilake") onOpen("day7", loc.scheduleImage);
+    else onOpen("day1", loc.scheduleImage);
+  };
+  return (
+    <div className="popover show" style={style} onMouseEnter={onEnter} onMouseLeave={onLeave}>
+      <div className="thumb"><img src={loc.image} alt={loc.name} /></div>
+      <div className="pv-title">{loc.name}<span className="alt">{loc.alt}</span></div>
+      <div className="pv-blurb">{loc.blurb}</div>
+      <a className="pv-link" onClick={openKey} onDoubleClick={openKey}>Open day schedule →</a>
+    </div>
+  );
+}
+
+function MapCanvas({ filter, onOpenDrawer }) {
+  const [popover, setPopover] = useState(null);
+  const hideTimer = useRef(null);
+  const lastTap = useRef({ id: null, time: 0 });
+
+  const showPopover = useCallback((loc) => {
+    clearTimeout(hideTimer.current);
+    const x = Number(loc.x) || 50;
+    const y = Number(loc.y) || 50;
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 900;
+    let leftPct = x;
+    let above = y > 52;
+
+    if (isMobile) {
+      // Mobile: keep full 220-240px card inside the map / screen
+      if (x < 34) leftPct = 34;
+      else if (x > 66) leftPct = 66;
+      if (y < 20) above = false;
+      if (y > 78) above = true;
+    } else {
+      // Desktop: gentle nudge only when very close to edge (looks natural next to pin)
+      if (x < 12) leftPct = 12;
+      else if (x > 88) leftPct = 88;
+      if (y < 15) above = false;
+      if (y > 85) above = true;
+    }
+
+    setPopover({
+      loc,
+      left: leftPct + "%",
+      top: `calc(${y}% - 12px)`,
+      above
+    });
+  }, []);
+
+  const scheduleHide = () => {
+    clearTimeout(hideTimer.current);
+    hideTimer.current = setTimeout(() => setPopover(null), 220);
+  };
+
+  const openInfo = useCallback((loc) => {
+    clearTimeout(hideTimer.current);
+    setPopover(null);
+    let key = filter !== "full" && filter ? filter : "day1";
+    if (filter === "full") {
+      if (loc.id === "delhi") key = "day1";
+      else if (["binsar","zeropoint","kasardevi","bineshwar"].includes(loc.id)) key = "day2";
+      else if (["munsiyari","thamri","harkot"].includes(loc.id)) key = "day4";
+      else if (loc.id === "birthi") key = "day5";
+      else if (["kausani","anashakti"].includes(loc.id)) key = "day6";
+      else if (["nainital","nainilake"].includes(loc.id)) key = "day7";
+      else key = "day1";
+    }
+    onOpenDrawer(key, loc.scheduleImage);
+  }, [onOpenDrawer, filter]);
+
+  const handlePinActivate = useCallback((loc, e) => {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    clearTimeout(hideTimer.current);
+    const now = Date.now();
+    const isDouble = lastTap.current.id === loc.id && (now - lastTap.current.time) < 400;
+    lastTap.current = { id: loc.id, time: now };
+
+    if (isDouble) {
+      // Double click / double tap → open full day schedule
+      openInfo(loc);
+    } else {
+      // Single click / single tap → show location overview card
+      showPopover(loc);
+    }
+  }, [openInfo, showPopover]);
+
+  const isFull = filter === "full";
+  const activeDays = isFull ? Object.keys(DAY_PATHS) : [filter];
+
+  useEffect(() => {
+    if (!popover) return;
+    const onDoc = (e) => {
+      // close if click outside pin and popover
+      if (e.target.closest && (e.target.closest('.pin') || e.target.closest('.popover'))) return;
+      setPopover(null);
+    };
+    document.addEventListener('click', onDoc, true);
+    return () => document.removeEventListener('click', onDoc, true);
+  }, [popover]);
+  // Full Journey shows every stop (spaced). Day filter highlights only that day's stops.
+  const activeLocIds = isFull ? null : (DAY_ACTIVE_LOCATIONS[filter] || []);
+  const dayPath = !isFull ? DAY_PATHS[filter] : null;
+
+  const pinRole = (loc) => {
+    if (!dayPath) return null;
+    if (loc.id === dayPath.fromId) return { type: "start" };
+    if (dayPath.viaIds && dayPath.viaIds.includes(loc.id)) {
+      const visitNum = dayPath.viaIds.indexOf(loc.id) + 1;
+      return { type: "via", num: visitNum };
+    }
+    if (loc.id === dayPath.toId && dayPath.fromId !== dayPath.toId) return { type: "end" };
+    return null;
+  };
+
+  const subtitle = isFull
+    ? "Kumaon · Binsar · Munsiyari · Kausani · Nainital · 8-day circuit"
+    : (dayPath
+        ? (dayPath.roundTrip && dayPath.fromId === dayPath.toId
+            ? `${dayPath.from}  · local circuit · return to hotel`
+            : `${dayPath.from}  →  ${dayPath.to}`)
+        : "Day route");
+
+  return (
+    <>
+    <div className="mapcanvas">
+      <div className="map-bg" />
+      <div className="map-title">Delhi → Kumaon Circuit</div>
+      <div className="map-subtitle">{subtitle}</div>
+
+      <svg className="routes" viewBox="0 0 1200 640" preserveAspectRatio="none">
+        <defs>
+          <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#d9713f" />
+          </marker>
+          <marker id="arrowSage" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#8fa98e" />
+          </marker>
+          <marker id="arrowWhite" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(255,255,255,0.5)" />
+          </marker>
+        </defs>
+
+        {!isFull && (
+          <g opacity="0.12">
+            {Object.values(DAY_PATHS).map((p, i) => (
+              <path key={"ghost"+i} d={p.d} fill="none" stroke="#fff" strokeWidth="2.5"
+                strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 10"
+                markerEnd="url(#arrowWhite)" />
+            ))}
+          </g>
+        )}
+
+        {activeDays.map(dayKey => {
+          const p = DAY_PATHS[dayKey];
+          if (!p) return null;
+          const marker = p.color.includes("sage") ? "url(#arrowSage)" : "url(#arrowOrange)";
+          return (
+            <path
+              key={dayKey}
+              className="route-path glow animated"
+              stroke={p.color}
+              strokeWidth={isFull ? 3.5 : 5.5}
+              d={p.d}
+              markerEnd={marker}
+            />
+          );
+        })}
+      </svg>
+
+      {LOCATIONS.map(loc => {
+        const isDim = activeLocIds && !activeLocIds.includes(loc.id);
+        const role = pinRole(loc);
+        const roleClass = role ? `role-${role.type}` : "";
+        return (
+          <div
+            key={loc.id}
+            className={`pin ${isDim ? "dim" : ""} ${roleClass}`}
+            data-group={loc.group}
+            style={{ left: loc.x + "%", top: loc.y + "%" }}
+            tabIndex={isDim ? -1 : 0}
+            role="button"
+            aria-label={loc.name + ". Open day schedule"}
+            onMouseEnter={() => !isDim && showPopover(loc)}
+            onMouseLeave={scheduleHide}
+            onClick={(e) => handlePinActivate(loc, e)}
+            onDoubleClick={(e) => handlePinActivate(loc, e)}
+            
+            onKeyDown={e => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                openInfo(loc);
+              }
+            }}
+          >
+            <div className="marker" />
+            <div className="badge">{loc.name} <span className="alt">{loc.alt}</span></div>
+            {role && role.type === "start" && <div className="role-tag">{dayPath && dayPath.roundTrip && dayPath.fromId === dayPath.toId ? "Base" : "Leave from"}</div>}
+            {role && role.type === "end" && <div className="role-tag">{dayPath && dayPath.roundTrip ? "Return" : "Arrive"}</div>}
+            {role && role.type === "via" && <div className="role-tag">Visit {role.num}</div>}
+          </div>
+        );
+      })}
+
+      {popover && (
+        <Popover loc={popover.loc} style={(() => {
+            const xShift =
+              popover.align === "right" ? "translateX(-92%)" :
+              popover.align === "left"  ? "translateX(-8%)"  :
+              "translateX(-50%)";
+            const yShift = popover.above
+              ? "translateY(calc(-100% - 16px))"
+              : "translateY(-8px)";
+            return {
+              left: popover.left,
+              top: popover.top,
+              transform: `${xShift} ${yShift}`
+            };
+          })()}
+          onEnter={() => clearTimeout(hideTimer.current)} onLeave={scheduleHide} onOpen={onOpenDrawer} />
+      )}
+    </div>
+
+    {dayPath && (
+      <div className="day-flow">
+        <div className="flow-label">
+          {dayPath.roundTrip
+            ? "This day’s movement (out & back to hotel)"
+            : "This day’s movement"}
+        </div>
+        {dayPath.roundTrip && dayPath.fromId === dayPath.toId ? (
+          <>
+            <div className="flow-stop start">
+              <span className="role">Leave from</span>
+              <span className="name">{dayPath.from}</span>
+            </div>
+            <div className="flow-arrow" aria-hidden="true">→</div>
+            <div className="flow-stop end">
+              <span className="role">Visit stops</span>
+              <span className="name">then return</span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flow-stop start">
+              <span className="role">Leave from</span>
+              <span className="name">{dayPath.from}</span>
+            </div>
+            <div className="flow-arrow" aria-hidden="true">→</div>
+            <div className="flow-stop end">
+              <span className="role">Arrive at</span>
+              <span className="name">{dayPath.to}</span>
+            </div>
+          </>
+        )}
+        {filter === "day1" && (
+          <div className="flow-note">Pickup: railway station / airport · ~393 km · ~10 hrs</div>
+        )}
+        {filter === "day2" && (
+          <div className="flow-note">Zero Point · Kasar Devi · Wildlife Sanctuary · Bineshwar · Khali Estate</div>
+        )}
+        {filter === "day3" && (
+          <div className="flow-note">Early start · ~8.5 hrs mountain drive · Himalaya View Point on arrival</div>
+        )}
+        {filter === "day4" && (
+          <div className="flow-note">Thamri Kund · Tribal Museum · Hill Top · Harkot Waterfall</div>
+        )}
+        {filter === "day5" && (
+          <div className="flow-note">Birthi Falls en route · ~7 hrs to Kausani</div>
+        )}
+        {filter === "day6" && (
+          <div className="flow-note">Anashakti Ashram · Tea Estate · Sunset Viewpoint</div>
+        )}
+        {filter === "day7" && (
+          <div className="flow-note">Transfer to Nainital · free time for viewpoints & lake</div>
+        )}
+        {filter === "day8" && (
+          <div className="flow-note">Naini Lake · local market · afternoon departure to Delhi</div>
+        )}
+      </div>
+    )}
+    </>
+  );
+}
+
+function Drawer({ dayKey, onClose, imageOverride }) {
+  if (!dayKey || !DAYINFO[dayKey]) return null;
+  const info = DAYINFO[dayKey];
+  const imageSrc = imageOverride || info.photo;
+  return (
+    <>
+      <div className={`scrim ${dayKey ? "show" : ""}`} onClick={onClose} />
+      <div className={`drawer ${dayKey ? "open" : ""}`}>
+        <div className="drawer-photo">
+          <img src={imageSrc} alt={info.title} />
+          <button className="drawer-close" onClick={onClose} aria-label="Close">✕</button>
+        </div>
+        <div className="drawer-body">
+          <div className="drawer-eyebrow">{info.eyebrow}</div>
+          <div className="drawer-title">{info.title}</div>
+          <div className="drawer-sub">{info.subtitle}</div>
+          <div className="moments">
+            {info.moments.map((m, i) => (
+              <div className="moment" key={i}>
+                <span className="dot" />
+                <div className="time">{m.time}</div>
+                <div className="m-title">{m.title}</div>
+                <div className="m-desc">{m.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function App() {
+  const [filter, setFilter] = useState("full");
+  const [drawerKey, setDrawerKey] = useState(null);
+  const [drawerImage, setDrawerImage] = useState(null);
+
+  useEffect(() => {
+    const onKey = e => {
+      if (e.key === "Escape") {
+        setDrawerKey(null);
+        setDrawerImage(null);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  const openDrawer = (key, image = null) => {
+    setDrawerKey(key);
+    setDrawerImage(image);
+  };
+
+  return (
+    <>
+      <nav className="topnav">
+        <div className="wrap topnav-inner">
+          <div className="brand">
+            <span className="brand-mark" aria-hidden="true" />
+            Delhi → Kumaon Circuit
+          </div>
+          <div className="navlinks">
+            <a href="#overview">Overview</a>
+            <a href="#map" className="active">Route Map</a>
+            <a href="#itinerary">Itinerary</a>
+            <a href="#tips">Tips</a>
+          </div>
+        </div>
+      </nav>
+
+      <header className="hero" id="overview">
+        <div className="wrap">
+          <span className="eyebrow">Uttarakhand · Kumaon hills</span>
+          <h1 className="serif">Eight days from Delhi through Binsar, Munsiyari, Kausani and Nainital.</h1>
+          <p className="lead">
+            Pickup in Delhi, long scenic drives into the Kumaon hills, Himalayan viewpoints,
+            wildlife and lake town, then drop back at the station or airport.
+          </p>
+          <div className="stats">
+            <div className="stat-card"><div className="label">Duration</div><div className="value">8 days</div></div>
+            <div className="stat-card"><div className="label">Day 1 drive</div><div className="value">~393 km</div></div>
+            <div className="stat-card"><div className="label">Highest base</div><div className="value">~2,400 m</div></div>
+            <div className="stat-card"><div className="label">Best season</div><div className="value" style={{fontSize:17}}>Mar–Jun · Sep–Nov</div></div>
+          </div>
+        </div>
+      </header>
+
+      <section className="mapshell" id="map">
+        <div className="wrap">
+          <div className="shell-head">
+            <span className="eyebrow">The journey, on one map</span>
+            <h2 className="serif">Filter by day to see where you leave from and where you arrive.</h2>
+          </div>
+
+          <div className="pills">
+            {[
+              { id: "full", label: "Full Journey" },
+              { id: "day1", label: "Day 1 · Binsar" },
+              { id: "day2", label: "Day 2 · Local" },
+              { id: "day3", label: "Day 3 · Munsiyari" },
+              { id: "day4", label: "Day 4 · Local" },
+              { id: "day5", label: "Day 5 · Kausani" },
+              { id: "day6", label: "Day 6 · Local" },
+              { id: "day7", label: "Day 7 · Nainital" },
+              { id: "day8", label: "Day 8 · Delhi" }
+            ].map(p => (
+              <button key={p.id} className={`pill ${filter === p.id ? "active" : ""}`}
+                onClick={() => setFilter(p.id)}>{p.label}</button>
+            ))}
+          </div>
+
+          <MapCanvas filter={filter} onOpenDrawer={openDrawer} />
+
+          <div className="legend">
+            <div className="item"><span className="dot" style={{background:"var(--white)"}} />Delhi</div>
+            <div className="item"><span className="dot" style={{background:"var(--orange)"}} />Transfer bases</div>
+            <div className="item"><span className="dot" style={{background:"var(--sage)"}} />Sightseeing stops</div>
+            <div className="hint">Full Journey = all stops · Select a day to highlight the route · tap pin for overview · double-tap for schedule</div>
+          </div>
+        </div>
+      </section>
+
+      <section className="elevation-section" id="elevation">
+        <div className="wrap">
+          <h2 className="serif">Elevation profile</h2>
+          <p className="sub">Approximate height gain across the main bases of the route.</p>
+          <div className="elev-card">
+            <div className="elev-chart">
+              <div className="elev-y-labels">
+                <span>2500 m</span>
+                <span>2000 m</span>
+                <span>1500 m</span>
+                <span>1000 m</span>
+                <span>500 m</span>
+                <span>0 m</span>
+              </div>
+              <svg viewBox="0 0 700 200" preserveAspectRatio="none" aria-hidden="true">
+                <line x1="60" y1="10" x2="680" y2="10" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="42" x2="680" y2="42" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="74" x2="680" y2="74" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="106" x2="680" y2="106" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="138" x2="680" y2="138" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="170" x2="680" y2="170" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <defs>
+                  <linearGradient id="elevFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#4fd4a3" stopOpacity="0.28" />
+                    <stop offset="100%" stopColor="#4fd4a3" stopOpacity="0.02" />
+                  </linearGradient>
+                </defs>
+                {/* Delhi ~220 → 156, Binsar ~2400 → 18, Munsiyari ~2200 → 30, Kausani ~1890 → 50, Nainital ~2084 → 38, Delhi ~220 → 156 */}
+                <path
+                  d="M60 156 L180 18 L320 30 L460 50 L600 38 L680 156"
+                  fill="url(#elevFill)"
+                  stroke="none"
+                />
+                <path
+                  d="M60 156 L180 18 L320 30 L460 50 L600 38 L680 156"
+                  fill="none"
+                  stroke="#4fd4a3"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <circle cx="60" cy="156" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="180" cy="18" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="320" cy="30" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="460" cy="50" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="600" cy="38" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="680" cy="156" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+              </svg>
+            </div>
+            <div className="elev-x-labels">
+              <span>Delhi</span>
+              <span>Binsar</span>
+              <span>Munsiyari</span>
+              <span>Kausani</span>
+              <span>Nainital</span>
+              <span>Delhi</span>
+            </div>
+            <p className="elev-note">Approx. elevations · Delhi ~220 m · Binsar ~2,400 m · Munsiyari ~2,200 m · Kausani ~1,890 m · Nainital ~2,084 m · return to Delhi</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="itinerary">
+        <div className="wrap">
+          <h2 className="serif" style={{fontSize:"clamp(22px,2.6vw,28px)", marginBottom:8, color:"var(--mist-100)"}}>Day-by-day overview</h2>
+          <p style={{color:"var(--mist-400)", fontSize:14.5, marginBottom:22}}>Click any card to open the detailed schedule.</p>
+          <div className="day-grid">
+            {DAY_CARDS.map(card => (
+              <div className="day-card" key={card.key} onClick={() => openDrawer(card.key)}>
+                <div className="card-photo">
+                  <img src={card.photo} alt={card.title} />
+                  <span className="day-tag">{card.tag}</span>
+                </div>
+                <div className="card-body">
+                  <h3>{card.title}</h3>
+                  <div className="card-meta">{card.meta}</div>
+                  <p>{card.desc}</p>
+                  <button className="open-btn">Open schedule →</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="tips-section" id="tips">
+        <div className="wrap">
+          <h2 className="serif">Practical tips</h2>
+          <p className="sub">Small things that make the Kumaon circuit smoother.</p>
+          <div className="tips-grid">
+            {TIPS.map((t, i) => (
+              <div className="tip" key={i}>
+                <div className="icon">{t.icon}</div>
+                <div>
+                  <h4>{t.title}</h4>
+                  <p>{t.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <div className="wrap">
+          Delhi → Binsar → Munsiyari → Kausani → Nainital → Delhi
+        </div>
+      </footer>
+
+      <Drawer
+        dayKey={drawerKey}
+        onClose={() => {
+          setDrawerKey(null);
+          setDrawerImage(null);
+        }}
+        imageOverride={drawerImage}
+      />
+    </>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>

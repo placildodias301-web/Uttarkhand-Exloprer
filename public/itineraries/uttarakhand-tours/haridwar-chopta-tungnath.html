@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haridwar to Chopta–Tungnath — Interactive Route Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.9/babel.min.js"></script>
+<style>
+:root {
+  --ink-950: #080c0b;
+  --ink-900: #0b1210;
+  --ink-800: #111a17;
+  --ink-700: #172a1d;
+  --ink-600: #1e3328;
+  --mist-100: #e8f0ec;
+  --mist-200: #c5d4cc;
+  --mist-300: #9aafa4;
+  --mist-400: #6b8076;
+  --mint: #4fd4a3;
+  --mint-bright: #2fbd8c;
+  --mint-dim: rgba(79, 212, 163, 0.12);
+  --mint-glow: rgba(79, 212, 163, 0.28);
+  --orange: #d9713f;
+  --orange-light: #e28a60;
+  --sage: #8fa98e;
+  --white: #f4f1e8;
+  --line: rgba(255,255,255,0.08);
+  --line-strong: rgba(255,255,255,0.12);
+  --card: #0f1714;
+  --card-hover: #13201b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ink-950);
+  color: var(--mist-200);
+  font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
+  background-size: 22px 22px;
+  overflow-x: hidden;
+}
+::selection { background: var(--mint); color: var(--ink-950); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--ink-900); }
+::-webkit-scrollbar-thumb { background: #26352f; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--mint-bright); }
+
+.serif { font-family: "Fraunces", serif; }
+.wrap { width: min(1180px, calc(100% - 40px)); margin: auto; }
+
+.topnav {
+  border-bottom: 1px solid var(--line);
+  padding: 20px 0;
+  background: rgba(8, 12, 11, 0.92);
+  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 30;
+}
+.topnav-inner { display: flex; align-items: center; justify-content: space-between; gap: 30px; }
+.brand {
+  font-family: "Fraunces", serif; font-size: 16px;
+  display: flex; align-items: center; gap: 12px; white-space: nowrap;
+  color: var(--mist-100);
+}
+.brand-mark {
+  width: 20px; height: 20px; border-radius: 50% 50% 50% 0;
+  background: var(--mint); transform: rotate(-45deg);
+  box-shadow: 0 0 0 4px rgba(79,212,163,0.15), 0 4px 12px rgba(0,0,0,0.4);
+  position: relative;
+}
+.brand-mark::after {
+  content: ""; position: absolute; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--ink-950); top: 6.5px; left: 6.5px;
+}
+.navlinks { display: flex; gap: 28px; }
+.navlinks a {
+  color: var(--mist-400); text-decoration: none; text-transform: uppercase;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.16em; padding-bottom: 5px;
+  border-bottom: 2px solid transparent; transition: color .2s, border-color .2s;
+}
+.navlinks a:hover { color: var(--mist-100); }
+.navlinks a.active { color: var(--mist-100); border-color: var(--mint); }
+
+.hero { padding: 48px 0 20px; }
+.eyebrow {
+  display: block; color: var(--mint); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+}
+.hero h1 {
+  margin: 12px 0 14px; max-width: 22ch;
+  font-size: clamp(28px, 4vw, 42px); line-height: 1.12; font-weight: 500;
+  color: var(--mist-100);
+}
+.hero .lead { color: var(--mist-400); font-size: 15.5px; max-width: 56ch; line-height: 1.65; }
+
+.stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 14px; margin: 28px 0 36px;
+}
+.stat-card {
+  background: var(--card); border-radius: 14px; padding: 16px 18px;
+  border: 1px solid var(--line); box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+.stat-card .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--mist-400); }
+.stat-card .value { font-family: "Fraunces", serif; font-size: 24px; font-weight: 500; margin-top: 5px; color: var(--mist-100); }
+
+.mapshell { padding: 10px 0 60px; }
+.shell-head { margin-bottom: 22px; }
+.shell-head h2 { margin: 10px 0 0; font-size: clamp(22px, 2.8vw, 30px); font-weight: 500; color: var(--mist-100); }
+
+.pills {
+  display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 12px;
+  scrollbar-width: thin; scrollbar-color: #26352f transparent;
+}
+.pill {
+  flex: 0 0 auto; border: 1px solid var(--line);
+  background: rgba(15, 23, 20, 0.8); color: var(--mist-400);
+  border-radius: 999px; padding: 10px 15px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  cursor: pointer; transition: all .2s ease;
+}
+.pill:hover { transform: translateY(-1px); border-color: var(--mint); color: var(--mist-200); }
+.pill.active {
+  background: var(--mint); color: var(--ink-950); border-color: var(--mint);
+  box-shadow: 0 4px 18px var(--mint-glow);
+}
+
+.mapcanvas {
+  position: relative; width: 100%; aspect-ratio: 16/9.2;
+  border-radius: 22px; overflow: hidden;
+  background-color: #0a1210;
+  box-shadow: 0 36px 80px -30px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05) inset;
+  touch-action: manipulation;
+}
+.map-bg {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(180deg, rgba(8,12,11,0.55) 0%, rgba(8,12,11,0.72) 45%, rgba(8,12,11,0.9) 100%),
+    url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1800&q=80');
+  background-size: cover; background-position: center 30%;
+  filter: saturate(0.75) contrast(1.08) brightness(0.85);
+}
+.map-title {
+  position: absolute; left: 5%; top: 4%; z-index: 2;
+  color: rgba(232,240,236,0.95); font-family: "Fraunces", serif; font-style: italic;
+  font-size: clamp(20px, 2.8vw, 32px); text-shadow: 0 2px 16px rgba(0,0,0,0.6);
+  max-width: 50%;
+}
+.map-subtitle {
+  position: absolute; left: 5%; top: 11%; z-index: 2;
+  color: rgba(232,240,236,0.4); font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase;
+}
+.routes { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+.route-path {
+  fill: none; stroke-linecap: round; stroke-linejoin: round;
+  transition: opacity .4s ease, stroke-width .3s ease, filter .4s ease;
+}
+.route-path.glow { filter: drop-shadow(0 0 10px currentColor); opacity: 1; }
+.route-path.animated { stroke-dasharray: 7 13; animation: dashMove 32s linear infinite; }
+@keyframes dashMove { to { stroke-dashoffset: -440; } }
+
+.pin {
+  position: absolute; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer; z-index: 5;
+  transition: opacity .3s, transform .2s, filter .3s;
+  min-width: 44px; min-height: 44px; touch-action: manipulation;
+}
+.pin:hover, .pin:focus-visible { transform: translate(-50%, -50%) scale(1.06); z-index: 8; }
+.pin.dim { opacity: 0.18; filter: grayscale(0.7); pointer-events: none; }
+.pin .marker {
+  width: 22px; height: 22px; border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg); position: relative;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.4), 0 5px 14px rgba(0,0,0,0.5);
+  transition: box-shadow .2s, transform .2s;
+}
+.pin:hover .marker { box-shadow: 0 0 0 4px var(--mint), 0 7px 18px rgba(0,0,0,0.5); }
+.pin .marker::after {
+  content: ""; position: absolute; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--ink-950); top: 7px; left: 7px;
+}
+.pin[data-group="start"] .marker { background: var(--white); }
+.pin[data-group="transfer"] .marker { background: var(--orange); }
+.pin[data-group="sight"] .marker { background: var(--mint); }
+.pin .badge {
+  margin-top: 8px; padding: 5px 10px; border-radius: 7px;
+  background: rgba(7,17,11,0.94); color: #fff; white-space: nowrap;
+  font-size: 11px; font-weight: 600;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06);
+}
+.pin .badge .alt { color: var(--mint); margin-left: 4px; font-size: 10px; }
+.pin .role-tag {
+  margin-top: 5px; padding: 3px 8px; border-radius: 5px;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.pin.role-start .role-tag { background: #fff; color: var(--ink-950); }
+.pin.role-end .role-tag { background: var(--mint); color: var(--ink-950); }
+.pin.role-via .role-tag { background: rgba(79,212,163,0.9); color: var(--ink-950); }
+.pin.role-start .marker {
+  box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(255,255,255,0.2), 0 6px 16px rgba(0,0,0,0.5);
+}
+.pin.role-end .marker {
+  box-shadow: 0 0 0 4px var(--mint), 0 0 0 7px var(--mint-glow), 0 6px 16px rgba(0,0,0,0.5);
+}
+.view-link { display: none !important; }
+
+.popover {
+  position: absolute; width: 240px; background: var(--ink-700);
+  border: 1px solid var(--line-strong); border-radius: 14px; padding: 14px;
+  box-shadow: 0 28px 60px rgba(0,0,0,0.55);
+  opacity: 0; pointer-events: none; transform: translate(-50%, 4px);
+  transition: opacity .2s ease, transform .2s ease; z-index: 25;
+  max-height: min(70vh, 420px); overflow-y: auto; -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+.popover.show { opacity: 1; pointer-events: auto; transform: translate(-50%, -8px); }
+.popover .thumb { width: 100%; height: 110px; border-radius: 9px; margin-bottom: 12px; overflow: hidden; background: var(--ink-800); }
+.popover .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.popover .pv-title { color: #fff; font-family: "Fraunces", serif; font-size: 16.5px; }
+.popover .pv-title .alt { color: var(--mint); font-family: "Inter", sans-serif; font-weight: 700; font-size: 12.5px; margin-left: 6px; }
+.popover .pv-blurb { color: rgba(232,240,236,0.7); font-size: 12.5px; line-height: 1.55; margin-top: 7px; }
+.popover .pv-link {
+  display: inline-block; margin-top: 11px; color: var(--mint); font-size: 12px; font-weight: 700;
+  text-decoration: none; cursor: pointer;
+}
+.popover .pv-link:hover { text-decoration: underline; }
+
+.legend {
+  display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+  margin-top: 16px; color: var(--mist-400); font-size: 11.5px;
+}
+.legend .item { display: flex; align-items: center; gap: 7px; }
+.legend .dot { width: 8px; height: 8px; border-radius: 50%; }
+.legend .hint { margin-left: auto; font-size: 10.5px; }
+
+.day-flow {
+  display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
+  margin-top: 14px; padding: 14px 18px; border-radius: 14px;
+  background: var(--card); border: 1px solid var(--line);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+.day-flow .flow-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mist-400);
+  width: 100%; text-align: center; margin-bottom: 2px;
+}
+.day-flow .flow-stop {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  min-width: 90px; padding: 8px 12px; border-radius: 10px; background: var(--ink-800);
+}
+.day-flow .flow-stop.start { background: rgba(255,255,255,0.06); border: 2px solid var(--mist-200); }
+.day-flow .flow-stop.end { background: var(--mint-dim); border: 2px solid var(--mint); }
+.day-flow .flow-stop .role { font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mist-400); }
+.day-flow .flow-stop.start .role { color: var(--mist-200); }
+.day-flow .flow-stop.end .role { color: var(--mint); }
+.day-flow .flow-stop .name { font-family: "Fraunces", serif; font-size: 15px; font-weight: 500; color: var(--mist-100); }
+.day-flow .flow-arrow { font-size: 22px; color: var(--mint); font-weight: 700; line-height: 1; }
+.day-flow .flow-note { width: 100%; text-align: center; font-size: 11.5px; color: var(--mist-400); margin-top: 4px; }
+
+.day-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px; margin: 40px 0;
+}
+.day-card {
+  background: var(--card); border-radius: 16px; overflow: hidden;
+  border: 1px solid var(--line); box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  cursor: pointer; transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+.day-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+  border-color: rgba(79,212,163,0.25);
+}
+.day-card .card-photo { height: 140px; position: relative; overflow: hidden; background: var(--ink-800); }
+.day-card .card-photo img { width: 100%; height: 100%; object-fit: cover; }
+.day-card .card-photo .day-tag {
+  position: absolute; top: 11px; left: 11px;
+  background: rgba(8,12,11,0.88); color: #fff;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 9px; border-radius: 6px;
+}
+.day-card .card-body { padding: 16px 18px 20px; }
+.day-card h3 { font-family: "Fraunces", serif; font-size: 18px; font-weight: 500; margin-bottom: 4px; color: var(--mist-100); }
+.day-card .card-meta { font-size: 12px; color: var(--mist-400); margin-bottom: 8px; }
+.day-card p { font-size: 13px; color: var(--mist-400); line-height: 1.5; }
+.day-card .open-btn {
+  margin-top: 12px; font-size: 12px; font-weight: 700; color: var(--mint);
+  background: none; border: none; cursor: pointer;
+}
+
+.elevation-section { margin: 10px 0 50px; }
+.elevation-section h2 { font-size: clamp(22px, 2.6vw, 28px); font-weight: 500; margin-bottom: 6px; color: var(--mist-100); }
+.elevation-section .sub { color: var(--mist-400); font-size: 14.5px; margin-bottom: 22px; }
+.elev-card {
+  background: var(--card); border-radius: 18px; border: 1px solid var(--line);
+  padding: 28px 24px 20px; box-shadow: 0 4px 18px rgba(0,0,0,0.2); overflow: hidden;
+}
+.elev-chart { position: relative; width: 100%; height: 220px; }
+.elev-chart svg { width: 100%; height: 100%; display: block; }
+.elev-y-labels {
+  position: absolute; left: 0; top: 0; bottom: 28px; width: 52px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  font-size: 11px; color: var(--mist-400); pointer-events: none;
+}
+.elev-x-labels {
+  display: flex; justify-content: space-between; padding: 10px 8px 0 52px;
+  font-size: 11.5px; color: var(--mist-200); font-weight: 500;
+}
+.elev-x-labels span { text-align: center; flex: 1; white-space: nowrap; }
+.elev-note { margin-top: 14px; font-size: 12px; color: var(--mist-400); text-align: center; }
+
+.tips-section { margin: 48px 0 60px; }
+.tips-section h2 { font-size: clamp(22px, 2.6vw, 28px); font-weight: 500; margin-bottom: 6px; color: var(--mist-100); }
+.tips-section .sub { color: var(--mist-400); font-size: 14.5px; margin-bottom: 22px; }
+.tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.tip {
+  background: var(--card); border-radius: 14px; padding: 16px 18px; border: 1px solid var(--line);
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.tip .icon {
+  width: 34px; height: 34px; border-radius: 9px; background: var(--mint-dim);
+  color: var(--mint); display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.tip h4 { font-size: 13.5px; font-weight: 600; margin-bottom: 3px; color: var(--mist-100); }
+.tip p { font-size: 12.5px; color: var(--mist-400); line-height: 1.45; }
+
+.scrim {
+  position: fixed; inset: 0; background: rgba(8,12,11,0.7);
+  opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 40;
+}
+.scrim.show { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; right: 0; width: min(430px, 94vw); height: 100%;
+  background: var(--ink-800); color: #fff;
+  transform: translateX(100%); transition: transform .38s cubic-bezier(.22,1,.36,1);
+  z-index: 50; overflow-y: auto; display: flex; flex-direction: column;
+  max-width: 100vw;
+}
+.drawer.open { transform: translateX(0); }
+.drawer-photo {
+  height: 200px; width: 100%; background: var(--ink-700); position: relative; flex-shrink: 0; overflow: hidden;
+}
+.drawer-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.drawer-close {
+  position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(7,17,11,0.7); border: none; color: #fff; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.drawer-body { padding: 26px 26px 48px; }
+.drawer-eyebrow { color: var(--mint); font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+.drawer-title { margin-top: 10px; font-family: "Fraunces", serif; font-style: italic; font-size: 28px; line-height: 1.15; color: var(--mist-100); }
+.drawer-sub { margin-top: 6px; color: rgba(232,240,236,0.5); font-size: 13px; line-height: 1.5; }
+.moments { margin-top: 28px; }
+.moment {
+  position: relative; margin-left: 4px; padding: 0 0 22px 26px;
+  border-left: 1px solid rgba(255,255,255,0.1);
+}
+.moment:last-child { border-color: transparent; padding-bottom: 0; }
+.moment .dot {
+  position: absolute; left: -5px; top: 3px; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--mint); border: 2px solid var(--ink-800);
+}
+.moment .time { color: var(--mint); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+.moment .m-title { margin-top: 3px; font-size: 15.5px; font-family: "Fraunces", serif; color: var(--mist-100); }
+.moment .m-desc { margin-top: 3px; color: rgba(232,240,236,0.55); font-size: 12.5px; line-height: 1.5; }
+
+footer {
+  border-top: 1px solid var(--line); padding: 28px 0 40px;
+  text-align: center; font-size: 13px; color: var(--mist-400);
+}
+
+img { max-width: 100%; height: auto; object-fit: cover; }
+.mapcanvas { touch-action: manipulation; max-width: 100%; }
+
+@media (max-width: 900px) {
+  .topnav-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .navlinks { width: 100%; flex-wrap: wrap; gap: 10px 14px; justify-content: flex-start; }
+  .mapcanvas { aspect-ratio: 3/4; border-radius: 16px; overflow: visible !important; }
+  .map-bg { border-radius: 16px; }
+  .legend { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .legend .hint { margin-left: 0; width: 100%; }
+  .day-flow { padding: 12px 12px; gap: 8px; }
+  .day-flow .flow-stop { min-width: 72px; padding: 8px 10px; }
+  .day-flow .flow-stop .name { font-size: 13px; }
+  .elev-chart { height: 200px; }
+  .elev-x-labels {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: 0; padding: 8px 2px 0 40px !important;
+    font-size: 8px !important; line-height: 1.15; min-height: 64px;
+    align-items: flex-start;
+  }
+  .elev-x-labels span {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    white-space: nowrap; text-align: left; height: 52px;
+    overflow: hidden; text-overflow: ellipsis; flex: none !important;
+  }
+  .elev-y-labels { width: 40px; font-size: 9px; bottom: 48px; }
+  .elev-note { font-size: 10.5px; text-align: left; padding: 0 2px; }
+  .elev-card { padding: 20px 12px 16px; padding-bottom: 12px !important; }
+  .popover { width: min(260px, calc(100vw - 24px)); max-width: calc(100% - 16px); }
+  .drawer { width: min(100vw, 430px); }
+  .wrap { width: calc(100% - 24px); max-width: 100%; }
+  .hero { padding: 32px 0 16px; }
+  .hero h1 { max-width: 100%; }
+  .pills { -webkit-overflow-scrolling: touch; }
+  .pill { min-height: 44px; padding: 10px 14px; display: inline-flex; align-items: center; }
+  .pin { min-width: 44px; min-height: 44px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .day-grid { grid-template-columns: 1fr !important; }
+  .tips-grid { grid-template-columns: 1fr !important; }
+  .pin .badge {
+    font-size: 9px !important; padding: 3px 7px !important;
+    max-width: 72px !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .pin .badge .alt { display: none !important; }
+  .pin .role-tag { font-size: 7.5px; padding: 2px 5px; }
+  .map-title { font-size: clamp(18px, 5vw, 28px); left: 4%; top: 4%; max-width: 90%; }
+  .map-subtitle { font-size: 8.5px; left: 4%; top: 11%; letter-spacing: 0.12em; max-width: 90%; }
+}
+@media (min-width: 901px) {
+  .mapcanvas { overflow: hidden; }
+}
+@media (max-width: 600px) {
+  .mapcanvas { aspect-ratio: 2/3; }
+  .pin .badge { opacity: 0.92; max-width: 64px !important; font-size: 8.5px !important; }
+  .pin.dim .badge { opacity: 0.35; }
+  .brand { font-size: 14px; }
+  .navlinks a { font-size: 9px; letter-spacing: 0.08em; padding: 6px 0; min-height: 36px; display: inline-flex; align-items: center; }
+  .stat-card .value { font-size: 18px; }
+  .day-card .card-photo { height: 140px; }
+  .topnav { padding: 14px 0; }
+  .hero .lead { font-size: 14.5px; }
+  .shell-head h2 { font-size: clamp(20px, 5vw, 26px); }
+  .popover {
+    width: min(220px, calc(100% - 20px)) !important;
+    max-width: calc(100% - 20px); padding: 12px;
+  }
+  .popover .thumb { height: 90px; }
+  .popover .pv-title { font-size: 15px; }
+  .popover .pv-blurb { font-size: 12px; }
+}
+@media (max-width: 480px) {
+  .mapcanvas { aspect-ratio: 3/5; }
+  .pin .badge { max-width: 56px !important; font-size: 8px !important; padding: 2px 5px !important; }
+  .wrap { width: calc(100% - 16px); }
+  .stats { gap: 10px; }
+  .stat-card { padding: 12px 14px; }
+  .popover { width: min(200px, calc(100% - 16px)) !important; padding: 10px; }
+  .popover .thumb { height: 80px; margin-bottom: 8px; }
+  .navlinks { gap: 8px 12px; }
+  .hero { padding: 24px 0 12px; }
+  .mapshell { padding-bottom: 40px; }
+  .elev-x-labels span { height: 58px; font-size: 7.5px !important; }
+}
+@media (max-width: 360px) {
+  .mapcanvas { aspect-ratio: 9/16; }
+  .hero h1 { font-size: clamp(22px, 8vw, 28px); }
+  .pill { padding: 8px 10px; font-size: 9px; min-height: 40px; }
+  .brand { font-size: 13px; gap: 8px; }
+  .stat-card .value { font-size: 16px; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// Plain image paths only — no IMG object
+// Each location: image = map/popover, scheduleImage = day-schedule drawer
+const LOCATIONS = [
+  { id: "haridwar", name: "Haridwar", alt: "Pickup / Drop", x: 12, y: 78, group: "start", image: "/itineraries/uttarakhand-tours/images/Haridwar.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Haridwar.jpg", blurb: "Arrival point. Pickup and final drop after the 5-day circuit." },
+  { id: "rishikesh", name: "Rishikesh", alt: "~340 m", x: 22, y: 72, group: "transfer", image: "/itineraries/uttarakhand-tours/images/rishikesh.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/rishikesh.jpg", blurb: "Yoga capital · Day 1 base. Local sightseeing and overnight." },
+  { id: "devprayag", name: "Devprayag", alt: "Sangam", x: 38, y: 58, group: "sight", image: "/itineraries/uttarakhand-tours/images/DevprayagSangam.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/DevprayagSangam.jpg", blurb: "Where Alaknanda meets Bhagirathi to form the Ganga." },
+  { id: "rudraprayag", name: "Rudraprayag", alt: "Sangam", x: 48, y: 52, group: "sight", image: "/itineraries/uttarakhand-tours/images/Rudraprayag.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Rudraprayag.jpg", blurb: "Confluence of Alaknanda & Mandakini. En-route stop." },
+  { id: "karanprayag", name: "Karanprayag", alt: "~860 m", x: 58, y: 48, group: "transfer", image: "/itineraries/uttarakhand-tours/images/Karanprayag.webp", scheduleImage: "/itineraries/uttarakhand-tours/images/Karanprayag.webp", blurb: "Alaknanda + Pindar confluence. Overnight on Day 2." },
+  { id: "gopeshwar", name: "Gopeshwar", alt: "~1,450 m", x: 68, y: 42, group: "transfer", image: "/itineraries/uttarakhand-tours/images/Gopeshwar.webp", scheduleImage: "/itineraries/uttarakhand-tours/images/Gopeshwar.webp", blurb: "Gopinath Temple town. Overnight on Day 3." },
+  { id: "chopta", name: "Chopta", alt: "~2,680 m", x: 76, y: 42, group: "transfer", image: "/itineraries/uttarakhand-tours/images/chopta.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/chopta.jpg", blurb: "Mini Switzerland · base for Tungnath & Chandrashila trek." },
+  { id: "tungnath", name: "Tungnath", alt: "3,680 m", x: 84, y: 28, group: "sight", image: "/itineraries/uttarakhand-tours/images/Tungnath.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Tungnath.jpg", blurb: "Highest Shiva temple in the world. 3.5 km trek from Chopta." },
+  { id: "chandrashila", name: "Chandrashila", alt: "~4,000 m", x: 90, y: 14, group: "sight", image: "/itineraries/uttarakhand-tours/images/chandrashila.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/chandrashila.jpg", blurb: "Summit peak with panoramic Himalayan views." }
+];
+
+const DAYINFO = {
+  day1: {
+    eyebrow: "DAY 01 · HARIDWAR → RISHIKESH",
+    title: "Arrival & local explore",
+    subtitle: "Pickup from Haridwar and short transfer to Rishikesh (≈25 km / 30–45 min)",
+    photo: "/itineraries/uttarakhand-tours/images/rishikesh.jpg",
+    moments: [
+      { time: "Arrival", title: "Meet in Haridwar", desc: "Our representative meets you and drives to Rishikesh" },
+      { time: "Day", title: "Rishikesh local sightseeing", desc: "Explore the town, ghats and serene riverside atmosphere" },
+      { time: "Afternoon", title: "Leisure time", desc: "Soak in the calm environment at your own pace" },
+      { time: "Evening", title: "Dinner & overnight", desc: "Dinner and overnight stay in Rishikesh" }
+    ]
+  },
+  day2: {
+    eyebrow: "DAY 02 · RISHIKESH → KARANPRAYAG",
+    title: "Prayag circuit",
+    subtitle: "Devprayag Sangam · Dhari Devi Temple · Rudraprayag Sangam · arrive Karanprayag",
+    photo: "/itineraries/uttarakhand-tours/images/Karanprayag.webp",
+    moments: [
+      { time: "Morning", title: "Depart Rishikesh", desc: "Drive along the Alaknanda corridor" },
+      { time: "En route", title: "Devprayag Sangam", desc: "Witness the birth of the Ganga — Alaknanda + Bhagirathi" },
+      { time: "En route", title: "Dhari Devi Temple", desc: "Guardian deity of the Char Dham region" },
+      { time: "En route", title: "Rudraprayag Sangam", desc: "Alaknanda meets Mandakini" },
+      { time: "Evening", title: "Arrive Karanprayag", desc: "Check-in and overnight stay" }
+    ]
+  },
+  day3: {
+    eyebrow: "DAY 03 · KARANPRAYAG → GOPESHWAR",
+    title: "Temple trail",
+    subtitle: "Kapeshwar Mahadev · Narsingh Temple · Gopinath Temple · overnight Gopeshwar",
+    photo: "/itineraries/uttarakhand-tours/images/Gopeshwar2.webp",
+    moments: [
+      { time: "Morning", title: "Breakfast & depart", desc: "Early start from Karanprayag" },
+      { time: "Day", title: "Kapeshwar Mahadev Temple", desc: "Sacred Shiva shrine on the route" },
+      { time: "Day", title: "Narsingh Temple", desc: "Visit the ancient temple dedicated to Lord Narasimha" },
+      { time: "Afternoon", title: "Gopinath Temple, Gopeshwar", desc: "Main shrine of the town" },
+      { time: "Evening", title: "Overnight Gopeshwar", desc: "Dinner and stay in Gopeshwar" }
+    ]
+  },
+  day4: {
+    eyebrow: "DAY 04 · CHOPTA · TUNGNATH · CHANDRASHILA",
+    title: "High-altitude trek day",
+    subtitle: "Trek to the world’s highest Shiva temple and the summit of Chandrashila",
+    photo: "/itineraries/uttarakhand-tours/images/chopta.jpg",
+    moments: [
+      { time: "Morning", title: "Breakfast & drive to Chopta", desc: "Reach the meadow base (~2,680 m)" },
+      { time: "Morning", title: "Trek to Tungnath", desc: "3.5 km stone path to the highest Shiva temple (3,680 m)" },
+      { time: "Mid-day", title: "Tungnath darshan", desc: "Seek blessings at the ancient Panch Kedar shrine" },
+      { time: "Afternoon", title: "Continue to Chandrashila", desc: "Further 1.5 km to the ~4,000 m summit · Himalayan panoramas" },
+      { time: "Late day", title: "Return to Chopta", desc: "Descend and overnight stay in Chopta" }
+    ]
+  },
+  day5: {
+    eyebrow: "DAY 05 · CHOPTA → HARIDWAR",
+    title: "Return journey",
+    subtitle: "Checkout and drive back to Haridwar for onward travel",
+    photo: "/itineraries/uttarakhand-tours/images/Haridwar.jpg",
+    moments: [
+      { time: "Morning", title: "Breakfast & checkout", desc: "Leave Chopta after breakfast" },
+      { time: "Day", title: "Long drive to Haridwar", desc: "Scenic descent through the Garhwal hills" },
+      { time: "Afternoon", title: "Drop in Haridwar", desc: "Arrive for your onward journey" },
+      { time: "End", title: "Tour concludes", desc: "Safe travels — thank you for travelling with us" }
+    ]
+  }
+};
+
+const DAY_CARDS = [
+  { key: "day1", tag: "Day 1", title: "Haridwar → Rishikesh", meta: "≈25 km · 30–45 min", desc: "Pickup and short transfer. Local sightseeing and overnight in Rishikesh.", photo: "/itineraries/uttarakhand-tours/images/rishikesh.jpg" },
+  { key: "day2", tag: "Day 2", title: "Prayag circuit", meta: "Devprayag · Dhari Devi · Rudraprayag", desc: "Sangams and temple stops en route to Karanprayag.", photo: "/itineraries/uttarakhand-tours/images/Karanprayag.webp" },
+  { key: "day3", tag: "Day 3", title: "Temple trail", meta: "Kapeshwar · Narsingh · Gopinath", desc: "Sacred temples and overnight in Gopeshwar.", photo: "/itineraries/uttarakhand-tours/images/Gopeshwar2.webp" },
+  { key: "day4", tag: "Day 4", title: "Tungnath & Chandrashila", meta: "Trek · 3,680 m · 4,000 m", desc: "Highest Shiva temple and summit trek from Chopta.", photo: "/itineraries/uttarakhand-tours/images/chopta.jpg" },
+  { key: "day5", tag: "Day 5", title: "Return Haridwar", meta: "Checkout · drop", desc: "Drive back to Haridwar for your onward journey.", photo: "/itineraries/uttarakhand-tours/images/Haridwar.jpg" }
+];
+
+const TIPS = [
+  { icon: "🥾", title: "Trek fitness", text: "Tungnath–Chandrashila is a moderate 5 km uphill. Start early; carry water and layers." },
+  { icon: "🧥", title: "Altitude & cold", text: "Chopta sits ~2,680 m; summit ~4,000 m. Evenings are cold even in summer." },
+  { icon: "☁️", title: "Clear mornings", text: "Chandrashila views are best before late morning. Clouds often build after noon." },
+  { icon: "🚗", title: "Road days", text: "Days 2 and 5 involve long mountain drives. Start early and carry snacks." },
+  { icon: "🙏", title: "Temple etiquette", text: "Dress modestly at Tungnath and other shrines. Photography rules may apply inside." },
+  { icon: "📅", title: "Best season", text: "April–June and September–November. Winter snow can close the Chopta road." }
+];
+
+const DAY_PATHS = {
+  /* SVG coords match LOCATIONS % on 1200×640:
+     haridwar 144,499 · rishikesh 264,461 · devprayag 456,371 · rudraprayag 576,333
+     karanprayag 696,307 · gopeshwar 816,269 · chopta 912,269 · tungnath 1008,179 · chandrashila 1080,90 */
+  day1: {
+    d: "M144 499 C180 485 220 470 264 461",
+    color: "var(--orange)", from: "Haridwar", to: "Rishikesh",
+    fromId: "haridwar", toId: "rishikesh", label: "Haridwar → Rishikesh (≈25 km)"
+  },
+  day2: {
+    d: "M264 461 C340 420 400 390 456 371 C520 350 550 340 576 333 C640 320 670 310 696 307",
+    color: "var(--mint)", from: "Rishikesh", to: "Karanprayag",
+    fromId: "rishikesh", toId: "karanprayag",
+    viaIds: ["devprayag", "rudraprayag"],
+    label: "Rishikesh → Devprayag → Rudraprayag → Karanprayag"
+  },
+  day3: {
+    d: "M696 307 C740 290 780 275 816 269",
+    color: "var(--mint)", from: "Karanprayag", to: "Gopeshwar",
+    fromId: "karanprayag", toId: "gopeshwar", label: "Karanprayag → Gopeshwar"
+  },
+  day4: {
+    d: "M912 269 L1008 179 L1080 90",
+    color: "var(--orange)", from: "Chopta", to: "Chandrashila",
+    fromId: "chopta", toId: "chandrashila",
+    viaIds: ["tungnath"],
+    label: "Chopta → Tungnath → Chandrashila (trek)", roundTrip: true
+  },
+  day5: {
+    d: "M912 269 C780 320 560 400 360 450 C260 475 190 490 144 499",
+    color: "var(--orange)", from: "Chopta", to: "Haridwar",
+    fromId: "chopta", toId: "haridwar", label: "Chopta → Haridwar"
+  }
+};
+
+const DAY_ACTIVE_LOCATIONS = {
+  day1: ["haridwar", "rishikesh"],
+  day2: ["rishikesh", "devprayag", "rudraprayag", "karanprayag"],
+  day3: ["karanprayag", "gopeshwar"],
+  day4: ["chopta", "tungnath", "chandrashila"],
+  day5: ["chopta", "haridwar"]
+};
+
+function Popover({ loc, style, onEnter, onLeave, onOpen }) {
+  const openKey = () => {
+    if (loc.id === "haridwar" || loc.id === "rishikesh") onOpen("day1", loc.scheduleImage || loc.image);
+    else if (loc.id === "devprayag" || loc.id === "rudraprayag" || loc.id === "karanprayag") onOpen("day2", loc.scheduleImage || loc.image);
+    else if (loc.id === "gopeshwar") onOpen("day3", loc.scheduleImage || loc.image);
+    else if (loc.id === "tungnath" || loc.id === "chandrashila" || loc.id === "chopta") onOpen("day4", loc.scheduleImage || loc.image);
+    else onOpen("day5", loc.scheduleImage || loc.image);
+  };
+  return (
+    <div className="popover show" style={style} onMouseEnter={onEnter} onMouseLeave={onLeave}>
+      <div className="thumb"><img src={loc.image} alt={loc.name} /></div>
+      <div className="pv-title">{loc.name}<span className="alt">{loc.alt}</span></div>
+      <div className="pv-blurb">{loc.blurb}</div>
+      <a className="pv-link" onClick={openKey}>Open day schedule →</a>
+    </div>
+  );
+}
+
+function MapCanvas({ filter, onOpenDrawer }) {
+  const [popover, setPopover] = useState(null);
+  const hideTimer = useRef(null);
+  const lastTap = useRef({ id: null, time: 0 });
+
+  const showPopover = useCallback((loc) => {
+    clearTimeout(hideTimer.current);
+    const x = Number(loc.x) || 50;
+    const y = Number(loc.y) || 50;
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 900;
+    let leftPct = x;
+    let above = y > 52;
+
+    if (isMobile) {
+      // Mobile: keep full 220-240px card inside the map / screen
+      if (x < 34) leftPct = 34;
+      else if (x > 66) leftPct = 66;
+      if (y < 20) above = false;
+      if (y > 78) above = true;
+    } else {
+      // Desktop: gentle nudge only when very close to edge (looks natural next to pin)
+      if (x < 12) leftPct = 12;
+      else if (x > 88) leftPct = 88;
+      if (y < 15) above = false;
+      if (y > 85) above = true;
+    }
+
+    setPopover({
+      loc,
+      left: leftPct + "%",
+      top: `calc(${y}% - 12px)`,
+      above
+    });
+  }, []);
+
+  const scheduleHide = () => {
+    clearTimeout(hideTimer.current);
+    hideTimer.current = setTimeout(() => setPopover(null), 220);
+  };
+
+  const openInfo = useCallback((loc) => {
+    clearTimeout(hideTimer.current);
+    setPopover(null);
+    let key = "day4";
+    if (loc.id === "haridwar" || loc.id === "rishikesh") key = "day1";
+    else if (["devprayag","rudraprayag","karanprayag"].includes(loc.id)) key = "day2";
+    else if (loc.id === "gopeshwar") key = "day3";
+    else if (["chopta","tungnath","chandrashila"].includes(loc.id)) key = "day4";
+    else key = "day5";
+    if (filter !== "full" && filter) key = filter;
+    onOpenDrawer(key, loc.scheduleImage || loc.image);
+  }, [onOpenDrawer, filter]);
+  const handlePinActivate = useCallback((loc, e) => {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    clearTimeout(hideTimer.current);
+    const now = Date.now();
+    const isDouble = lastTap.current.id === loc.id && (now - lastTap.current.time) < 400;
+    lastTap.current = { id: loc.id, time: now };
+
+    if (isDouble) {
+      // Double click / double tap → open full day schedule
+      openInfo(loc);
+    } else {
+      // Single click / single tap → show location overview card
+      showPopover(loc);
+    }
+  }, [openInfo, showPopover]);
+
+
+  const isFull = filter === "full";
+  const activeDays = isFull ? Object.keys(DAY_PATHS) : [filter];
+
+  useEffect(() => {
+    if (!popover) return;
+    const onDoc = (e) => {
+      // close if click outside pin and popover
+      if (e.target.closest && (e.target.closest('.pin') || e.target.closest('.popover'))) return;
+      setPopover(null);
+    };
+    document.addEventListener('click', onDoc, true);
+    return () => document.removeEventListener('click', onDoc, true);
+  }, [popover]);
+  const activeLocIds = isFull ? null : (DAY_ACTIVE_LOCATIONS[filter] || []);
+  const dayPath = !isFull ? DAY_PATHS[filter] : null;
+
+  const pinRole = (loc) => {
+    if (!dayPath) return null;
+    if (loc.id === dayPath.fromId) return "start";
+    if (dayPath.viaIds && dayPath.viaIds.includes(loc.id)) return "via";
+    if (loc.id === dayPath.toId && dayPath.fromId !== dayPath.toId) return "end";
+    return null;
+  };
+
+  const subtitle = isFull
+    ? "Garhwal · Panch Prayag · Tungnath trek · 5 days"
+    : (dayPath
+        ? (dayPath.roundTrip
+            ? `${dayPath.from}  · trek circuit · return to Chopta`
+            : `${dayPath.from}  →  ${dayPath.to}`)
+        : "Day route");
+
+  return (
+    <>
+    <div className="mapcanvas">
+      <div className="map-bg" />
+      <div className="map-title">Haridwar → Chopta</div>
+      <div className="map-subtitle">{subtitle}</div>
+
+      <svg className="routes" viewBox="0 0 1200 640" preserveAspectRatio="none">
+        <defs>
+          <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#d9713f" />
+          </marker>
+          <marker id="arrowMint" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#4fd4a3" />
+          </marker>
+          <marker id="arrowWhite" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(255,255,255,0.7)" />
+          </marker>
+        </defs>
+
+        {!isFull && (
+          <g opacity="0.12">
+            {Object.values(DAY_PATHS).map((p, i) => (
+              <path key={"ghost"+i} d={p.d} fill="none" stroke="#fff" strokeWidth="2.5"
+                strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 10"
+                markerEnd="url(#arrowWhite)" />
+            ))}
+          </g>
+        )}
+
+        {activeDays.map(dayKey => {
+          const p = DAY_PATHS[dayKey];
+          if (!p) return null;
+          const marker = p.color.includes("mint") ? "url(#arrowMint)" : "url(#arrowOrange)";
+          return (
+            <path
+              key={dayKey}
+              className="route-path glow animated"
+              stroke={p.color}
+              strokeWidth={isFull ? 3 : 5}
+              d={p.d}
+              markerEnd={marker}
+            />
+          );
+        })}
+      </svg>
+
+      {LOCATIONS.map(loc => {
+        const isDim = !isFull && activeLocIds && !activeLocIds.includes(loc.id);
+        const role = pinRole(loc);
+        const roleClass = role ? `role-${role}` : "";
+        return (
+          <div
+            key={loc.id}
+            className={`pin ${isDim ? "dim" : ""} ${roleClass}`}
+            data-group={loc.group}
+            style={{ left: loc.x + "%", top: loc.y + "%" }}
+            tabIndex={isDim ? -1 : 0}
+            role="button"
+            aria-label={loc.name + ". Open day schedule"}
+            onMouseEnter={() => !isDim && showPopover(loc)}
+            onMouseLeave={scheduleHide}
+            onClick={(e) => handlePinActivate(loc, e)}
+            onKeyDown={e => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                openInfo(loc);
+              }
+            }}
+          >
+            <div className="marker" />
+            <div className="badge">{loc.name} <span className="alt">{loc.alt}</span></div>
+            {role === "start" && <div className="role-tag">Leave from</div>}
+            {role === "end" && <div className="role-tag">{dayPath && dayPath.roundTrip ? "Summit" : "Arrive"}</div>}
+            {role === "via" && <div className="role-tag">Visit</div>}
+            
+          </div>
+        );
+      })}
+
+      {popover && (
+        <Popover loc={popover.loc} style={{
+            left: popover.left,
+            top: popover.top,
+            transform: popover.above
+              ? "translate(-50%, calc(-100% - 18px))"
+              : "translate(-50%, 14px)",
+            maxWidth: "min(240px, 90vw)"
+          }}
+          onEnter={() => clearTimeout(hideTimer.current)} onLeave={scheduleHide} onOpen={onOpenDrawer} />
+      )}
+    </div>
+
+    {dayPath && (
+      <div className="day-flow">
+        <div className="flow-label">
+          {dayPath.roundTrip ? "This day’s movement (trek out & back)" : "This day’s movement"}
+        </div>
+        {dayPath.roundTrip ? (
+          <>
+            <div className="flow-stop start">
+              <span className="role">Leave from</span>
+              <span className="name">Chopta</span>
+            </div>
+            <div className="flow-arrow" aria-hidden="true">→</div>
+            <div className="flow-stop end">
+              <span className="role">Trek to</span>
+              <span className="name">Tungnath · Chandrashila</span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flow-stop start">
+              <span className="role">Leave from</span>
+              <span className="name">{dayPath.from}</span>
+            </div>
+            <div className="flow-arrow" aria-hidden="true">→</div>
+            <div className="flow-stop end">
+              <span className="role">Arrive at</span>
+              <span className="name">{dayPath.to}</span>
+            </div>
+          </>
+        )}
+        {filter === "day2" && <div className="flow-note">Devprayag Sangam · Dhari Devi · Rudraprayag Sangam</div>}
+        {filter === "day4" && <div className="flow-note">3.5 km to Tungnath (3,680 m) · +1.5 km to Chandrashila (~4,000 m)</div>}
+        {filter === "day1" && <div className="flow-note">≈25 km · 30–45 minutes</div>}
+      </div>
+    )}
+    </>
+  );
+}
+
+function Drawer({ dayKey, onClose, imageOverride }) {
+  if (!dayKey || !DAYINFO[dayKey]) return null;
+  const info = DAYINFO[dayKey];
+  const imageSrc = imageOverride || info.photo;
+  return (
+    <>
+      <div className={`scrim ${dayKey ? "show" : ""}`} onClick={onClose} />
+      <div className={`drawer ${dayKey ? "open" : ""}`}>
+        <div className="drawer-photo">
+          <img src={imageSrc} alt={info.title} />
+          <button className="drawer-close" onClick={onClose} aria-label="Close">✕</button>
+        </div>
+        <div className="drawer-body">
+          <div className="drawer-eyebrow">{info.eyebrow}</div>
+          <div className="drawer-title">{info.title}</div>
+          <div className="drawer-sub">{info.subtitle}</div>
+          <div className="moments">
+            {info.moments.map((m, i) => (
+              <div className="moment" key={i}>
+                <span className="dot" />
+                <div className="time">{m.time}</div>
+                <div className="m-title">{m.title}</div>
+                <div className="m-desc">{m.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function App() {
+  const [filter, setFilter] = useState("full");
+  const [drawerKey, setDrawerKey] = useState(null);
+  const [drawerImage, setDrawerImage] = useState(null);
+
+  useEffect(() => {
+    const onKey = e => {
+      if (e.key === "Escape") {
+        setDrawerKey(null);
+        setDrawerImage(null);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  const openDrawer = (key, image = null) => {
+    setDrawerKey(key);
+    setDrawerImage(image);
+  };
+
+  return (
+    <>
+      <nav className="topnav">
+        <div className="wrap topnav-inner">
+          <div className="brand">
+            <span className="brand-mark" aria-hidden="true" />
+            Haridwar → Chopta · Tungnath
+          </div>
+          <div className="navlinks">
+            <a href="#overview">Overview</a>
+            <a href="#map" className="active">Route Map</a>
+            <a href="#elevation">Elevation</a>
+            <a href="#itinerary">Itinerary</a>
+            <a href="#tips">Tips</a>
+          </div>
+        </div>
+      </nav>
+
+      <header className="hero" id="overview">
+        <div className="wrap">
+          <span className="eyebrow">Garhwal · Panch Prayag · Panch Kedar</span>
+          <h1 className="serif">Five days from Haridwar to the high meadows of Chopta and Tungnath.</h1>
+          <p className="lead">
+            Pickup in Haridwar, Rishikesh stay, the sacred Prayags, temple towns of Karanprayag and Gopeshwar,
+            then the classic trek to the world’s highest Shiva temple and Chandrashila summit.
+          </p>
+          <div className="stats">
+            <div className="stat-card"><div className="label">Duration</div><div className="value">5 days</div></div>
+            <div className="stat-card"><div className="label">Highest point</div><div className="value">~4,000 m</div></div>
+            <div className="stat-card"><div className="label">Trek day</div><div className="value">~5 km</div></div>
+            <div className="stat-card"><div className="label">Best season</div><div className="value" style={{fontSize:17}}>Apr–Jun · Sep–Nov</div></div>
+          </div>
+        </div>
+      </header>
+
+      <section className="mapshell" id="map">
+        <div className="wrap">
+          <div className="shell-head">
+            <span className="eyebrow">The journey, on one map</span>
+            <h2 className="serif">Filter by day to see where you leave from and where you arrive.</h2>
+          </div>
+
+          <div className="pills">
+            {[
+              { id: "full", label: "Full Journey" },
+              { id: "day1", label: "Day 1 · Rishikesh" },
+              { id: "day2", label: "Day 2 · Prayags" },
+              { id: "day3", label: "Day 3 · Temples" },
+              { id: "day4", label: "Day 4 · Trek" },
+              { id: "day5", label: "Day 5 · Return" }
+            ].map(p => (
+              <button key={p.id} className={`pill ${filter === p.id ? "active" : ""}`}
+                onClick={() => setFilter(p.id)}>{p.label}</button>
+            ))}
+          </div>
+
+          <MapCanvas filter={filter} onOpenDrawer={openDrawer} />
+
+          <div className="legend">
+            <div className="item"><span className="dot" style={{background:"var(--white)"}} />Haridwar / start</div>
+            <div className="item"><span className="dot" style={{background:"var(--orange)"}} />Transfer / trek days</div>
+            <div className="item"><span className="dot" style={{background:"var(--mint)"}} />Sightseeing stops</div>
+            <div className="hint">Select a day → START & END light up · arrows show direction · tap pin for overview · double-tap for schedule</div>
+          </div>
+        </div>
+      </section>
+
+      <section className="elevation-section" id="elevation">
+        <div className="wrap">
+          <h2 className="serif">Elevation profile</h2>
+          <p className="sub">Approximate height gain across the main points of the route.</p>
+          <div className="elev-card">
+            <div className="elev-chart">
+              <div className="elev-y-labels">
+                <span>4000 m</span>
+                <span>3500 m</span>
+                <span>3000 m</span>
+                <span>2500 m</span>
+                <span>2000 m</span>
+                <span>1500 m</span>
+                <span>1000 m</span>
+                <span>500 m</span>
+              </div>
+              <svg viewBox="0 0 760 220" preserveAspectRatio="none" aria-hidden="true">
+                {/* grid: 4000→8, 3500→32, 3000→56, 2500→80, 2000→104, 1500→128, 1000→152, 500→176 */}
+                <line x1="64" y1="8" x2="740" y2="8" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="64" y1="32" x2="740" y2="32" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="64" y1="56" x2="740" y2="56" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="64" y1="80" x2="740" y2="80" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="64" y1="104" x2="740" y2="104" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="64" y1="128" x2="740" y2="128" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="64" y1="152" x2="740" y2="152" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="64" y1="176" x2="740" y2="176" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <defs>
+                  <linearGradient id="elevFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#4fd4a3" stopOpacity="0.30" />
+                    <stop offset="100%" stopColor="#4fd4a3" stopOpacity="0.02" />
+                  </linearGradient>
+                </defs>
+                {/* y = 176 - ((elev-500)/3500)*168
+                    Haridwar 300→186≈176 (clamp), Rishikesh 350→183,
+                    Devprayag 830→160, Karnaprayag 860→159, Gopeshwar 1450→130,
+                    Chopta 2680→72, Tungnath 3680→24, Chandrashila 4000→8, Chopta 2680→72 */}
+                <path
+                  d="M64 186 L140 183 L230 160 L320 159 L410 130 L500 72 L590 24 L680 8 L740 72"
+                  fill="url(#elevFill)"
+                  stroke="none"
+                />
+                <path
+                  d="M64 186 L140 183 L230 160 L320 159 L410 130 L500 72 L590 24 L680 8 L740 72"
+                  fill="none"
+                  stroke="#4fd4a3"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <circle cx="64" cy="186" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="140" cy="183" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="230" cy="160" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="320" cy="159" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="410" cy="130" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="500" cy="72" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="590" cy="24" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="680" cy="8" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="740" cy="72" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+              </svg>
+            </div>
+            <div className="elev-x-labels">
+              <span>Haridwar</span>
+              <span>Rishikesh</span>
+              <span>Devprayag</span>
+              <span>Karanprayag</span>
+              <span>Gopeshwar</span>
+              <span>Chopta</span>
+              <span>Tungnath</span>
+              <span>Chandrashila</span>
+              <span>Chopta</span>
+            </div>
+            <p className="elev-note">Approx. elevations · Haridwar ~300 m · Rishikesh ~350 m · Chopta ~2,680 m · Tungnath 3,680 m · Chandrashila ~4,000 m</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="itinerary">
+        <div className="wrap">
+          <h2 className="serif" style={{fontSize:"clamp(22px,2.6vw,28px)", marginBottom:8, color:"var(--mist-100)"}}>Day-by-day overview</h2>
+          <p style={{color:"var(--mist-400)", fontSize:14.5, marginBottom:22}}>Click any card to open the detailed schedule.</p>
+          <div className="day-grid">
+            {DAY_CARDS.map(card => (
+              <div className="day-card" key={card.key} onClick={() => openDrawer(card.key)}>
+                <div className="card-photo">
+                  <img src={card.photo} alt={card.title} />
+                  <span className="day-tag">{card.tag}</span>
+                </div>
+                <div className="card-body">
+                  <h3>{card.title}</h3>
+                  <div className="card-meta">{card.meta}</div>
+                  <p>{card.desc}</p>
+                  <button className="open-btn">Open schedule →</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="tips-section" id="tips">
+        <div className="wrap">
+          <h2 className="serif">Practical tips</h2>
+          <p className="sub">Small things that make the Chopta–Tungnath trip smoother.</p>
+          <div className="tips-grid">
+            {TIPS.map((t, i) => (
+              <div className="tip" key={i}>
+                <div className="icon">{t.icon}</div>
+                <div>
+                  <h4>{t.title}</h4>
+                  <p>{t.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <div className="wrap">
+          Haridwar → Rishikesh → Devprayag · Rudraprayag · Karanprayag → Gopeshwar → Chopta → Tungnath · Chandrashila → Haridwar
+        </div>
+      </footer>
+
+      <Drawer
+        dayKey={drawerKey}
+        onClose={() => {
+          setDrawerKey(null);
+          setDrawerImage(null);
+        }}
+        imageOverride={drawerImage}
+      />
+    </>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>

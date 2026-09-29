@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dehradun to Chopta & Auli — Interactive Route Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.9/babel.min.js"></script>
+<style>
+
+:root {
+  --ink-950: #080c0b;
+  --ink-900: #0b1210;
+  --ink-800: #111a17;
+  --ink-700: #172a1d;
+  --ink-600: #1e3328;
+  --mist-100: #e8f0ec;
+  --mist-200: #c5d4cc;
+  --mist-300: #9aafa4;
+  --mist-400: #6b8076;
+  --mint: #4fd4a3;
+  --mint-bright: #2fbd8c;
+  --mint-dim: rgba(79, 212, 163, 0.12);
+  --mint-glow: rgba(79, 212, 163, 0.28);
+  --orange: #d9713f;
+  --orange-light: #e28a60;
+  --sage: #8fa98e;
+  --white: #f4f1e8;
+  --line: rgba(255,255,255,0.08);
+  --line-strong: rgba(255,255,255,0.12);
+  --card: #0f1714;
+  --card-hover: #13201b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--ink-950);
+  color: var(--mist-200);
+  font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
+  background-size: 22px 22px;
+  overflow-x: hidden;
+}
+::selection {
+  background: var(--mint);
+  color: var(--ink-950);
+}
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--ink-900); }
+::-webkit-scrollbar-thumb { background: #26352f; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--mint-bright); }
+
+.serif { font-family: "Fraunces", serif; }
+.wrap { width: min(1180px, calc(100% - 40px)); margin: auto; }
+
+.topnav {
+  border-bottom: 1px solid var(--line);
+  padding: 20px 0;
+  background: rgba(8, 12, 11, 0.92);
+  backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: 30;
+}
+.topnav-inner {
+  display: flex; align-items: center; justify-content: space-between; gap: 30px;
+}
+.brand {
+  font-family: "Fraunces", serif; font-size: 16px;
+  display: flex; align-items: center; gap: 12px; white-space: nowrap;
+  color: var(--mist-100);
+}
+.brand-mark {
+  width: 20px; height: 20px; border-radius: 50% 50% 50% 0;
+  background: var(--mint);
+  transform: rotate(-45deg);
+  box-shadow: 0 0 0 4px rgba(79,212,163,0.15), 0 4px 12px rgba(0,0,0,0.4);
+  position: relative;
+}
+.brand-mark::after {
+  content: ""; position: absolute; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--ink-950); top: 6.5px; left: 6.5px;
+}
+.navlinks { display: flex; gap: 28px; }
+.navlinks a {
+  color: var(--mist-400); text-decoration: none; text-transform: uppercase;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.16em; padding-bottom: 5px;
+  border-bottom: 2px solid transparent; transition: color .2s, border-color .2s;
+}
+.navlinks a:hover { color: var(--mist-100); }
+.navlinks a.active { color: var(--mist-100); border-color: var(--mint); }
+
+.hero { padding: 48px 0 20px; }
+.eyebrow {
+  display: block; color: var(--mint); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+}
+.hero h1 {
+  margin: 12px 0 14px; max-width: 22ch;
+  font-size: clamp(28px, 4vw, 42px); line-height: 1.12; font-weight: 500;
+  color: var(--mist-100);
+}
+.hero .lead { color: var(--mist-400); font-size: 15.5px; max-width: 54ch; line-height: 1.65; }
+
+.stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 14px; margin: 28px 0 36px;
+}
+.stat-card {
+  background: var(--card); border-radius: 14px; padding: 16px 18px;
+  border: 1px solid var(--line); box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+.stat-card .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--mist-400); }
+.stat-card .value { font-family: "Fraunces", serif; font-size: 24px; font-weight: 500; margin-top: 5px; color: var(--mist-100); }
+
+.mapshell { padding: 10px 0 60px; }
+.shell-head { margin-bottom: 22px; }
+.shell-head h2 { margin: 10px 0 0; font-size: clamp(22px, 2.8vw, 30px); font-weight: 500; color: var(--mist-100); }
+
+.pills {
+  display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 12px;
+  scrollbar-width: thin; scrollbar-color: #26352f transparent;
+}
+.pill {
+  flex: 0 0 auto; border: 1px solid var(--line);
+  background: rgba(15, 23, 20, 0.8); color: var(--mist-400);
+  border-radius: 999px; padding: 10px 15px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+  cursor: pointer; transition: all .2s ease;
+}
+.pill:hover { transform: translateY(-1px); border-color: var(--mint); color: var(--mist-200); }
+.pill.active {
+  background: var(--mint); color: var(--ink-950); border-color: var(--mint);
+  box-shadow: 0 4px 18px var(--mint-glow);
+}
+
+.mapcanvas {
+  position: relative; width: 100%; aspect-ratio: 16/9.2;
+  border-radius: 22px; overflow: visible;
+  background-color: #0a1210;
+  box-shadow: 0 36px 80px -30px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05) inset;
+}
+.map-bg {
+  position: absolute; inset: 0;
+  border-radius: 22px; overflow: hidden;
+  background-image:
+    linear-gradient(180deg, rgba(8,12,11,0.55) 0%, rgba(8,12,11,0.72) 45%, rgba(8,12,11,0.9) 100%),
+    url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1800&q=80');
+  background-size: cover; background-position: center 30%;
+  filter: saturate(0.75) contrast(1.08) brightness(0.85);
+}
+.map-title {
+  position: absolute; left: 5%; top: 5%; z-index: 2;
+  color: rgba(232,240,236,0.95); font-family: "Fraunces", serif; font-style: italic;
+  font-size: clamp(22px, 3vw, 34px); text-shadow: 0 2px 16px rgba(0,0,0,0.6);
+}
+.map-subtitle {
+  position: absolute; left: 5%; top: 12.5%; z-index: 2;
+  color: rgba(232,240,236,0.4); font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase;
+}
+.routes { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+.route-path {
+  fill: none; stroke-linecap: round; stroke-linejoin: round;
+  transition: opacity .4s ease, stroke-width .3s ease, filter .4s ease;
+}
+.route-path.dim { opacity: 0.12; stroke-width: 2.5; }
+.route-path.glow { filter: drop-shadow(0 0 10px currentColor); opacity: 1; }
+.route-path.animated { stroke-dasharray: 7 13; animation: dashMove 32s linear infinite; }
+@keyframes dashMove { to { stroke-dashoffset: -440; } }
+
+.pin {
+  position: absolute; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer; z-index: 5;
+  transition: opacity .3s, transform .2s, filter .3s;
+  touch-action: manipulation;
+}
+.pin:hover, .pin:focus-visible { transform: translate(-50%, -50%) scale(1.06); z-index: 8; }
+.pin.dim { opacity: 0.18; filter: grayscale(0.7); pointer-events: none; }
+.pin .marker {
+  width: 22px; height: 22px; border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg); position: relative;
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.4), 0 5px 14px rgba(0,0,0,0.5);
+  transition: box-shadow .2s, transform .2s;
+}
+.pin:hover .marker { box-shadow: 0 0 0 4px var(--mint), 0 7px 18px rgba(0,0,0,0.5); }
+.pin .marker::after {
+  content: ""; position: absolute; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--ink-950); top: 7px; left: 7px;
+}
+.pin[data-group="start"] .marker { background: var(--white); }
+.pin[data-group="transfer"] .marker { background: var(--orange); }
+.pin[data-group="sight"] .marker { background: var(--sage); }
+.pin .badge {
+  margin-top: 8px; padding: 5px 10px; border-radius: 7px;
+  background: rgba(7,17,11,0.94); color: #fff; white-space: nowrap;
+  font-size: 11px; font-weight: 600;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06);
+}
+.pin .badge .alt { color: var(--mint); margin-left: 4px; font-size: 10px; }
+.pin .role-tag {
+  margin-top: 5px; padding: 3px 8px; border-radius: 5px;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.pin.role-start .role-tag { background: #fff; color: var(--ink-950); }
+.pin.role-end .role-tag { background: var(--mint); color: var(--ink-950); }
+.pin.role-via .role-tag { background: rgba(79,212,163,0.9); color: var(--ink-950); }
+.pin.role-start .marker {
+  box-shadow: 0 0 0 4px #fff, 0 0 0 7px rgba(255,255,255,0.2), 0 6px 16px rgba(0,0,0,0.5);
+}
+.pin.role-end .marker {
+  box-shadow: 0 0 0 4px var(--mint), 0 0 0 7px var(--mint-glow), 0 6px 16px rgba(0,0,0,0.5);
+}
+.view-link { display: none !important; }
+
+.popover {
+  position: absolute; width: 240px; background: var(--ink-700);
+  border: 1px solid var(--line-strong); border-radius: 14px; padding: 14px;
+  box-shadow: 0 28px 60px rgba(0,0,0,0.55);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease; z-index: 40;
+  max-height: min(70vh, 420px); overflow-y: auto; -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+.popover.show { opacity: 1; pointer-events: auto; }
+.popover .thumb { width: 100%; height: 110px; border-radius: 9px; margin-bottom: 12px; overflow: hidden; background: var(--ink-800); }
+.popover .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.popover .pv-title { color: #fff; font-family: "Fraunces", serif; font-size: 16.5px; }
+.popover .pv-title .alt { color: var(--mint); font-family: "Inter", sans-serif; font-weight: 700; font-size: 12.5px; margin-left: 6px; }
+.popover .pv-blurb { color: rgba(232,240,236,0.7); font-size: 12.5px; line-height: 1.55; margin-top: 7px; }
+.popover .pv-link {
+  display: inline-block; margin-top: 11px; color: var(--mint); font-size: 12px; font-weight: 700;
+  text-decoration: none; cursor: pointer;
+}
+.popover .pv-link:hover { text-decoration: underline; }
+
+.legend {
+  display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+  margin-top: 16px; color: var(--mist-400); font-size: 11.5px;
+}
+.legend .item { display: flex; align-items: center; gap: 7px; }
+.legend .dot { width: 8px; height: 8px; border-radius: 50%; }
+.legend .hint { margin-left: auto; font-size: 10.5px; }
+
+.day-flow {
+  display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;
+  margin-top: 14px; padding: 14px 18px; border-radius: 14px;
+  background: var(--card); border: 1px solid var(--line);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+.day-flow .flow-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mist-400);
+  width: 100%; text-align: center; margin-bottom: 2px;
+}
+.day-flow .flow-stop {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  min-width: 90px; padding: 8px 12px; border-radius: 10px; background: var(--ink-800);
+}
+.day-flow .flow-stop.start { background: rgba(255,255,255,0.06); border: 2px solid var(--mist-200); }
+.day-flow .flow-stop.end { background: var(--mint-dim); border: 2px solid var(--mint); }
+.day-flow .flow-stop .role { font-size: 9px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mist-400); }
+.day-flow .flow-stop.start .role { color: var(--mist-200); }
+.day-flow .flow-stop.end .role { color: var(--mint); }
+.day-flow .flow-stop .name { font-family: "Fraunces", serif; font-size: 15px; font-weight: 500; color: var(--mist-100); }
+.day-flow .flow-arrow { font-size: 22px; color: var(--mint); font-weight: 700; line-height: 1; }
+.day-flow .flow-note { width: 100%; text-align: center; font-size: 11.5px; color: var(--mist-400); margin-top: 4px; }
+
+.day-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px; margin: 40px 0;
+}
+.day-card {
+  background: var(--card); border-radius: 16px; overflow: hidden;
+  border: 1px solid var(--line); box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  cursor: pointer; transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+.day-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+  border-color: rgba(79,212,163,0.25);
+}
+.day-card .card-photo { height: 140px; position: relative; overflow: hidden; background: var(--ink-800); }
+.day-card .card-photo img { width: 100%; height: 100%; object-fit: cover; }
+.day-card .card-photo .day-tag {
+  position: absolute; top: 11px; left: 11px;
+  background: rgba(8,12,11,0.88); color: #fff;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 4px 9px; border-radius: 6px;
+}
+.day-card .card-body { padding: 16px 18px 20px; }
+.day-card h3 { font-family: "Fraunces", serif; font-size: 18px; font-weight: 500; margin-bottom: 4px; color: var(--mist-100); }
+.day-card .card-meta { font-size: 12px; color: var(--mist-400); margin-bottom: 8px; }
+.day-card p { font-size: 13px; color: var(--mist-400); line-height: 1.5; }
+.day-card .open-btn {
+  margin-top: 12px; font-size: 12px; font-weight: 700; color: var(--mint);
+  background: none; border: none; cursor: pointer;
+}
+
+.elevation-section { margin: 10px 0 50px; }
+.elevation-section h2 {
+  font-size: clamp(22px, 2.6vw, 28px); font-weight: 500; margin-bottom: 6px; color: var(--mist-100);
+}
+.elevation-section .sub { color: var(--mist-400); font-size: 14.5px; margin-bottom: 22px; }
+.elev-card {
+  background: var(--card);
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  padding: 28px 24px 20px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+.elev-chart { position: relative; width: 100%; height: 220px; }
+.elev-chart svg { width: 100%; height: 100%; display: block; }
+.elev-y-labels {
+  position: absolute; left: 0; top: 0; bottom: 28px; width: 52px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  font-size: 11px; color: var(--mist-400); pointer-events: none;
+}
+.elev-x-labels {
+  display: flex; justify-content: space-between;
+  padding: 10px 8px 0 52px;
+  font-size: 11.5px; color: var(--mist-200); font-weight: 500;
+}
+.elev-x-labels span { text-align: center; flex: 1; white-space: nowrap; }
+.elev-note { margin-top: 14px; font-size: 12px; color: var(--mist-400); text-align: center; }
+
+.tips-section { margin: 48px 0 60px; }
+.tips-section h2 { font-size: clamp(22px, 2.6vw, 28px); font-weight: 500; margin-bottom: 6px; color: var(--mist-100); }
+.tips-section .sub { color: var(--mist-400); font-size: 14.5px; margin-bottom: 22px; }
+.tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.tip {
+  background: var(--card); border-radius: 14px; padding: 16px 18px; border: 1px solid var(--line);
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.tip .icon {
+  width: 34px; height: 34px; border-radius: 9px; background: var(--mint-dim);
+  color: var(--mint); display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.tip h4 { font-size: 13.5px; font-weight: 600; margin-bottom: 3px; color: var(--mist-100); }
+.tip p { font-size: 12.5px; color: var(--mist-400); line-height: 1.45; }
+
+.scrim {
+  position: fixed; inset: 0; background: rgba(8,12,11,0.7);
+  opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 40;
+}
+.scrim.show { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; right: 0; width: min(430px, 94vw); height: 100%;
+  background: var(--ink-800); color: #fff;
+  transform: translateX(100%); transition: transform .38s cubic-bezier(.22,1,.36,1);
+  z-index: 50; overflow-y: auto; display: flex; flex-direction: column;
+  max-width: 100vw;
+}
+.drawer.open { transform: translateX(0); }
+.drawer-photo {
+  height: 200px; width: 100%; background: var(--ink-700); position: relative; flex-shrink: 0; overflow: hidden;
+}
+.drawer-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.drawer-close {
+  position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(7,17,11,0.7); border: none; color: #fff; cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.drawer-body { padding: 26px 26px 48px; }
+.drawer-eyebrow { color: var(--mint); font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+.drawer-title { margin-top: 10px; font-family: "Fraunces", serif; font-style: italic; font-size: 28px; line-height: 1.15; color: var(--mist-100); }
+.drawer-sub { margin-top: 6px; color: rgba(232,240,236,0.5); font-size: 13px; line-height: 1.5; }
+.moments { margin-top: 28px; }
+.moment {
+  position: relative; margin-left: 4px; padding: 0 0 22px 26px;
+  border-left: 1px solid rgba(255,255,255,0.1);
+}
+.moment:last-child { border-color: transparent; padding-bottom: 0; }
+.moment .dot {
+  position: absolute; left: -5px; top: 3px; width: 9px; height: 9px; border-radius: 50%;
+  background: var(--mint); border: 2px solid var(--ink-800);
+}
+.moment .time { color: var(--mint); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+.moment .m-title { margin-top: 3px; font-size: 15.5px; font-family: "Fraunces", serif; color: var(--mist-100); }
+.moment .m-desc { margin-top: 3px; color: rgba(232,240,236,0.55); font-size: 12.5px; line-height: 1.5; }
+
+footer {
+  border-top: 1px solid var(--line); padding: 28px 0 40px;
+  text-align: center; font-size: 13px; color: var(--mist-400);
+}
+
+img { max-width: 100%; height: auto; object-fit: cover; }
+.mapcanvas { touch-action: manipulation; max-width: 100%; }
+
+@media (max-width: 900px) {
+  .topnav-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .navlinks { width: 100%; flex-wrap: wrap; gap: 10px 14px; justify-content: flex-start; }
+  .mapcanvas { aspect-ratio: 3/4; border-radius: 16px; overflow: visible !important; }
+  .map-bg { border-radius: 16px; }
+  .legend { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .legend .hint { margin-left: 0; width: 100%; }
+  .day-flow { padding: 12px 12px; gap: 8px; }
+  .day-flow .flow-stop { min-width: 72px; padding: 8px 10px; }
+  .day-flow .flow-stop .name { font-size: 13px; }
+  .elev-chart { height: 200px; }
+  .elev-x-labels {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: 0;
+    padding: 8px 2px 0 40px !important;
+    font-size: 8px !important;
+    line-height: 1.15;
+    min-height: 64px;
+    align-items: flex-start;
+  }
+  .elev-x-labels span {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    text-align: left;
+    height: 52px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: none !important;
+  }
+  .elev-y-labels { width: 40px; font-size: 9px; bottom: 48px; }
+  .elev-note { font-size: 10.5px; text-align: left; padding: 0 2px; }
+  .elev-card { padding: 20px 12px 16px; padding-bottom: 12px !important; }
+  .popover { width: min(260px, calc(100vw - 24px)); max-width: calc(100% - 16px); }
+  .drawer { width: min(100vw, 430px); }
+  .wrap { width: calc(100% - 24px); max-width: 100%; }
+  .hero { padding: 32px 0 16px; }
+  .hero h1 { max-width: 100%; }
+  .pills { -webkit-overflow-scrolling: touch; }
+  .pill { min-height: 44px; padding: 10px 14px; display: inline-flex; align-items: center; }
+  .pin { min-width: 44px; min-height: 44px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .day-grid { grid-template-columns: 1fr !important; }
+  .tips-grid { grid-template-columns: 1fr !important; }
+  .pin .badge {
+    font-size: 9.5px !important; padding: 4px 8px !important;
+    max-width: 110px !important; white-space: normal !important;
+    overflow: visible !important; text-overflow: unset !important; line-height: 1.2;
+  }
+  .pin .badge .alt { display: none !important; }
+  .pin .role-tag { font-size: 7.5px; padding: 2px 5px; }
+  .map-title { font-size: clamp(18px, 5vw, 28px); left: 4%; top: 4%; }
+  .map-subtitle { font-size: 8.5px; left: 4%; top: 11%; letter-spacing: 0.12em; max-width: 90%; }
+}
+
+@media (min-width: 901px) {
+  .mapcanvas { overflow: visible; }
+}
+
+@media (max-width: 600px) {
+  .mapcanvas { aspect-ratio: 2/3; }
+  .pin .badge {
+    opacity: 0.95; max-width: 96px !important; font-size: 9px !important; padding: 3px 7px !important;
+  }
+  .pin.dim .badge { opacity: 0.4; }
+  .brand { font-size: 14px; }
+  .navlinks a { font-size: 9px; letter-spacing: 0.08em; padding: 6px 0; min-height: 36px; display: inline-flex; align-items: center; }
+  .stat-card .value { font-size: 18px; }
+  .day-card .card-photo { height: 140px; }
+  .topnav { padding: 14px 0; }
+  .hero .lead { font-size: 14.5px; }
+  .shell-head h2 { font-size: clamp(20px, 5vw, 26px); }
+  .popover {
+    width: min(220px, calc(100% - 20px)) !important;
+    max-width: calc(100% - 20px);
+    padding: 12px;
+  }
+  .popover .thumb { height: 90px; }
+  .popover .pv-title { font-size: 15px; }
+  .popover .pv-blurb { font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+  .mapcanvas { aspect-ratio: 3/5; }
+  .pin .badge { max-width: 88px !important; font-size: 8.5px !important; padding: 3px 6px !important; }
+  .wrap { width: calc(100% - 16px); }
+  .stats { gap: 10px; }
+  .stat-card { padding: 12px 14px; }
+  .popover { width: min(200px, calc(100% - 16px)) !important; padding: 10px; }
+  .popover .thumb { height: 80px; margin-bottom: 8px; }
+  .navlinks { gap: 8px 12px; }
+  .hero { padding: 24px 0 12px; }
+  .mapshell { padding-bottom: 40px; }
+  .elev-x-labels span { height: 58px; font-size: 7.5px !important; }
+}
+
+@media (max-width: 400px) {
+  .pin .badge { max-width: 88px !important; font-size: 8.5px !important; padding: 3px 6px !important; }
+}
+
+@media (max-width: 360px) {
+  .mapcanvas { aspect-ratio: 9/16; }
+  .hero h1 { font-size: clamp(22px, 8vw, 28px); }
+  .pill { padding: 8px 10px; font-size: 9px; min-height: 40px; }
+  .brand { font-size: 13px; gap: 8px; }
+  .stat-card .value { font-size: 16px; }
+}
+
+@media (max-width: 320px) {
+  .wrap { width: calc(100% - 12px); }
+  .mapcanvas { aspect-ratio: 0.55; }
+}
+
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// Plain image paths only — no IMG object
+// Each location: image = map/popover, scheduleImage = day-schedule drawer
+const LOCATIONS = [
+  { id: "dehradun", name: "Dehradun", alt: "Pickup / Drop", x: 88, y: 82, group: "start", image: "/itineraries/honeymoon/images/Dehradun.webp", blurb: "Pickup from bus stand, railway station or airport. Final drop on Day 4 at the airport." },
+  { id: "chopta", name: "Chopta", alt: "~2,700 m", x: 52, y: 48, group: "transfer", image: "/itineraries/honeymoon/images/Chopta.jpg", scheduleImage: "/itineraries/honeymoon/images/Chopta.jpg", blurb: "Mini Switzerland of India — your base for Night 1. Lush meadows and deodar forests." },
+  { id: "tungnath", name: "Tungnath", alt: "3,680 m", x: 42, y: 32, group: "sight", image: "/itineraries/honeymoon/images/TungnathTample.jpg", scheduleImage: "/itineraries/honeymoon/images/TungnathTample.jpg", blurb: "Highest Shiva temple in the world. 3 km trek through forests and meadows from Chopta." },
+  { id: "chandrashila", name: "Chandrashila", alt: "~4,000 m", x: 36, y: 22, group: "sight", image: "/itineraries/honeymoon/images/Chandrashila.webp", scheduleImage: "/itineraries/honeymoon/images/Chandrashila.webp", blurb: "Summit above Tungnath. Breathtaking Himalayan panoramas of Nanda Devi, Trishul & more." },
+  { id: "auli", name: "Auli", alt: "~2,800 m", x: 28, y: 52, group: "transfer", image: "/itineraries/honeymoon/images/Auli.jpg", scheduleImage: "/itineraries/honeymoon/images/Auli.jpg", blurb: "Famous ski resort & alpine meadows. Base for Nights 2–3. Chairlift & artificial lake." },
+  { id: "gurson", name: "Gurson Bugyal", alt: "~3,050 m", x: 18, y: 40, group: "sight", image: "/itineraries/honeymoon/images/GursonBugyal.jpg", scheduleImage: "/itineraries/honeymoon/images/GursonBugyal.jpg", blurb: "Stunning alpine meadow. 3 km trek with views of Nanda Devi, Trishul and Dron Parvat." },
+  { id: "aulilake", name: "Auli Lake", alt: "Artificial", x: 24, y: 58, group: "sight", image: "/itineraries/honeymoon/images/Aulilake.jpg", scheduleImage: "/itineraries/honeymoon/images/Aulilake.jpg", blurb: "One of the world’s highest man-made lakes. Visited with the chair ride in Auli." }
+];
+
+const DAYINFO = {
+  day1: {
+    eyebrow: "DAY 01 · DEHRADUN → CHOPTA",
+    title: "Arrival & long drive",
+    subtitle: "Pickup from Dehradun and scenic 250 km drive to Chopta — Mini Switzerland of India",
+    photo: "/itineraries/honeymoon/images/Chopta.jpg",
+    moments: [
+      { time: "Morning", title: "Pickup in Dehradun", desc: "Meet at bus stand, railway station or airport as per your arrival" },
+      { time: "Day", title: "Drive to Chopta", desc: "Approximately 250 km · 9 hours via Rishikesh / Devprayag / Ukhimath" },
+      { time: "En route", title: "Scenic mountain road", desc: "Stops for views, tea and short breaks on the Himalayan highway" },
+      { time: "Evening", title: "Arrive Chopta", desc: "Check into camp and unwind in the serene surroundings" },
+      { time: "Night", title: "Dinner & overnight", desc: "Dinner at camp · overnight stay in Chopta" }
+    ]
+  },
+  day2: {
+    eyebrow: "DAY 02 · CHOPTA TREK → AULI",
+    title: "Tungnath–Chandrashila trek & transfer",
+    subtitle: "Highest Shiva temple and summit views, then drive 160 km to Auli",
+    photo: "/itineraries/honeymoon/images/Chandrashila.webp",
+    moments: [
+      { time: "Morning", title: "Breakfast & start trek", desc: "3 km trek through lush forests and meadows to Tungnath (3,680 m)" },
+      { time: "Morning", title: "Tungnath Temple", desc: "World’s highest Shiva temple — short break and darshan" },
+      { time: "Mid-day", title: "Chandrashila Peak", desc: "Continue 1 km to the summit for panoramic Himalayan views" },
+      { time: "Afternoon", title: "Descend & drive", desc: "Return to Chopta, then 160 km / 6 hrs drive to Auli" },
+      { time: "Evening", title: "Arrive Auli", desc: "Check into hotel, dinner and overnight stay" }
+    ]
+  },
+  day3: {
+    eyebrow: "DAY 03 · AULI & GURSON BUGYAL",
+    title: "Explore Auli meadows",
+    subtitle: "Chair ride, artificial lake and trek to Gurson Bugyal with Nanda Devi views",
+    photo: "/itineraries/honeymoon/images/Auli.jpg",
+    moments: [
+      { time: "Morning", title: "Breakfast at hotel", desc: "Leisure start in the alpine setting of Auli" },
+      { time: "Morning", title: "Chair ride & Auli Lake", desc: "Cable/chair ride and visit to one of the world’s highest man-made lakes (tickets on direct payment)" },
+      { time: "Day", title: "Gurson Bugyal trek", desc: "3 km trek to the alpine meadow with views of Nanda Devi, Trishul & Dron Parvat" },
+      { time: "Afternoon", title: "Return to hotel", desc: "Free time to rest or explore the surroundings" },
+      { time: "Evening", title: "Dinner & overnight", desc: "Dinner and overnight stay at the hotel in Auli" }
+    ]
+  },
+  day4: {
+    eyebrow: "DAY 04 · AULI → DEHRADUN",
+    title: "Return & drop",
+    subtitle: "Early checkout and long transfer back to Dehradun for your onward journey",
+    photo: "/itineraries/honeymoon/images/Dehradun.webp",
+    moments: [
+      { time: "Morning", title: "Breakfast & checkout", desc: "Early breakfast and check out from the hotel" },
+      { time: "Day", title: "Drive to Dehradun", desc: "Approximately 300 km · 10 hours" },
+      { time: "Afternoon / Eve", title: "Drop in Dehradun", desc: "Airport drop for your onward journey" },
+      { time: "End", title: "Tour concludes", desc: "Safe onward journey — thank you for travelling with us" }
+    ]
+  }
+};
+
+const DAY_CARDS = [
+  { key: "day1", tag: "Day 1", title: "Dehradun → Chopta", meta: "Pickup · ~250 km · 9 hrs", desc: "Pickup from Dehradun and scenic long drive to Chopta camp for overnight stay.", photo: "/itineraries/honeymoon/images/Chopta.jpg" },
+  { key: "day2", tag: "Day 2", title: "Trek + Auli transfer", meta: "Tungnath · Chandrashila · 160 km", desc: "Trek to world’s highest Shiva temple and summit, then drive to Auli.", photo: "/itineraries/honeymoon/images/Chandrashila.webp" },
+  { key: "day3", tag: "Day 3", title: "Auli & Gurson Bugyal", meta: "Chair ride · lake · meadow trek", desc: "Explore Auli, artificial lake and trek to Gurson Bugyal meadows.", photo: "/itineraries/honeymoon/images/Auli.jpg" },
+  { key: "day4", tag: "Day 4", title: "Return Dehradun", meta: "Checkout · ~300 km · 10 hrs", desc: "Drive back to Dehradun for airport drop.", photo: "/itineraries/honeymoon/images/Dehradun.webp" }
+];
+
+const TIPS = [
+  { icon: "🚗", title: "Long road days", text: "Day 1 (~9 hrs) and Day 4 (~10 hrs) are long mountain drives. Start early and carry snacks/water." },
+  { icon: "🧥", title: "Layer up", text: "Chopta ~2,700 m, Tungnath 3,680 m, Auli ~2,800 m. Evenings and early mornings are cold even in summer." },
+  { icon: "🥾", title: "Tungnath trek", text: "3 km + 1 km to Chandrashila. Moderate climb. Wear good shoes; start early for clear summit views." },
+  { icon: "🚠", title: "Chair / cable car", text: "Auli chair ride and lake tickets are on direct payment basis. Carry cash or check online options." },
+  { icon: "📷", title: "Clear mornings", text: "Himalayan views from Chandrashila and Gurson are best early. Clouds often build after late morning." },
+  { icon: "📅", title: "Best season", text: "March–June and September–November. Monsoon roads can be tricky; winter brings snow and possible closures." }
+];
+
+const DAY_PATHS = {
+  day1: {
+    d: "M1056 525 C980 500 880 460 780 420 C700 390 620 360 624 307",
+    color: "var(--orange)", from: "Dehradun", to: "Chopta",
+    fromId: "dehradun", toId: "chopta", label: "Dehradun → Chopta (~250 km)"
+  },
+  day2: {
+    d: "M624 307 C580 280 540 240 504 205 C480 180 450 150 432 141 C450 160 500 200 540 240 C560 270 580 290 624 307 C560 340 420 380 336 333",
+    color: "var(--sage)", from: "Chopta", to: "Auli",
+    fromId: "chopta", toId: "auli",
+    viaIds: ["tungnath", "chandrashila"],
+    visitOrder: { tungnath: 1, chandrashila: 2 },
+    label: "Chopta trek → Auli transfer", roundTrip: false
+  },
+  day3: {
+    d: "M336 333 C300 310 260 280 216 256 C240 280 280 310 300 340 C310 360 320 370 336 333",
+    color: "var(--sage)", from: "Auli", to: "Gurson & lake",
+    fromId: "auli", toId: "auli",
+    viaIds: ["aulilake", "gurson"],
+    visitOrder: { aulilake: 1, gurson: 2 },
+    label: "Auli local (chair ride · lake · Gurson · return)", roundTrip: true
+  },
+  day4: {
+    d: "M336 333 C420 380 560 420 700 460 C820 500 960 520 1056 525",
+    color: "var(--orange)", from: "Auli", to: "Dehradun",
+    fromId: "auli", toId: "dehradun", label: "Auli → Dehradun (~300 km)"
+  }
+};
+
+const DAY_ACTIVE_LOCATIONS = {
+  day1: ["dehradun", "chopta"],
+  day2: ["chopta", "tungnath", "chandrashila", "auli"],
+  day3: ["auli", "aulilake", "gurson"],
+  day4: ["auli", "dehradun"]
+};
+
+function Popover({ loc, style, onEnter, onLeave, onOpen }) {
+  const openKey = () => {
+    const img = loc.scheduleImage || loc.image;
+    if (loc.id === "dehradun") onOpen("day1", img);
+    else if (loc.id === "chopta" || loc.id === "tungnath" || loc.id === "chandrashila") onOpen("day2", img);
+    else if (loc.group === "sight") onOpen("day3", img);
+    else onOpen("day3", img);
+  };
+  return (
+    <div className="popover show" style={style} onMouseEnter={onEnter} onMouseLeave={onLeave}>
+      <div className="thumb"><img src={loc.image} alt={loc.name} /></div>
+      <div className="pv-title">{loc.name}<span className="alt">{loc.alt}</span></div>
+      <div className="pv-blurb">{loc.blurb}</div>
+      <a className="pv-link" onClick={openKey} onDoubleClick={openKey}>Open day schedule →</a>
+    </div>
+  );
+}
+
+function MapCanvas({ filter, onOpenDrawer }) {
+  const [popover, setPopover] = useState(null);
+  const hideTimer = useRef(null);
+  const lastTap = useRef({ id: null, time: 0 });
+
+  const showPopover = useCallback((loc) => {
+    clearTimeout(hideTimer.current);
+    const x = Number(loc.x) || 50;
+    const y = Number(loc.y) || 50;
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 900;
+    let leftPct = x;
+    let above = y > 52;
+
+    if (isMobile) {
+      // Mobile: keep full 220-240px card inside the map / screen
+      if (x < 34) leftPct = 34;
+      else if (x > 66) leftPct = 66;
+      if (y < 20) above = false;
+      if (y > 78) above = true;
+    } else {
+      // Desktop: gentle nudge only when very close to edge (looks natural next to pin)
+      if (x < 12) leftPct = 12;
+      else if (x > 88) leftPct = 88;
+      if (y < 15) above = false;
+      if (y > 85) above = true;
+    }
+
+    setPopover({
+      loc,
+      left: leftPct + "%",
+      top: `calc(${y}% - 12px)`,
+      above
+    });
+  }, []);
+
+  const scheduleHide = () => {
+    clearTimeout(hideTimer.current);
+    hideTimer.current = setTimeout(() => setPopover(null), 220);
+  };
+
+  const openInfo = useCallback((loc) => {
+    clearTimeout(hideTimer.current);
+    setPopover(null);
+    let key = filter !== "full" && filter ? filter : "day3";
+    if (filter === "full") {
+      if (loc.id === "dehradun") key = "day1";
+      else if (loc.id === "chopta" || loc.id === "tungnath" || loc.id === "chandrashila") key = "day2";
+      else if (loc.id === "auli") key = "day3";
+      else key = "day3";
+    }
+    onOpenDrawer(key, loc.scheduleImage || loc.image);
+  }, [onOpenDrawer, filter]);
+
+  const handlePinActivate = useCallback((loc, e) => {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    clearTimeout(hideTimer.current);
+    const now = Date.now();
+    const isDouble = lastTap.current.id === loc.id && (now - lastTap.current.time) < 400;
+    lastTap.current = { id: loc.id, time: now };
+
+    if (isDouble) {
+      // Double click / double tap → open full day schedule
+      openInfo(loc);
+    } else {
+      // Single click / single tap → show location overview card
+      showPopover(loc);
+    }
+  }, [openInfo, showPopover]);
+
+  const isFull = filter === "full";
+  const activeDays = isFull ? Object.keys(DAY_PATHS) : [filter];
+
+  useEffect(() => {
+    if (!popover) return;
+    const onDoc = (e) => {
+      // close if click outside pin and popover
+      if (e.target.closest && (e.target.closest('.pin') || e.target.closest('.popover'))) return;
+      setPopover(null);
+    };
+    document.addEventListener('click', onDoc, true);
+    return () => document.removeEventListener('click', onDoc, true);
+  }, [popover]);
+  const activeLocIds = isFull ? null : (DAY_ACTIVE_LOCATIONS[filter] || []);
+  const dayPath = !isFull ? DAY_PATHS[filter] : null;
+
+  const pinRole = (loc) => {
+    if (!dayPath) return null;
+    if (loc.id === dayPath.fromId) return "start";
+    if (dayPath.viaIds && dayPath.viaIds.includes(loc.id)) return "via";
+    if (loc.id === dayPath.toId && dayPath.fromId !== dayPath.toId) return "end";
+    return null;
+  };
+
+  const subtitle = isFull
+    ? "Uttarakhand · Garhwal Himalayas · 4-day circuit"
+    : (dayPath
+        ? (dayPath.roundTrip && dayPath.fromId === dayPath.toId
+            ? `${dayPath.from}  · local circuit · return to hotel`
+            : `${dayPath.from}  →  ${dayPath.to}`)
+        : "Day route");
+
+  return (
+    <>
+    <div className="mapcanvas">
+      <div className="map-bg" />
+      <div className="map-title">Dehradun → Chopta & Auli</div>
+      <div className="map-subtitle">{subtitle}</div>
+
+      <svg className="routes" viewBox="0 0 1200 640" preserveAspectRatio="none">
+        <defs>
+          <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#d9713f" />
+          </marker>
+          <marker id="arrowSage" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#8fa98e" />
+          </marker>
+          <marker id="arrowWhite" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="rgba(255,255,255,0.5)" />
+          </marker>
+        </defs>
+
+        {!isFull && (
+          <g opacity="0.12">
+            {Object.values(DAY_PATHS).map((p, i) => (
+              <path key={"ghost"+i} d={p.d} fill="none" stroke="#fff" strokeWidth="2.5"
+                strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 10"
+                markerEnd="url(#arrowWhite)" />
+            ))}
+          </g>
+        )}
+
+        {activeDays.map(dayKey => {
+          const p = DAY_PATHS[dayKey];
+          if (!p) return null;
+          const marker = p.color.includes("sage") ? "url(#arrowSage)" : "url(#arrowOrange)";
+          return (
+            <path
+              key={dayKey}
+              className="route-path glow animated"
+              stroke={p.color}
+              strokeWidth={isFull ? 3.5 : 5.5}
+              d={p.d}
+              markerEnd={marker}
+            />
+          );
+        })}
+      </svg>
+
+      {LOCATIONS.map(loc => {
+        const isDim = !isFull && activeLocIds && !activeLocIds.includes(loc.id);
+        const role = pinRole(loc);
+        const roleClass = role ? `role-${role}` : "";
+        return (
+          <div
+            key={loc.id}
+            className={`pin ${isDim ? "dim" : ""} ${roleClass}`}
+            data-group={loc.group}
+            style={{ left: loc.x + "%", top: loc.y + "%" }}
+            tabIndex={isDim ? -1 : 0}
+            role="button"
+            aria-label={loc.name + ". Open day schedule"}
+            onMouseEnter={() => !isDim && showPopover(loc)}
+            onMouseLeave={scheduleHide}
+            onClick={(e) => handlePinActivate(loc, e)}
+            onDoubleClick={(e) => handlePinActivate(loc, e)}
+            
+            onKeyDown={e => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                openInfo(loc);
+              }
+            }}
+          >
+            <div className="marker" />
+            <div className="badge">{loc.name} <span className="alt">{loc.alt}</span></div>
+            {role === "start" && <div className="role-tag">{dayPath && dayPath.roundTrip && dayPath.fromId === dayPath.toId ? "Base" : "Leave from"}</div>}
+            {role === "end" && <div className="role-tag">{dayPath && dayPath.roundTrip ? "Return" : "Arrive"}</div>}
+            {role === "via" && (
+              <div className="role-tag">
+                {dayPath && dayPath.visitOrder && dayPath.visitOrder[loc.id]
+                  ? `Visit ${dayPath.visitOrder[loc.id]}`
+                  : "Visit"}
+              </div>
+            )}
+            
+          </div>
+        );
+      })}
+
+      {popover && (
+        <Popover loc={popover.loc} style={{
+            left: popover.left,
+            top: popover.top,
+            ...(popover.above ? { transform: "translate(-50%, calc(-100% - 16px))" } : {})
+          }}
+          onEnter={() => clearTimeout(hideTimer.current)} onLeave={scheduleHide} onOpen={onOpenDrawer} />
+      )}
+    </div>
+
+    {dayPath && (
+      <div className="day-flow">
+        <div className="flow-label">
+          {dayPath.roundTrip
+            ? "This day’s movement (out & back to hotel)"
+            : "This day’s movement"}
+        </div>
+        {dayPath.roundTrip && dayPath.fromId === dayPath.toId ? (
+          <>
+            <div className="flow-stop start">
+              <span className="role">Leave from</span>
+              <span className="name">{dayPath.from}</span>
+            </div>
+            <div className="flow-arrow" aria-hidden="true">→</div>
+            <div className="flow-stop end">
+              <span className="role">Visit stops</span>
+              <span className="name">then return</span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flow-stop start">
+              <span className="role">Leave from</span>
+              <span className="name">{dayPath.from}</span>
+            </div>
+            <div className="flow-arrow" aria-hidden="true">→</div>
+            <div className="flow-stop end">
+              <span className="role">Arrive at</span>
+              <span className="name">{dayPath.to}</span>
+            </div>
+          </>
+        )}
+        {filter === "day2" && (
+          <div className="flow-note">Visit 1: Tungnath · Visit 2: Chandrashila · then drive to Auli (~160 km / 6 hrs)</div>
+        )}
+        {filter === "day3" && (
+          <div className="flow-note">Visit 1: Auli Lake (chair ride) · Visit 2: Gurson Bugyal · return to hotel</div>
+        )}
+        {filter === "day1" && (
+          <div className="flow-note">Pickup: bus stand / railway / airport · ~250 km · 9 hrs</div>
+        )}
+        {filter === "day4" && (
+          <div className="flow-note">Drop: Dehradun airport · ~300 km · 10 hrs</div>
+        )}
+      </div>
+    )}
+    </>
+  );
+}
+
+function Drawer({ dayKey, onClose, imageOverride }) {
+  if (!dayKey || !DAYINFO[dayKey]) return null;
+  const info = DAYINFO[dayKey];
+  const imageSrc = imageOverride || info.photo;
+  return (
+    <>
+      <div className={`scrim ${dayKey ? "show" : ""}`} onClick={onClose} />
+      <div className={`drawer ${dayKey ? "open" : ""}`}>
+        <div className="drawer-photo">
+          <img src={imageSrc} alt={info.title} />
+          <button className="drawer-close" onClick={onClose} aria-label="Close">✕</button>
+        </div>
+        <div className="drawer-body">
+          <div className="drawer-eyebrow">{info.eyebrow}</div>
+          <div className="drawer-title">{info.title}</div>
+          <div className="drawer-sub">{info.subtitle}</div>
+          <div className="moments">
+            {info.moments.map((m, i) => (
+              <div className="moment" key={i}>
+                <span className="dot" />
+                <div className="time">{m.time}</div>
+                <div className="m-title">{m.title}</div>
+                <div className="m-desc">{m.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function App() {
+  const [filter, setFilter] = useState("full");
+  const [drawerKey, setDrawerKey] = useState(null);
+  const [drawerImage, setDrawerImage] = useState(null);
+
+  useEffect(() => {
+    const onKey = e => {
+      if (e.key === "Escape") {
+        setDrawerKey(null);
+        setDrawerImage(null);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  const openDrawer = (key, image = null) => {
+    setDrawerKey(key);
+    setDrawerImage(image);
+  };
+
+  return (
+    <>
+      <nav className="topnav">
+        <div className="wrap topnav-inner">
+          <div className="brand">
+            <span className="brand-mark" aria-hidden="true" />
+            Dehradun → Chopta & Auli
+          </div>
+          <div className="navlinks">
+            <a href="#overview">Overview</a>
+            <a href="#map" className="active">Route Map</a>
+            <a href="#itinerary">Itinerary</a>
+            <a href="#tips">Tips</a>
+          </div>
+        </div>
+      </nav>
+
+      <header className="hero" id="overview">
+        <div className="wrap">
+          <span className="eyebrow">Uttarakhand · Garhwal Himalayas</span>
+          <h1 className="serif">Four days from Dehradun to Chopta, Tungnath & the meadows of Auli.</h1>
+          <p className="lead">
+            Pickup in Dehradun, long scenic drive to Chopta, trek to the world’s highest Shiva temple
+            and Chandrashila summit, explore Auli and Gurson Bugyal, then drop back at the airport.
+          </p>
+          <div className="stats">
+            <div className="stat-card"><div className="label">Duration</div><div className="value">4 days</div></div>
+            <div className="stat-card"><div className="label">Longest drive</div><div className="value">~300 km</div></div>
+            <div className="stat-card"><div className="label">Highest point</div><div className="value">~4,000 m</div></div>
+            <div className="stat-card"><div className="label">Best season</div><div className="value" style={{fontSize:17}}>Mar–Jun · Sep–Nov</div></div>
+          </div>
+        </div>
+      </header>
+
+      <section className="mapshell" id="map">
+        <div className="wrap">
+          <div className="shell-head">
+            <span className="eyebrow">The journey, on one map</span>
+            <h2 className="serif">Filter by day to see where you leave from and where you arrive.</h2>
+          </div>
+
+          <div className="pills">
+            {[
+              { id: "full", label: "Full Journey" },
+              { id: "day1", label: "Day 1 · Chopta" },
+              { id: "day2", label: "Day 2 · Trek & Auli" },
+              { id: "day3", label: "Day 3 · Auli explore" },
+              { id: "day4", label: "Day 4 · Dehradun" }
+            ].map(p => (
+              <button key={p.id} className={`pill ${filter === p.id ? "active" : ""}`}
+                onClick={() => setFilter(p.id)}>{p.label}</button>
+            ))}
+          </div>
+
+          <MapCanvas filter={filter} onOpenDrawer={openDrawer} />
+
+          <div className="legend">
+            <div className="item"><span className="dot" style={{background:"var(--white)"}} />Dehradun</div>
+            <div className="item"><span className="dot" style={{background:"var(--orange)"}} />Transfer days</div>
+            <div className="item"><span className="dot" style={{background:"var(--sage)"}} />Sightseeing / trek stops</div>
+            <div className="hint">Select a day → START & END light up · arrows show direction · tap pin for overview · double-tap for schedule</div>
+          </div>
+        </div>
+      </section>
+
+      <section className="elevation-section" id="elevation">
+        <div className="wrap">
+          <h2 className="serif">Elevation profile</h2>
+          <p className="sub">Approximate height gain across the main points of the route.</p>
+          <div className="elev-card">
+            <div className="elev-chart">
+              <div className="elev-y-labels">
+                <span>4000 m</span>
+                <span>3500 m</span>
+                <span>3000 m</span>
+                <span>2500 m</span>
+                <span>1500 m</span>
+                <span>500 m</span>
+              </div>
+              <svg viewBox="0 0 700 200" preserveAspectRatio="none" aria-hidden="true">
+                <line x1="60" y1="10" x2="680" y2="10" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="42" x2="680" y2="42" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="74" x2="680" y2="74" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="106" x2="680" y2="106" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="138" x2="680" y2="138" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="170" x2="680" y2="170" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <defs>
+                  <linearGradient id="elevFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#4fd4a3" stopOpacity="0.28" />
+                    <stop offset="100%" stopColor="#4fd4a3" stopOpacity="0.02" />
+                  </linearGradient>
+                </defs>
+                {/* y ≈ 170 - ((elev-500)/3500)*160
+                    Dehradun 650→163, Chopta 2700→70, Tungnath 3680→26, Chandrashila 4000→12,
+                    Auli 2800→66, Gurson 3050→54, Dehradun 650→163 */}
+                <path
+                  d="M60 163 L140 70 L240 26 L320 12 L420 66 L520 54 L680 163"
+                  fill="url(#elevFill)"
+                  stroke="none"
+                />
+                <path
+                  d="M60 163 L140 70 L240 26 L320 12 L420 66 L520 54 L680 163"
+                  fill="none"
+                  stroke="#4fd4a3"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <circle cx="60" cy="163" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="140" cy="70" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="240" cy="26" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="320" cy="12" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="420" cy="66" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="520" cy="54" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="680" cy="163" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+              </svg>
+            </div>
+            <div className="elev-x-labels">
+              <span>Dehradun</span>
+              <span>Chopta</span>
+              <span>Tungnath</span>
+              <span>Chandrashila</span>
+              <span>Auli</span>
+              <span>Gurson</span>
+              <span>Dehradun</span>
+            </div>
+            <p className="elev-note">Approx. elevations · Dehradun ~650 m · Chopta ~2,700 m · Tungnath 3,680 m · Chandrashila ~4,000 m · Auli ~2,800 m · Gurson ~3,050 m · return to Dehradun</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="itinerary">
+        <div className="wrap">
+          <h2 className="serif" style={{fontSize:"clamp(22px,2.6vw,28px)", marginBottom:8, color:"var(--mist-100)"}}>Day-by-day overview</h2>
+          <p style={{color:"var(--mist-400)", fontSize:14.5, marginBottom:22}}>Click any card to open the detailed schedule.</p>
+          <div className="day-grid">
+            {DAY_CARDS.map(card => (
+              <div className="day-card" key={card.key} onClick={() => openDrawer(card.key)}>
+                <div className="card-photo">
+                  <img src={card.photo} alt={card.title} />
+                  <span className="day-tag">{card.tag}</span>
+                </div>
+                <div className="card-body">
+                  <h3>{card.title}</h3>
+                  <div className="card-meta">{card.meta}</div>
+                  <p>{card.desc}</p>
+                  <button className="open-btn">Open schedule →</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="tips-section" id="tips">
+        <div className="wrap">
+          <h2 className="serif">Practical tips</h2>
+          <p className="sub">Small things that make the Chopta–Auli trip smoother.</p>
+          <div className="tips-grid">
+            {TIPS.map((t, i) => (
+              <div className="tip" key={i}>
+                <div className="icon">{t.icon}</div>
+                <div>
+                  <h4>{t.title}</h4>
+                  <p>{t.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <div className="wrap">
+          Dehradun → Chopta → Tungnath · Chandrashila → Auli · Gurson Bugyal → Dehradun
+        </div>
+      </footer>
+
+      <Drawer
+        dayKey={drawerKey}
+        onClose={() => {
+          setDrawerKey(null);
+          setDrawerImage(null);
+        }}
+        imageOverride={drawerImage}
+      />
+    </>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>
