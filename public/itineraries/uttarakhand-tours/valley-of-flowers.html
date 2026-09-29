@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mussoorie · Dhanaulti · Kanatal — Interactive Route Map</title>
+<title>Govindghat → Valley of Flowers — Interactive Route Map</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
@@ -98,7 +98,7 @@ body {
   letter-spacing: 0.2em; text-transform: uppercase;
 }
 .hero h1 {
-  margin: 12px 0 14px; max-width: 26ch;
+  margin: 12px 0 14px; max-width: 22ch;
   font-size: clamp(28px, 4vw, 42px); line-height: 1.12; font-weight: 500;
   color: var(--mist-100);
 }
@@ -148,14 +148,13 @@ body {
   background-image:
     linear-gradient(180deg, rgba(8,12,11,0.55) 0%, rgba(8,12,11,0.72) 45%, rgba(8,12,11,0.9) 100%),
     url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1800&q=80');
-  background-size: cover; background-position: center 30%;
+  background-size: cover; background-position: center 35%;
   filter: saturate(0.75) contrast(1.08) brightness(0.85);
 }
 .map-title {
   position: absolute; left: 5%; top: 5%; z-index: 2;
   color: rgba(232,240,236,0.95); font-family: "Fraunces", serif; font-style: italic;
   font-size: clamp(22px, 3vw, 34px); text-shadow: 0 2px 16px rgba(0,0,0,0.6);
-  max-width: 55%;
 }
 .map-subtitle {
   position: absolute; left: 5%; top: 12.5%; z-index: 2;
@@ -178,7 +177,6 @@ body {
   cursor: pointer; z-index: 5;
   transition: opacity .3s, transform .2s, filter .3s;
   touch-action: manipulation;
-  min-width: 44px; min-height: 44px;
 }
 .pin:hover, .pin:focus-visible { transform: translate(-50%, -50%) scale(1.06); z-index: 8; }
 .pin.dim { opacity: 0.18; filter: grayscale(0.7); pointer-events: none; }
@@ -533,138 +531,124 @@ const { useState, useEffect, useRef, useCallback } = React;
 // Plain image paths only — no IMG object
 // Each location: image = map/popover, scheduleImage = day-schedule drawer
 const LOCATIONS = [
-  { id: "dehradun", name: "Dehradun / Haridwar", alt: "Arrival", x: 18, y: 78, group: "start", image: "/itineraries/local-tours/images/haridwar-dehradun.webp", scheduleImage: "/itineraries/local-tours/images/haridwar-dehradun.webp", blurb: "Pickup point. Our executive receives you and transfers you via Dehradun to Mussoorie." },
-  { id: "mussoorie", name: "Mussoorie", alt: "Base", x: 42, y: 48, group: "transfer", image: "/itineraries/local-tours/images/MussoorieBase.jpg", scheduleImage: "/itineraries/local-tours/images/MussoorieBase.jpg", blurb: "Your base for the trip. Queen of Hills. Hotel stay, Mall Road evenings, and local sightseeing hub." },
-  { id: "kempty", name: "Kempty Falls", alt: "Day 2", x: 32, y: 38, group: "sight", image: "/itineraries/local-tours/images/KemptyFalls.jpg", scheduleImage: "/itineraries/local-tours/images/KemptyFalls.jpg", blurb: "Popular waterfall near Mussoorie. One of the main attractions on the local sightseeing day." },
-  { id: "laltibba", name: "Lal Tibba", alt: "Viewpoint", x: 48, y: 32, group: "sight", image: "/itineraries/local-tours/images/LalTibbaViewpoint.jpg", scheduleImage: "/itineraries/local-tours/images/LalTibbaViewpoint.jpg", blurb: "Highest point in Mussoorie. Panoramic views of the Himalayan ranges. Also covers Gun Hill & Camel’s Back Road." },
-  { id: "dhanaulti", name: "Dhanaulti", alt: "Eco parks", x: 58, y: 42, group: "sight", image: "/itineraries/local-tours/images/DhanaultiEcoparks.jpg", scheduleImage: "/itineraries/local-tours/images/DhanaultiEcoparks.jpg", blurb: "Quiet hill station with eco-parks, deodar forests, and adventure activities. Beautiful sunset views." },
-  { id: "surkunda", name: "Surkunda Devi", alt: "Shaktipeeth", x: 68, y: 28, group: "sight", image: "/itineraries/local-tours/images/SurkundaDeviShaktipeeth.jpg", scheduleImage: "/itineraries/local-tours/images/SurkundaDeviShaktipeeth.jpg", blurb: "Major Shaktipeeth temple ~6 km from Dhanaulti. Linked to the legend of Sati. Sacred and scenic." },
-  { id: "kanatal", name: "Kanatal", alt: "Day 4", x: 72, y: 48, group: "sight", image: "/itineraries/local-tours/images/KanatalDay.jpg", scheduleImage: "/itineraries/local-tours/images/KanatalDay.jpg", blurb: "Peaceful hill stop with apple orchards and quiet views. Often combined with Tehri Lake." },
-  { id: "tehri", name: "Tehri Jheel", alt: "Lake", x: 82, y: 58, group: "sight", image: "/itineraries/local-tours/images/TehriJheelLake.jpg", scheduleImage: "/itineraries/local-tours/images/TehriJheelLake.jpg", blurb: "Large artificial lake formed by Tehri Dam. Boating and wide open mountain views." }
+  { id: "govindghat", name: "Govindghat", alt: "Trek start · 1,830 m", day: 1, x: 12, y: 78, group: "start", image: "/itineraries/uttarakhand-tours/images/Govindghat.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Govindghat.jpg", blurb: "Roadhead on the Alaknanda and start of the trek. Pickup from Joshimath (20 km). Ponies, palkis and helicopter are available here." },
+  { id: "pulna", name: "Pulna", alt: "Village", day: 1, x: 28, y: 62, group: "sight", image: "/itineraries/uttarakhand-tours/images/Pulna.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Pulna.jpg", blurb: "First village on the trail. Tea stalls and a good place for a short rest." },
+  { id: "bhyundar", name: "Bhyundar", alt: "Village", day: 1, x: 44, y: 50, group: "sight", image: "/itineraries/uttarakhand-tours/images/Bhyundar.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Bhyundar.jpg", blurb: "Mid-way village on the climb, close to the Bhyundar Ganga river. Last big stop before Ghangaria." },
+  { id: "ghangaria", name: "Ghangaria", alt: "Base · 3,050 m", day: 1, x: 56, y: 42, group: "transfer", image: "/itineraries/uttarakhand-tours/images/Ghangaria.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Ghangaria.jpg", blurb: "Base village for both nights. Simple stays, cold evenings, and the forest check-post for the valley." },
+  { id: "entry", name: "Valley Entry", alt: "Check-post", day: 2, x: 68, y: 26, group: "sight", image: "/itineraries/uttarakhand-tours/images/ValleyEntry.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/ValleyEntry.jpg", blurb: "Entry gate of the national park. Carry ID and your ticket; entry closes in the afternoon." },
+  { id: "river", name: "Pushpawati River", alt: "Trail", day: 2, x: 78, y: 46, group: "sight", image: "/itineraries/uttarakhand-tours/images/PushpawatiRiver.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/PushpawatiRiver.jpg", blurb: "The glacial river that runs through the valley. The trail follows it with waterfalls and bridges." },
+  { id: "meadows", name: "Valley of Flowers", alt: "~3,600 m", day: 2, x: 90, y: 26, group: "sight", image: "/itineraries/uttarakhand-tours/images/ValleyOfFlowers.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/ValleyOfFlowers.jpg", blurb: "UNESCO-listed alpine meadows of wildflowers ringed by snow peaks. Bloom peaks mid-July to mid-August." }
 ];
 
 const DAYINFO = {
   day1: {
-    eyebrow: "DAY 01 · ARRIVAL & MUSSOORIE",
-    title: "Dehradun / Haridwar → Mussoorie",
-    subtitle: "Warm welcome · Transfer to hotel · Overnight Mussoorie",
-    photo: "/itineraries/local-tours/images/haridwar-dehradun.webp",
+    eyebrow: "DAY 01 · GOVINDGHAT → GHANGARIA",
+    title: "Trek to the base village",
+    subtitle: "13 km trek climbing about 1,200 m through forest, waterfalls and villages",
+    photo: "/itineraries/uttarakhand-tours/images/Ghangaria.jpg",
     moments: [
-      { time: "Arrival", title: "Pickup", desc: "Our executive receives you at Dehradun or Haridwar with a warm welcome." },
-      { time: "Day", title: "Drive to Mussoorie", desc: "Scenic transfer via Dehradun to Mussoorie. Enjoy the hill drive." },
-      { time: "Evening", title: "Check-in & dinner", desc: "Check into your Mussoorie hotel. Delicious dinner and overnight stay." }
+      { time: "Morning", title: "Reach Govindghat", desc: "Pickup from Joshimath (20 km, 45 min–1 hr). Register at the trek check-post." },
+      { time: "Morning", title: "Start the trek", desc: "Cross the bridge and follow the Lakshman Ganga through forest and waterfalls." },
+      { time: "Mid-day", title: "Pulna & Bhyundar", desc: "Tea stops and steady climbing. Ponies, palkis and helicopter available (pay directly)." },
+      { time: "Afternoon", title: "Arrive Ghangaria", desc: "About 5–7 hrs on foot. Check in, rest and acclimatise." },
+      { time: "Night", title: "Dinner & overnight", desc: "Simple dinner · overnight stay in Ghangaria. Nights are cold." }
     ]
   },
   day2: {
-    eyebrow: "DAY 02 · MUSSOORIE LOCAL SIGHTSEEING",
-    title: "Full day around Mussoorie",
-    subtitle: "Kempty Falls · Lal Tibba · Gun Hill · Mall Road",
-    photo: "/itineraries/local-tours/images/MussoorieBase.jpg",
+    eyebrow: "DAY 02 · VALLEY OF FLOWERS",
+    title: "A full day among the wildflowers",
+    subtitle: "About 4 km each way into the national park, back in Ghangaria by evening",
+    photo: "/itineraries/uttarakhand-tours/images/ValleyOfFlowers.jpg",
     moments: [
-      { time: "Morning", title: "Breakfast & start", desc: "Healthy breakfast at the hotel. Begin the full-day local sightseeing." },
-      { time: "Day", title: "Key attractions", desc: "Visit Kempty Falls, Sister’s Town, Lal Tibba, Company Garden, Gun Hill, Camel’s Back Road, and Mussoorie Christ Church." },
-      { time: "Evening", title: "Mall Road stroll", desc: "Free time to stroll on the famous Mall Road. Dinner and overnight at Mussoorie hotel." }
+      { time: "Early morning", title: "Breakfast & entry permit", desc: "Show ID and get your ticket at the forest check-post. Carry a packed lunch, water and rain gear." },
+      { time: "Morning", title: "Valley entry & river trail", desc: "Gentle climb beside the Pushpawati river, crossing bridges and passing waterfalls." },
+      { time: "Mid-day", title: "Roam the meadows", desc: "Wander among the flowers with snow peaks around you. Go as far as time and weather allow." },
+      { time: "Afternoon", title: "Return to Ghangaria", desc: "Head back early; the park must be exited before evening." },
+      { time: "Night", title: "Dinner & overnight", desc: "Dinner and overnight stay in Ghangaria." }
     ]
   },
   day3: {
-    eyebrow: "DAY 03 · DHANAULTI & SURKUNDA DEVI",
-    title: "Day trip to Dhanaulti",
-    subtitle: "Eco-parks · Farms · Surkunda Devi Temple",
-    photo: "/itineraries/local-tours/images/DhanaultiEcoparks.jpg",
+    eyebrow: "DAY 03 · GHANGARIA → GOVINDGHAT",
+    title: "Trek down & drop",
+    subtitle: "13 km downhill trek back to Govindghat, then onward transfer",
+    photo: "/itineraries/uttarakhand-tours/images/Govindghat.jpg",
     moments: [
-      { time: "Morning", title: "Breakfast & depart", desc: "After breakfast, drive to Dhanaulti." },
-      { time: "Day", title: "Dhanaulti & Surkunda", desc: "Explore eco-parks and farms. Visit Mata Surkunda Devi Temple (major Shaktipeeth, ~6 km ahead). Enjoy forest patches and sunset views." },
-      { time: "Evening", title: "Return to Mussoorie", desc: "Drive back to hotel. Dinner and overnight stay at Mussoorie." }
-    ]
-  },
-  day4: {
-    eyebrow: "DAY 04 · KANATAL · TEHRI · DEPARTURE",
-    title: "Kanatal, Tehri Jheel & onward",
-    subtitle: "Checkout · Day tour · Drop to Delhi / Dehradun / Haridwar",
-    photo: "/itineraries/local-tours/images/KanatalDay.jpg",
-    moments: [
-      { time: "Morning", title: "Checkout", desc: "Healthy breakfast and checkout from Mussoorie hotel." },
-      { time: "Day", title: "Kanatal & Tehri Jheel", desc: "Day tour to Kanatal and Tehri Lake (Tehri Jheel). Enjoy the open views and lake." },
-      { time: "Evening", title: "Drop", desc: "Transporter drops you at Delhi, Dehradun or Haridwar for your onward journey. Tour ends with beautiful memories." }
+      { time: "Morning", title: "Breakfast & checkout", desc: "Leave early so you reach Govindghat before the afternoon." },
+      { time: "Day", title: "Trek down", desc: "About 13 km · 4–5 hrs downhill via Bhyundar and Pulna, or ride a pony / take the helicopter (pay directly)." },
+      { time: "Afternoon", title: "Reach Govindghat", desc: "Meet your driver for the transfer to Joshimath or onward." },
+      { time: "End", title: "Tour concludes", desc: "Safe onward journey — thank you for travelling with us." }
     ]
   }
 };
 
 const DAY_CARDS = [
-  { key: "day1", tag: "Day 1", title: "Arrival → Mussoorie", meta: "Pickup · Transfer · Hotel", desc: "Warm welcome at Dehradun/Haridwar. Scenic drive to Mussoorie. Check-in, dinner and overnight.", photo: "/itineraries/local-tours/images/haridwar-dehradun.webp" },
-  { key: "day2", tag: "Day 2", title: "Mussoorie sightseeing", meta: "Kempty · Lal Tibba · Mall Road", desc: "Full day covering Kempty Falls, Lal Tibba, Gun Hill, Camel’s Back Road, Christ Church and Mall Road evening.", photo: "/itineraries/local-tours/images/MussoorieBase.jpg" },
-  { key: "day3", tag: "Day 3", title: "Dhanaulti & Surkunda", meta: "Eco-parks · Shaktipeeth", desc: "Day trip to Dhanaulti eco-parks and farms. Visit Mata Surkunda Devi Temple. Return to Mussoorie.", photo: "/itineraries/local-tours/images/DhanaultiEcoparks.jpg" },
-  { key: "day4", tag: "Day 4", title: "Kanatal · Tehri · Drop", meta: "Lake · Onward journey", desc: "Checkout, visit Kanatal and Tehri Jheel, then drop to Delhi / Dehradun / Haridwar.", photo: "/itineraries/local-tours/images/KanatalDay.jpg" }
+  { key: "day1", tag: "Day 1", title: "Govindghat → Ghangaria", meta: "13 km trek · 5–7 hrs", desc: "Climb through forest, waterfalls and villages to the base camp of the valley.", photo: "/itineraries/uttarakhand-tours/images/Ghangaria.jpg" },
+  { key: "day2", tag: "Day 2", title: "Valley of Flowers", meta: "~4 km each way · full day", desc: "Walk into the alpine valley, follow the river and roam the flower meadows.", photo: "/itineraries/uttarakhand-tours/images/ValleyOfFlowers.jpg" },
+  { key: "day3", tag: "Day 3", title: "Ghangaria → Govindghat", meta: "13 km downhill · 4–5 hrs", desc: "Trek back down and drop at Govindghat for your onward journey.", photo: "/itineraries/uttarakhand-tours/images/Govindghat.jpg" }
 ];
 
 const TIPS = [
-  { icon: "🧥", title: "Weather layers", text: "Mussoorie evenings can be cool even in summer. Carry a light jacket or shawl for Mall Road and higher viewpoints." },
-  { icon: "🚗", title: "Road conditions", text: "Hill roads to Dhanaulti, Surkunda and Tehri are winding. Start early and keep motion-sickness tablets if needed." },
-  { icon: "📷", title: "Best viewpoints", text: "Lal Tibba and Surkunda Devi offer excellent Himalayan views on clear mornings. Gun Hill is great for sunset." },
-  { icon: "🛍️", title: "Mall Road", text: "Evenings on Mall Road are lively. Good for shopping, cafés and a relaxed stroll after the day’s sightseeing." },
-  { icon: "🛕", title: "Surkunda Devi", text: "Temple visit involves a short climb. Wear comfortable shoes. Respect local customs at the Shaktipeeth." },
-  { icon: "📅", title: "Best season", text: "March–June and September–November are ideal. Monsoon brings lush greenery but also slippery roads." }
+  { icon: "🥾", title: "Trek fitness", text: "Day 1 is 13 km uphill (5–7 hrs). Wear broken-in trekking shoes and use a stick. Ponies and palkis can be hired on the trail." },
+  { icon: "🎒", title: "Pack light", text: "Take a small backpack for 2 nights in Ghangaria. Ask your operator about storing extra luggage at Govindghat or Joshimath." },
+  { icon: "🌧️", title: "Rain gear", text: "July–September is rainy. Carry a poncho and waterproof bag covers; trails can be slippery." },
+  { icon: "🌸", title: "When to see blooms", text: "Peak flowering is usually mid-July to mid-August. June still has snow patches; September has fewer colours." },
+  { icon: "🪪", title: "Permits & timing", text: "Entry is via the forest check-post at Ghangaria. Carry ID and check current fees and entry cut-off times." },
+  { icon: "⛰️", title: "Want more time?", text: "Hemkund Sahib (~4,330 m, 6 km from Ghangaria) needs an extra day. Ask for the longer 4-day version." }
 ];
 
 const DAY_PATHS = {
+  /* viewBox 0 0 1200 640 · x=%*12 · y=%*6.4
+     Govindghat 144,499 | Pulna 336,397 | Bhyundar 528,320 | Ghangaria 672,269
+     Entry 816,166 | River 936,294 | Meadows 1080,166 */
   day1: {
-    d: "M216 499 C280 420 360 340 504 307",
-    color: "var(--orange)", from: "Dehradun", to: "Mussoorie",
-    fromId: "dehradun", toId: "mussoorie",
-    viaIds: [],
-    label: "Dehradun / Haridwar → Mussoorie",
-    roundTrip: false
+    d: "M144 499 L336 397 L528 320 L672 269",
+    color: "var(--sage)", from: "Govindghat", to: "Ghangaria",
+    fromId: "govindghat", toId: "ghangaria",
+    viaIds: ["pulna", "bhyundar"],
+    label: "Govindghat → Ghangaria (13 km trek)"
   },
   day2: {
-    d: "M504 307 C460 280 400 260 384 243 C420 250 480 230 576 205 C540 250 520 290 504 307",
-    color: "var(--sage)", from: "Mussoorie", to: "Mussoorie",
-    fromId: "mussoorie", toId: "mussoorie",
-    viaIds: ["kempty", "laltibba"],
-    order: { kempty: 1, laltibba: 2 },
-    label: "Mussoorie → Kempty → Lal Tibba → Mussoorie",
-    roundTrip: true
+    d: "M672 269 L816 166 L936 294 L1080 166 C1000 260 820 320 672 269",
+    color: "var(--sage)", from: "Ghangaria", to: "Valley & return",
+    fromId: "ghangaria", toId: "ghangaria",
+    viaIds: ["entry", "river", "meadows"],
+    label: "Ghangaria → Valley of Flowers → back", roundTrip: true
   },
   day3: {
-    d: "M504 307 C540 290 600 280 696 269 C720 240 760 210 816 179 C760 210 720 240 696 269 C600 280 540 290 504 307",
-    color: "var(--sage)", from: "Mussoorie", to: "Surkunda Devi",
-    fromId: "mussoorie", toId: "mussoorie",
-    viaIds: ["dhanaulti", "surkunda"],
-    order: { dhanaulti: 1, surkunda: 2 },
-    label: "Mussoorie → Dhanaulti → Surkunda → Mussoorie",
-    roundTrip: true
-  },
-  day4: {
-    d: "M504 307 C620 300 760 300 864 307 C910 320 950 350 984 371",
-    color: "var(--orange)", from: "Mussoorie", to: "Tehri Jheel",
-    fromId: "mussoorie", toId: "tehri",
-    viaIds: ["kanatal"],
-    label: "Mussoorie → Kanatal → Tehri Jheel",
-    roundTrip: false
+    d: "M672 269 L528 320 L336 397 L144 499",
+    color: "var(--orange)", from: "Ghangaria", to: "Govindghat",
+    fromId: "ghangaria", toId: "govindghat",
+    viaIds: [],
+    label: "Ghangaria → Govindghat (13 km downhill)"
   }
 };
 
 const DAY_ACTIVE_LOCATIONS = {
-  day1: ["dehradun", "mussoorie"],
-  day2: ["mussoorie", "kempty", "laltibba"],
-  day3: ["mussoorie", "dhanaulti", "surkunda"],
-  day4: ["mussoorie", "kanatal", "tehri"]
+  day1: ["govindghat", "pulna", "bhyundar", "ghangaria"],
+  day2: ["ghangaria", "entry", "river", "meadows"],
+  day3: ["ghangaria", "bhyundar", "pulna", "govindghat"]
+};
+
+const FLOW_NOTES = {
+  day1: "13 km trek (5–7 hrs) · Visit 1 Pulna → 2 Bhyundar → Ghangaria (night)",
+  day2: "~4 km each way · Visit 1 Valley Entry → 2 Pushpawati River → 3 Meadows · back by evening",
+  day3: "13 km downhill (4–5 hrs) via Bhyundar and Pulna · drop at Govindghat"
 };
 
 function Popover({ loc, style, onEnter, onLeave, onOpen }) {
-  const openKey = () => {
-    if (loc.id === "dehradun") onOpen("day1", loc.scheduleImage || loc.image);
-    else if (loc.id === "mussoorie") onOpen("day1", loc.scheduleImage || loc.image);
-    else if (["kempty", "laltibba"].includes(loc.id)) onOpen("day2", loc.scheduleImage || loc.image);
-    else if (["dhanaulti", "surkunda"].includes(loc.id)) onOpen("day3", loc.scheduleImage || loc.image);
-    else if (["kanatal", "tehri"].includes(loc.id)) onOpen("day4", loc.scheduleImage || loc.image);
-    else onOpen("day1", loc.scheduleImage || loc.image);
-  };
+  const openKey = () => onOpen("day" + loc.day, loc.scheduleImage || loc.image);
   return (
     <div className="popover show" style={style} onMouseEnter={onEnter} onMouseLeave={onLeave}>
-      <div className="thumb"><img src={loc.image} alt={loc.name} onError={(e) => { e.target.style.display = "none"; }} /></div>
+      <div className="thumb">
+        <img
+          src={loc.image}
+          alt={loc.name}
+          onError={(e) => { e.target.style.display = "none"; }}
+        />
+      </div>
       <div className="pv-title">{loc.name}<span className="alt">{loc.alt}</span></div>
       <div className="pv-blurb">{loc.blurb}</div>
-      <a className="pv-link" onClick={openKey}>Open day schedule →</a>
+      <a className="pv-link" onClick={openKey} onDoubleClick={openKey}>Open day schedule →</a>
     </div>
   );
 }
@@ -680,26 +664,32 @@ function MapCanvas({ filter, onOpenDrawer }) {
     const y = Number(loc.y) || 50;
     const isMobile = typeof window !== "undefined" && window.innerWidth <= 900;
     let leftPct = x;
-    let above = y > 52;
+    let above = y > 45; // prefer above the pin when possible
 
     if (isMobile) {
-      if (x < 34) leftPct = 34;
-      else if (x > 66) leftPct = 66;
-      if (y < 20) above = false;
-      if (y > 78) above = true;
+      // Keep card fully inside map on mobile
+      if (x < 28) leftPct = 28;
+      else if (x > 72) leftPct = 72;
+      if (y < 28) above = false;
+      if (y > 72) above = true;
     } else {
-      if (x < 12) leftPct = 12;
-      else if (x > 88) leftPct = 88;
-      if (y < 15) above = false;
-      if (y > 85) above = true;
+      // Desktop: keep near pin, nudge only at edges
+      if (x < 14) leftPct = 14;
+      else if (x > 86) leftPct = 86;
+      if (y < 22) above = false;
+      if (y > 80) above = true;
     }
 
-    setPopover({
-      loc,
+    // Build CSS style so the card sits next to the pin
+    const style = {
       left: leftPct + "%",
-      top: `calc(${y}% - 12px)`,
-      above
-    });
+      top: above ? `calc(${y}% - 18px)` : `calc(${y}% + 28px)`,
+      transform: above
+        ? "translate(-50%, -100%)"   // card sits above the pin
+        : "translate(-50%, 0)",      // card sits below the pin
+    };
+
+    setPopover({ loc, style });
   }, []);
 
   const scheduleHide = () => {
@@ -710,14 +700,7 @@ function MapCanvas({ filter, onOpenDrawer }) {
   const openInfo = useCallback((loc) => {
     clearTimeout(hideTimer.current);
     setPopover(null);
-    let key = filter !== "full" && filter ? filter : "day1";
-    if (filter === "full") {
-      if (loc.id === "dehradun" || loc.id === "mussoorie") key = "day1";
-      else if (["kempty", "laltibba"].includes(loc.id)) key = "day2";
-      else if (["dhanaulti", "surkunda"].includes(loc.id)) key = "day3";
-      else if (["kanatal", "tehri"].includes(loc.id)) key = "day4";
-      else key = "day1";
-    }
+    const key = filter !== "full" && filter ? filter : "day" + loc.day;
     onOpenDrawer(key, loc.scheduleImage || loc.image);
   }, [onOpenDrawer, filter]);
 
@@ -729,8 +712,10 @@ function MapCanvas({ filter, onOpenDrawer }) {
     lastTap.current = { id: loc.id, time: now };
 
     if (isDouble) {
+      // Double click / double tap → open full day schedule
       openInfo(loc);
     } else {
+      // Single click / single tap → show location overview card
       showPopover(loc);
     }
   }, [openInfo, showPopover]);
@@ -741,6 +726,7 @@ function MapCanvas({ filter, onOpenDrawer }) {
   useEffect(() => {
     if (!popover) return;
     const onDoc = (e) => {
+      // close if click outside pin and popover
       if (e.target.closest && (e.target.closest('.pin') || e.target.closest('.popover'))) return;
       setPopover(null);
     };
@@ -752,33 +738,28 @@ function MapCanvas({ filter, onOpenDrawer }) {
 
   const pinRole = (loc) => {
     if (!dayPath) return null;
-    if (dayPath.stay && loc.id === dayPath.fromId) return "start";
-    if (loc.id === dayPath.fromId) return "start";
+    if (loc.id === dayPath.fromId) return { type: "start" };
     if (dayPath.viaIds && dayPath.viaIds.includes(loc.id)) {
-      if (dayPath.order && dayPath.order[loc.id]) return { type: "via", num: dayPath.order[loc.id] };
-      return "via";
+      const num = dayPath.viaIds.indexOf(loc.id) + 1;
+      return { type: "via", num };
     }
-    if (loc.id === dayPath.toId && dayPath.fromId !== dayPath.toId) return "end";
+    if (loc.id === dayPath.toId && dayPath.fromId !== dayPath.toId) return { type: "end" };
     return null;
   };
 
   const subtitle = isFull
-    ? "Uttarakhand · Mussoorie · 4-day trip"
+    ? "Uttarakhand · Garhwal Himalayas · 3-day trek"
     : (dayPath
-        ? (filter === "day2"
-            ? "Mussoorie · 1. Kempty → 2. Lal Tibba → return"
-            : filter === "day3"
-            ? "Mussoorie · 1. Dhanaulti → 2. Surkunda → return"
-            : (dayPath.roundTrip || dayPath.stay
-                ? `${dayPath.from}  ·  return to base`
-                : `${dayPath.from}  →  ${dayPath.to}`))
+        ? (dayPath.roundTrip && dayPath.fromId === dayPath.toId
+            ? `${dayPath.from}  · local circuit · return to hotel`
+            : `${dayPath.from}  →  ${dayPath.to}`)
         : "Day route");
 
   return (
     <>
     <div className="mapcanvas">
       <div className="map-bg" />
-      <div className="map-title">Mussoorie · Dhanaulti · Kanatal</div>
+      <div className="map-title">Govindghat → Valley of Flowers</div>
       <div className="map-subtitle">{subtitle}</div>
 
       <svg className="routes" viewBox="0 0 1200 640" preserveAspectRatio="none">
@@ -797,18 +778,16 @@ function MapCanvas({ filter, onOpenDrawer }) {
         {!isFull && (
           <g opacity="0.12">
             {Object.values(DAY_PATHS).map((p, i) => (
-              p.d && p.d.length > 10 ? (
-                <path key={"ghost"+i} d={p.d} fill="none" stroke="#fff" strokeWidth="2.5"
-                  strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 10"
-                  markerEnd="url(#arrowWhite)" />
-              ) : null
+              <path key={"ghost"+i} d={p.d} fill="none" stroke="#fff" strokeWidth="2.5"
+                strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 10"
+                markerEnd="url(#arrowWhite)" />
             ))}
           </g>
         )}
 
         {activeDays.map(dayKey => {
           const p = DAY_PATHS[dayKey];
-          if (!p || !p.d || p.d.length < 10) return null;
+          if (!p) return null;
           const marker = p.color.includes("sage") ? "url(#arrowSage)" : "url(#arrowOrange)";
           return (
             <path
@@ -826,8 +805,7 @@ function MapCanvas({ filter, onOpenDrawer }) {
       {LOCATIONS.map(loc => {
         const isDim = !isFull && activeLocIds && !activeLocIds.includes(loc.id);
         const role = pinRole(loc);
-        const roleType = role && typeof role === "object" ? role.type : role;
-        const roleClass = roleType ? `role-${roleType}` : "";
+        const roleClass = role ? `role-${role.type}` : "";
         return (
           <div
             key={loc.id}
@@ -851,47 +829,41 @@ function MapCanvas({ filter, onOpenDrawer }) {
           >
             <div className="marker" />
             <div className="badge">{loc.name} <span className="alt">{loc.alt}</span></div>
-            {roleType === "start" && <div className="role-tag">{dayPath && (dayPath.roundTrip || dayPath.stay) ? "Base" : "Leave from"}</div>}
-            {roleType === "end" && <div className="role-tag">{dayPath && dayPath.roundTrip ? "Return" : "Arrive"}</div>}
-            {roleType === "via" && (
-              <div className="role-tag">
-                {role && typeof role === "object" && role.num ? `${role.num} · Visit` : "Visit"}
-              </div>
-            )}
-            
+            {role && role.type === "start" && <div className="role-tag">{dayPath && dayPath.roundTrip && dayPath.fromId === dayPath.toId ? "Base" : "Leave from"}</div>}
+            {role && role.type === "end" && <div className="role-tag">{dayPath && dayPath.roundTrip ? "Return" : "Arrive"}</div>}
+            {role && role.type === "via" && <div className="role-tag">Visit {role.num}</div>}
           </div>
         );
       })}
 
       {popover && (
-        <Popover loc={popover.loc} style={{
-            left: popover.left,
-            top: popover.top,
-            transform: popover.above
-              ? (popover.shiftLeft ? "translate(-20%, calc(-100% - 16px))" : "translate(-50%, calc(-100% - 16px))")
-              : (popover.shiftLeft ? "translate(-20%, -8px)" : "translate(-50%, -8px)")
-          }}
-          onEnter={() => clearTimeout(hideTimer.current)} onLeave={scheduleHide} onOpen={onOpenDrawer} />
+        <Popover
+          loc={popover.loc}
+          style={popover.style}
+          onEnter={() => clearTimeout(hideTimer.current)}
+          onLeave={scheduleHide}
+          onOpen={onOpenDrawer}
+        />
       )}
     </div>
 
     {dayPath && (
       <div className="day-flow">
         <div className="flow-label">
-          {dayPath.roundTrip || dayPath.stay
+          {dayPath.roundTrip
             ? "This day’s movement (out & back to hotel)"
             : "This day’s movement"}
         </div>
-        {dayPath.roundTrip || dayPath.stay ? (
+        {dayPath.roundTrip && dayPath.fromId === dayPath.toId ? (
           <>
             <div className="flow-stop start">
-              <span className="role">Base</span>
+              <span className="role">Leave from</span>
               <span className="name">{dayPath.from}</span>
             </div>
             <div className="flow-arrow" aria-hidden="true">→</div>
             <div className="flow-stop end">
-              <span className="role">Visit & return</span>
-              <span className="name">{dayPath.to === dayPath.from ? "Local" : dayPath.to}</span>
+              <span className="role">Visit stops</span>
+              <span className="name">then return</span>
             </div>
           </>
         ) : (
@@ -907,10 +879,7 @@ function MapCanvas({ filter, onOpenDrawer }) {
             </div>
           </>
         )}
-        {filter === "day1" && <div className="flow-note">Pickup at Dehradun / Haridwar · transfer to Mussoorie hotel</div>}
-        {filter === "day2" && <div className="flow-note">Order: 1. Kempty Falls → 2. Lal Tibba / Gun Hill / Camel’s Back → Mall Road evening</div>}
-        {filter === "day3" && <div className="flow-note">Order: 1. Dhanaulti eco-parks → 2. Surkunda Devi Temple → return to hotel</div>}
-        {filter === "day4" && <div className="flow-note">Kanatal · Tehri Jheel · drop to Delhi / Dehradun / Haridwar</div>}
+        {FLOW_NOTES[filter] && <div className="flow-note">{FLOW_NOTES[filter]}</div>}
       </div>
     )}
     </>
@@ -926,7 +895,7 @@ function Drawer({ dayKey, onClose, imageOverride }) {
       <div className={`scrim ${dayKey ? "show" : ""}`} onClick={onClose} />
       <div className={`drawer ${dayKey ? "open" : ""}`}>
         <div className="drawer-photo">
-          <img src={imageSrc} alt={info.title} />
+          <img src={imageSrc} alt={info.title} onError={(e) => { e.target.style.display = "none"; }} />
           <button className="drawer-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
         <div className="drawer-body">
@@ -976,10 +945,10 @@ function App() {
         <div className="wrap topnav-inner">
           <div className="brand">
             <span className="brand-mark" aria-hidden="true" />
-            Mussoorie · Dhanaulti · Kanatal
+            Govindghat → Valley of Flowers
           </div>
           <div className="navlinks">
-<a href="/packages">← Packages</a>
+            <a href="/packages">← Packages</a>
             <a href="#overview">Overview</a>
             <a href="#map" className="active">Route Map</a>
             <a href="#itinerary">Itinerary</a>
@@ -990,17 +959,17 @@ function App() {
 
       <header className="hero" id="overview">
         <div className="wrap">
-          <span className="eyebrow">Uttarakhand · Queen of Hills</span>
-          <h1 className="serif">Four days in Mussoorie with Dhanaulti, Surkunda Devi, Kanatal & Tehri Lake.</h1>
+          <span className="eyebrow">Uttarakhand · Garhwal Himalayas</span>
+          <h1 className="serif">Three days on foot into the Valley of Flowers.</h1>
           <p className="lead">
-            Pickup from Dehradun or Haridwar, base in Mussoorie, full local sightseeing,
-            day trips to Dhanaulti & Surkunda Devi, then Kanatal–Tehri and drop.
+            Trek from Govindghat to Ghangaria, spend a full day roaming the alpine wildflower meadows of the national park,
+            then walk back down.
           </p>
           <div className="stats">
-            <div className="stat-card"><div className="label">Duration</div><div className="value">4 days</div></div>
-            <div className="stat-card"><div className="label">Base</div><div className="value">Mussoorie</div></div>
-            <div className="stat-card"><div className="label">Altitude</div><div className="value">~2,000 m</div></div>
-            <div className="stat-card"><div className="label">Best season</div><div className="value" style={{fontSize:17}}>Mar–Jun · Sep–Nov</div></div>
+            <div className="stat-card"><div className="label">Duration</div><div className="value">3 days</div></div>
+            <div className="stat-card"><div className="label">Trek each way</div><div className="value">13 km</div></div>
+            <div className="stat-card"><div className="label">Highest point</div><div className="value">~3,600 m</div></div>
+            <div className="stat-card"><div className="label">Best season</div><div className="value" style={{fontSize:17}}>Jul–Sep</div></div>
           </div>
         </div>
       </header>
@@ -1015,10 +984,9 @@ function App() {
           <div className="pills">
             {[
               { id: "full", label: "Full Journey" },
-              { id: "day1", label: "Day 1 · Arrival" },
-              { id: "day2", label: "Day 2 · Local" },
-              { id: "day3", label: "Day 3 · Dhanaulti" },
-              { id: "day4", label: "Day 4 · Kanatal & Drop" }
+              { id: "day1", label: "Day 1 · Ghangaria" },
+              { id: "day2", label: "Day 2 · Valley of Flowers" },
+              { id: "day3", label: "Day 3 · Govindghat" }
             ].map(p => (
               <button key={p.id} className={`pill ${filter === p.id ? "active" : ""}`}
                 onClick={() => setFilter(p.id)}>{p.label}</button>
@@ -1028,9 +996,9 @@ function App() {
           <MapCanvas filter={filter} onOpenDrawer={openDrawer} />
 
           <div className="legend">
-            <div className="item"><span className="dot" style={{background:"var(--white)"}} />Arrival / Drop</div>
-            <div className="item"><span className="dot" style={{background:"var(--orange)"}} />Base (Mussoorie)</div>
-            <div className="item"><span className="dot" style={{background:"var(--sage)"}} />Sightseeing stops</div>
+            <div className="item"><span className="dot" style={{background:"var(--white)"}} />Govindghat (start)</div>
+            <div className="item"><span className="dot" style={{background:"var(--orange)"}} />Overnight base</div>
+            <div className="item"><span className="dot" style={{background:"var(--sage)"}} />Sights & trek stops</div>
             <div className="hint">Select a day → START & END light up · arrows show direction · tap pin for overview · double-tap for schedule</div>
           </div>
         </div>
@@ -1039,62 +1007,63 @@ function App() {
       <section className="elevation-section" id="elevation">
         <div className="wrap">
           <h2 className="serif">Elevation profile</h2>
-          <p className="sub">Approximate height gain across the main points of the trip.</p>
+          <p className="sub">Approximate heights along the route, from Govindghat up to the valley meadows.</p>
           <div className="elev-card">
             <div className="elev-chart">
               <div className="elev-y-labels">
-                <span>2500 m</span>
-                <span>2000 m</span>
-                <span>1500 m</span>
-                <span>1000 m</span>
-                <span>500 m</span>
+                <span>4000 m</span>
+                <span>3200 m</span>
+                <span>2400 m</span>
+                <span>1600 m</span>
+                <span>800 m</span>
+                <span>0 m</span>
               </div>
               <svg viewBox="0 0 700 200" preserveAspectRatio="none" aria-hidden="true">
-                <line x1="60" y1="20" x2="680" y2="20" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
-                <line x1="60" y1="55" x2="680" y2="55" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
-                <line x1="60" y1="90" x2="680" y2="90" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
-                <line x1="60" y1="125" x2="680" y2="125" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
-                <line x1="60" y1="160" x2="680" y2="160" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="10" x2="680" y2="10" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="42" x2="680" y2="42" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="74" x2="680" y2="74" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="106" x2="680" y2="106" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="138" x2="680" y2="138" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="60" y1="170" x2="680" y2="170" stroke="rgba(255,255,255,0.06)" strokeWidth="1" strokeDasharray="4 4" />
                 <defs>
                   <linearGradient id="elevFill" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#4fd4a3" stopOpacity="0.28" />
                     <stop offset="100%" stopColor="#4fd4a3" stopOpacity="0.02" />
                   </linearGradient>
                 </defs>
+                {/* y = 170 - (elev/4000)*160 */}
                 <path
-                  d="M60 155 L140 70 L220 85 L300 55 L400 75 L500 50 L580 90 L680 155"
+                  d="M60 97 L163 86 L267 66 L370 48 L473 42 L577 36 L680 26"
                   fill="url(#elevFill)"
                   stroke="none"
                 />
                 <path
-                  d="M60 155 L140 70 L220 85 L300 55 L400 75 L500 50 L580 90 L680 155"
+                  d="M60 97 L163 86 L267 66 L370 48 L473 42 L577 36 L680 26"
                   fill="none"
                   stroke="#4fd4a3"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-                <circle cx="60" cy="155" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
-                <circle cx="140" cy="70" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
-                <circle cx="220" cy="85" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
-                <circle cx="300" cy="55" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
-                <circle cx="400" cy="75" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
-                <circle cx="500" cy="50" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
-                <circle cx="580" cy="90" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
-                <circle cx="680" cy="155" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="60" cy="97" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="163" cy="86" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="267" cy="66" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="370" cy="48" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="473" cy="42" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="577" cy="36" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
+                <circle cx="680" cy="26" r="5" fill="#e8f0ec" stroke="#080c0b" strokeWidth="2" />
               </svg>
             </div>
             <div className="elev-x-labels">
-              <span>Dehradun</span>
-              <span>Mussoorie</span>
-              <span>Kempty</span>
-              <span>Lal Tibba</span>
-              <span>Dhanaulti</span>
-              <span>Surkunda</span>
-              <span>Tehri</span>
-              <span>Drop</span>
+              <span>Govindghat</span>
+              <span>Pulna</span>
+              <span>Bhyundar</span>
+              <span>Ghangaria</span>
+              <span>Valley Entry</span>
+              <span>Pushpawati</span>
+              <span>Meadows</span>
             </div>
-            <p className="elev-note">Approx. elevations · Mussoorie ~2,000 m · Lal Tibba highest local point · Surkunda Devi ~2,700–2,900 m · return to plains</p>
+            <p className="elev-note">Approx. elevations · Govindghat ~1,830 m · Ghangaria ~3,050 m · Valley meadows ~3,600 m (Pulna, Bhyundar and the valley entry are rough estimates)</p>
           </div>
         </div>
       </section>
@@ -1107,7 +1076,7 @@ function App() {
             {DAY_CARDS.map(card => (
               <div className="day-card" key={card.key} onClick={() => openDrawer(card.key)}>
                 <div className="card-photo">
-                  <img src={card.photo} alt={card.title} />
+                  <img src={card.photo} alt={card.title} onError={(e) => { e.target.style.display = "none"; }} />
                   <span className="day-tag">{card.tag}</span>
                 </div>
                 <div className="card-body">
@@ -1125,7 +1094,7 @@ function App() {
       <section className="tips-section" id="tips">
         <div className="wrap">
           <h2 className="serif">Practical tips</h2>
-          <p className="sub">Small things that make the Mussoorie trip smoother.</p>
+          <p className="sub">Small things that make the Valley of Flowers trek smoother.</p>
           <div className="tips-grid">
             {TIPS.map((t, i) => (
               <div className="tip" key={i}>
@@ -1142,7 +1111,7 @@ function App() {
 
       <footer>
         <div className="wrap">
-          Dehradun / Haridwar → Mussoorie → Kempty · Lal Tibba · Dhanaulti · Surkunda Devi → Kanatal · Tehri → Drop
+          Govindghat → Pulna → Bhyundar → Ghangaria → Valley of Flowers → Ghangaria → Govindghat
         </div>
       </footer>
 

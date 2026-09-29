@@ -19,6 +19,12 @@ const ITINERARIES = [
     href: "/itineraries/uttarakhand-tours/delhi-nainital-kumaon.html",
     image: "/itineraries/uttarakhand-tours/images/Bhimtal.webp",
   },
+  {
+    title: "Valley of Flowers Trek",
+    desc: "3-day trek from Govindghat to Ghangaria and a full day in the alpine flower meadows.",
+    href: "/itineraries/uttarakhand-tours/valley-of-flowers.html",
+    image: "/itineraries/uttarakhand-tours/images/ValleyOfFlowers.jpg",
+  },
 ];
 
 export default function UttarakhandTourPackages() {
@@ -35,9 +41,7 @@ export default function UttarakhandTourPackages() {
           <a
             key={item.href}
             href={item.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block rounded-2xl border border-white/10 bg-ink-900/80 overflow-hidden hover:border-emerald-400/40 hover:-translate-y-0.5 transition shadow-lg"
+            className="PASTE-FULL-CLASSNAME-FROM-Packages.jsx-HERE"
           >
             <div className="h-40 w-full overflow-hidden bg-ink-800">
               <img

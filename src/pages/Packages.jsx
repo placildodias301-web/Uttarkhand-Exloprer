@@ -1,3 +1,4 @@
+
 import SectionHeader from "../components/SectionHeader";
 import { Link } from "react-router-dom";
 
@@ -101,6 +102,14 @@ const ALL_PACKAGES = [
     href: "/itineraries/honeymoon/delhi-kumaon.html",
     image: "/itineraries/honeymoon/images/Kausani.webp",
   },
+  {
+    category: "Honeymoon",
+    categoryPath: "/packages/honeymoon",
+    title: "Tehri Lake Honeymoon",
+    desc: "Lakeside stay at New Tehri, Tehri Dam, Surkanda Devi and quiet Dhanaulti in 3 days.",
+    href: "/itineraries/honeymoon/tehri-honeymoon.html",
+    image: "/itineraries/honeymoon/images/TehriLake.jpg",
+  },
   // Uttarakhand tours
   {
     category: "Uttarakhand Tours",
@@ -126,6 +135,14 @@ const ALL_PACKAGES = [
     href: "/itineraries/uttarakhand-tours/delhi-nainital-kumaon.html",
     image: "/itineraries/uttarakhand-tours/images/Bhimtal.webp",
   },
+  {
+    category: "Uttarakhand Tours",
+    categoryPath: "/packages/uttarakhand-tours",
+    title: "Valley of Flowers Trek",
+    desc: "3-day trek from Govindghat to Ghangaria and a full day in the alpine flower meadows.",
+    href: "/itineraries/uttarakhand-tours/valley-of-flowers.html",
+    image: "/itineraries/uttarakhand-tours/images/ValleyOfFlowers.jpg",
+  },
 ];
 
 export default function Packages() {
@@ -142,9 +159,7 @@ export default function Packages() {
           <a
             key={item.href}
             href={item.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group rounded-2xl overflow-hidden border border-white/5 bg-ink-850 shadow-card flex flex-col hover:border-emerald-400/30 hover:-translate-y-0.5 transition"
+            className="group flex flex-col rounded-2xl overflow-hidden border border-white/5 bg-ink-850 shadow-card hover:border-emerald-400/30 hover:-translate-y-1 transition duration-300"
           >
             <div className="relative h-52 overflow-hidden bg-ink-800">
               <img

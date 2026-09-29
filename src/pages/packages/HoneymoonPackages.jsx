@@ -25,6 +25,12 @@ const ITINERARIES = [
     href: "/itineraries/honeymoon/delhi-kumaon.html",
     image: "/itineraries/honeymoon/images/Kausani.webp",
   },
+  {
+    title: "Tehri Lake Honeymoon",
+    desc: "Lakeside stay at New Tehri, Tehri Dam, Surkanda Devi and quiet Dhanaulti in 3 days.",
+    href: "/itineraries/honeymoon/tehri-honeymoon.html",
+    image: "/itineraries/honeymoon/images/TehriLake.jpg",
+  },
 ];
 
 export default function HoneymoonPackages() {
@@ -41,9 +47,7 @@ export default function HoneymoonPackages() {
           <a
             key={item.href}
             href={item.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block rounded-2xl border border-white/10 bg-ink-900/80 overflow-hidden hover:border-emerald-400/40 hover:-translate-y-0.5 transition shadow-lg"
+            className="group flex flex-col rounded-2xl overflow-hidden border border-white/5 bg-ink-850 shadow-card hover:border-emerald-400/30 hover:-translate-y-1 transition duration-300"
           >
             <div className="h-40 w-full overflow-hidden bg-ink-800">
               <img

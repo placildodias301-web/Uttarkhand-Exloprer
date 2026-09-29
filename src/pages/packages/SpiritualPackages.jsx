@@ -50,13 +50,11 @@ export default function SpiritualPackages() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-10">
         {ITINERARIES.map((item) => (
-          <a
-            key={item.href}
-            href={item.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block rounded-2xl border border-white/10 bg-ink-900/80 overflow-hidden hover:border-emerald-400/40 hover:-translate-y-0.5 transition shadow-lg"
-          >
+     <a
+  key={item.href}
+  href={item.href}
+  className="group rounded-2xl overflow-hidden border border-white/5 ..."
+>
             <div className="h-40 w-full overflow-hidden bg-ink-800">
               <img
                 src={item.image}
