@@ -531,15 +531,15 @@ const { useState, useEffect, useRef, useCallback } = React;
 // Plain image paths only — no IMG object
 // Each location: image = map/popover, scheduleImage = day-schedule drawer
 const LOCATIONS = [
-  { id: "rishikesh", name: "Rishikesh", alt: "Pickup · ~340 m", day: 1, x: 8, y: 80, group: "start", image: "/itineraries/uttarakhand-tours/images/Rishikesh.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Rishikesh.jpg", blurb: "Pickup from Rishikesh (Dehradun pickup also possible). The hill road to Tehri starts here." },
-  { id: "kunjapuri", name: "Kunjapuri Devi", alt: "Temple · ~1,680 m", day: 1, x: 19, y: 66, group: "sight", image: "/itineraries/uttarakhand-tours/images/Kunjapuri.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Kunjapuri.jpg", blurb: "Hilltop Shakti temple known for wide views of the Himalayan peaks and the Ganga valley." },
-  { id: "chamba", name: "Chamba", alt: "Hill town", day: 1, x: 30, y: 56, group: "sight", image: "/itineraries/uttarakhand-tours/images/Chamba.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Chamba.jpg", blurb: "Hill town on the road to Tehri. Tea and lunch stop with mountain views." },
-  { id: "newtehri", name: "New Tehri", alt: "Night 1 · ~1,750 m", day: 1, x: 42, y: 46, group: "transfer", image: "/itineraries/uttarakhand-tours/images/NewTehri.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/NewTehri.jpg", blurb: "Planned town on the rim of Tehri Lake. Overnight base for the first night." },
-  { id: "tehridam", name: "Tehri Dam", alt: "~260 m tall", day: 2, x: 54, y: 28, group: "sight", image: "/itineraries/uttarakhand-tours/images/TehriDam.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/TehriDam.jpg", blurb: "India’s tallest dam on the Bhagirathi. View it from the designated viewpoints; the dam site is security controlled." },
-  { id: "tehrilake", name: "Tehri Lake", alt: "Koti · Water sports", day: 2, x: 64, y: 50, group: "sight", image: "/itineraries/uttarakhand-tours/images/TehriLake.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/TehriLake.jpg", blurb: "Huge reservoir with boating and water sports near Koti Colony. The old Tehri town lies beneath it." },
-  { id: "surkanda", name: "Surkanda Devi", alt: "Temple · ~2,760 m", day: 2, x: 80, y: 26, group: "sight", image: "/itineraries/uttarakhand-tours/images/SurkandaDevi.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/SurkandaDevi.jpg", blurb: "Hilltop temple reached by a short trek from Kaddukhal, with wide views of the Himalayas." },
-  { id: "dhanaulti", name: "Dhanaulti", alt: "Night 2 · ~2,290 m", day: 2, x: 84, y: 56, group: "transfer", image: "/itineraries/uttarakhand-tours/images/Dhanaulti.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Dhanaulti.jpg", blurb: "Quiet deodar and pine hill station. Overnight base for the second night." },
-  { id: "ecopark", name: "Dhanaulti Eco Park", alt: "Forest walk", day: 3, x: 70, y: 74, group: "sight", image: "/itineraries/uttarakhand-tours/images/DhanaultiEcoPark.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/DhanaultiEcoPark.jpg", blurb: "Easy walking trails through deodar forest before the drive back." }
+  { id: "rishikesh", name: "Rishikesh", alt: "Pickup · ~340 m", day: 1, x: 8, y: 80, group: "start", image: "/itineraries/honeymoon/images/rishikesh.webp", scheduleImage: "/itineraries/honeymoon/images/rishikesh.webp", blurb: "Pickup from Rishikesh (Dehradun pickup also possible). The hill road to Tehri starts here." },
+  { id: "kunjapuri", name: "Kunjapuri Devi", alt: "Temple · ~1,680 m", day: 1, x: 19, y: 66, group: "sight", image: "/itineraries/honeymoon/images/Kunjapuri.webp", scheduleImage: "/itineraries/honeymoon/images/Kunjapuri.webp", blurb: "Hilltop Shakti temple known for wide views of the Himalayan peaks and the Ganga valley." },
+  { id: "chamba", name: "Chamba", alt: "Hill town", day: 1, x: 30, y: 56, group: "sight", image: "/itineraries/honeymoon/images/ChambaHill.webp", scheduleImage: "/itineraries/honeymoon/images/ChambaHill.webp", blurb: "Hill town on the road to Tehri. Tea and lunch stop with mountain views." },
+  { id: "newtehri", name: "New Tehri", alt: "Night 1 · ~1,750 m", day: 1, x: 42, y: 46, group: "transfer", image: "/itineraries/honeymoon/images/TehriNight.jpg", scheduleImage: "/itineraries/honeymoon/images/TehriNight.jpg", blurb: "Planned town on the rim of Tehri Lake. Overnight base for the first night." },
+  { id: "tehridam", name: "Tehri Dam", alt: "~260 m tall", day: 2, x: 54, y: 28, group: "sight", image: "/itineraries/honeymoon/images/TehriDam.webp", scheduleImage: "/itineraries/honeymoon/images/TehriDam.webp", blurb: "India’s tallest dam on the Bhagirathi. View it from the designated viewpoints; the dam site is security controlled." },
+  { id: "tehrilake", name: "Tehri Lake", alt: "Koti · Water sports", day: 2, x: 64, y: 50, group: "sight", image: "/itineraries/honeymoon/images/TehriLakeKoti.jpg", scheduleImage: "/itineraries/honeymoon/images/TehriLakeKoti.jpg", blurb: "Huge reservoir with boating and water sports near Koti Colony. The old Tehri town lies beneath it." },
+  { id: "surkanda", name: "Surkanda Devi", alt: "Temple · ~2,760 m", day: 2, x: 80, y: 26, group: "sight", image: "/itineraries/honeymoon/images/surkanda.webp", scheduleImage: "/itineraries/honeymoon/images/surkanda.webp", blurb: "Hilltop temple reached by a short trek from Kaddukhal, with wide views of the Himalayas." },
+  { id: "dhanaulti", name: "Dhanaulti", alt: "Night 2 · ~2,290 m", day: 2, x: 84, y: 56, group: "transfer", image: "/itineraries/honeymoon/images/DHANAULTI.jpg", scheduleImage: "/itineraries/honeymoon/images/DHANAULTI.jpg", blurb: "Quiet deodar and pine hill station. Overnight base for the second night." },
+  { id: "ecopark", name: "Dhanaulti Eco Park", alt: "Forest walk", day: 3, x: 70, y: 74, group: "sight", image: "/itineraries/honeymoon/images/ecopark.jpg", blurb: "Easy walking trails through deodar forest before the drive back." }
 ];
 
 const DAYINFO = {
@@ -547,7 +547,7 @@ const DAYINFO = {
     eyebrow: "DAY 01 · RISHIKESH → NEW TEHRI",
     title: "Temple views & the road to Tehri",
     subtitle: "~75 km · 3–4 hrs with stops at Kunjapuri Devi and Chamba",
-    photo: "/itineraries/uttarakhand-tours/images/Kunjapuri.jpg",
+    photo: "/itineraries/honeymoon/images/rishikesh.webp",
     moments: [
       { time: "Morning", title: "Pickup in Rishikesh", desc: "Meet at your hotel, station or bus stand and head into the hills." },
       { time: "Morning", title: "Kunjapuri Devi Temple", desc: "Short drive and steps up to the hilltop temple for Himalayan views." },
@@ -560,7 +560,7 @@ const DAYINFO = {
     eyebrow: "DAY 02 · TEHRI DAM & LAKE → DHANAULTI",
     title: "Dam, lake & Surkanda Devi",
     subtitle: "Tehri Dam and lake activities, then ~60 km to Dhanaulti with a stop at Surkanda Devi",
-    photo: "/itineraries/uttarakhand-tours/images/TehriLake.jpg",
+    photo: "/itineraries/honeymoon/images/TehriDam.webp",
     moments: [
       { time: "Morning", title: "Tehri Dam viewpoint", desc: "See India’s tallest dam from the viewpoints. Carry ID; the dam site is security controlled." },
       { time: "Morning", title: "Tehri Lake, Koti", desc: "Boating and water sports on the lake (activities at own cost)." },
@@ -573,7 +573,7 @@ const DAYINFO = {
     eyebrow: "DAY 03 · DHANAULTI → RISHIKESH",
     title: "Eco Park walk & drop",
     subtitle: "Morning walk in the forest, then ~3 hrs drive to Rishikesh or Dehradun",
-    photo: "/itineraries/uttarakhand-tours/images/DhanaultiEcoPark.jpg",
+    photo: "/itineraries/honeymoon/images/ecopark.jpg",
     moments: [
       { time: "Morning", title: "Breakfast & checkout", desc: "Enjoy a relaxed breakfast among the pines." },
       { time: "Morning", title: "Dhanaulti Eco Park", desc: "Easy walk on forest trails and viewpoints." },
@@ -585,9 +585,9 @@ const DAYINFO = {
 };
 
 const DAY_CARDS = [
-  { key: "day1", tag: "Day 1", title: "Rishikesh → New Tehri", meta: "~75 km · Kunjapuri · Chamba", desc: "Hilltop temple views and a scenic drive to the lakeside town of New Tehri.", photo: "/itineraries/uttarakhand-tours/images/Kunjapuri.jpg" },
-  { key: "day2", tag: "Day 2", title: "Tehri Dam & Lake", meta: "Dam · water sports · Surkanda Devi", desc: "See India’s tallest dam, try the lake, then head up to Surkanda Devi and Dhanaulti.", photo: "/itineraries/uttarakhand-tours/images/TehriLake.jpg" },
-  { key: "day3", tag: "Day 3", title: "Dhanaulti → Rishikesh", meta: "Eco Park · ~90 km · ~3 hrs", desc: "Forest walk in Dhanaulti and drop at Rishikesh or Dehradun.", photo: "/itineraries/uttarakhand-tours/images/DhanaultiEcoPark.jpg" }
+  { key: "day1", tag: "Day 1", title: "Rishikesh → New Tehri", meta: "~75 km · Kunjapuri · Chamba", desc: "Hilltop temple views and a scenic drive to the lakeside town of New Tehri.", photo: "/itineraries/honeymoon/images/rishikesh.webp" },
+  { key: "day2", tag: "Day 2", title: "Tehri Dam & Lake", meta: "Dam · water sports · Surkanda Devi", desc: "See India’s tallest dam, try the lake, then head up to Surkanda Devi and Dhanaulti.", photo: "/itineraries/honeymoon/images/TehriDam.webp" },
+  { key: "day3", tag: "Day 3", title: "Dhanaulti → Rishikesh", meta: "Eco Park · ~90 km · ~3 hrs", desc: "Forest walk in Dhanaulti and drop at Rishikesh or Dehradun.", photo: "/itineraries/honeymoon/images/ecopark.jpg" }
 ];
 
 const TIPS = [
