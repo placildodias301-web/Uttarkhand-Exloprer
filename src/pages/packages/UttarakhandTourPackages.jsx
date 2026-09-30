@@ -23,7 +23,7 @@ const ITINERARIES = [
     title: "Valley of Flowers Trek",
     desc: "3-day trek from Govindghat to Ghangaria and a full day in the alpine flower meadows.",
     href: "/itineraries/uttarakhand-tours/valley-of-flowers.html",
-    image: "/itineraries/uttarakhand-tours/images/ValleyOfFlowers.jpg",
+    image: "/itineraries/uttarakhand-tours/images/PushpawatiRiverTrail.jpg",
   },
 ];
 

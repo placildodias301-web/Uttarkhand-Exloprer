@@ -531,13 +531,13 @@ const { useState, useEffect, useRef, useCallback } = React;
 // Plain image paths only — no IMG object
 // Each location: image = map/popover, scheduleImage = day-schedule drawer
 const LOCATIONS = [
-  { id: "govindghat", name: "Govindghat", alt: "Trek start · 1,830 m", day: 1, x: 12, y: 78, group: "start", image: "/itineraries/uttarakhand-tours/images/Govindghat.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Govindghat.jpg", blurb: "Roadhead on the Alaknanda and start of the trek. Pickup from Joshimath (20 km). Ponies, palkis and helicopter are available here." },
-  { id: "pulna", name: "Pulna", alt: "Village", day: 1, x: 28, y: 62, group: "sight", image: "/itineraries/uttarakhand-tours/images/Pulna.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Pulna.jpg", blurb: "First village on the trail. Tea stalls and a good place for a short rest." },
-  { id: "bhyundar", name: "Bhyundar", alt: "Village", day: 1, x: 44, y: 50, group: "sight", image: "/itineraries/uttarakhand-tours/images/Bhyundar.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Bhyundar.jpg", blurb: "Mid-way village on the climb, close to the Bhyundar Ganga river. Last big stop before Ghangaria." },
-  { id: "ghangaria", name: "Ghangaria", alt: "Base · 3,050 m", day: 1, x: 56, y: 42, group: "transfer", image: "/itineraries/uttarakhand-tours/images/Ghangaria.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Ghangaria.jpg", blurb: "Base village for both nights. Simple stays, cold evenings, and the forest check-post for the valley." },
-  { id: "entry", name: "Valley Entry", alt: "Check-post", day: 2, x: 68, y: 26, group: "sight", image: "/itineraries/uttarakhand-tours/images/ValleyEntry.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/ValleyEntry.jpg", blurb: "Entry gate of the national park. Carry ID and your ticket; entry closes in the afternoon." },
-  { id: "river", name: "Pushpawati River", alt: "Trail", day: 2, x: 78, y: 46, group: "sight", image: "/itineraries/uttarakhand-tours/images/PushpawatiRiver.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/PushpawatiRiver.jpg", blurb: "The glacial river that runs through the valley. The trail follows it with waterfalls and bridges." },
-  { id: "meadows", name: "Valley of Flowers", alt: "~3,600 m", day: 2, x: 90, y: 26, group: "sight", image: "/itineraries/uttarakhand-tours/images/ValleyOfFlowers.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/ValleyOfFlowers.jpg", blurb: "UNESCO-listed alpine meadows of wildflowers ringed by snow peaks. Bloom peaks mid-July to mid-August." }
+  { id: "govindghat", name: "Govindghat", alt: "Trek start · 1,830 m", day: 1, x: 12, y: 78, group: "start", image: "/itineraries/uttarakhand-tours/images/Govindghat.webp", scheduleImage: "/itineraries/uttarakhand-tours/images/Govindghat.webp", blurb: "Roadhead on the Alaknanda and start of the trek. Pickup from Joshimath (20 km). Ponies, palkis and helicopter are available here." },
+  { id: "pulna", name: "Pulna", alt: "Village", day: 1, x: 28, y: 62, group: "sight", image: "/itineraries/uttarakhand-tours/images/PulnaVillage.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/PulnaVillage.jpg", blurb: "First village on the trail. Tea stalls and a good place for a short rest." },
+  { id: "bhyundar", name: "Bhyundar", alt: "Village", day: 1, x: 44, y: 50, group: "sight", image: "/itineraries/uttarakhand-tours/images/BhyundarVillage.webp", scheduleImage: "/itineraries/uttarakhand-tours/images/BhyundarVillage.webp", blurb: "Mid-way village on the climb, close to the Bhyundar Ganga river. Last big stop before Ghangaria." },
+  { id: "ghangaria", name: "Ghangaria", alt: "Base · 3,050 m", day: 1, x: 56, y: 42, group: "transfer", image: "/itineraries/uttarakhand-tours/images/GhangariaBase.webp", scheduleImage: "/itineraries/uttarakhand-tours/images/GhangariaBase.webp", blurb: "Base village for both nights. Simple stays, cold evenings, and the forest check-post for the valley." },
+  { id: "entry", name: "Valley Entry", alt: "Check-post", day: 2, x: 68, y: 26, group: "sight", image: "/itineraries/uttarakhand-tours/images/flower vally.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/flower vally.jpg", blurb: "Entry gate of the national park. Carry ID and your ticket; entry closes in the afternoon." },
+  { id: "river", name: "Pushpawati River", alt: "Trail", day: 2, x: 78, y: 46, group: "sight", image: "/itineraries/uttarakhand-tours/images/Pushpawat.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/Pushpawat.jpg", blurb: "The glacial river that runs through the valley. The trail follows it with waterfalls and bridges." },
+  { id: "meadows", name: "Valley of Flowers", alt: "~3,600 m", day: 2, x: 90, y: 26, group: "sight", image: "/itineraries/uttarakhand-tours/images/vally.jpg", scheduleImage: "/itineraries/uttarakhand-tours/images/vally.jpg", blurb: "UNESCO-listed alpine meadows of wildflowers ringed by snow peaks. Bloom peaks mid-July to mid-August." }
 ];
 
 const DAYINFO = {
@@ -545,7 +545,7 @@ const DAYINFO = {
     eyebrow: "DAY 01 · GOVINDGHAT → GHANGARIA",
     title: "Trek to the base village",
     subtitle: "13 km trek climbing about 1,200 m through forest, waterfalls and villages",
-    photo: "/itineraries/uttarakhand-tours/images/Ghangaria.jpg",
+    photo: "/itineraries/uttarakhand-tours/images/Govindghat.webp",
     moments: [
       { time: "Morning", title: "Reach Govindghat", desc: "Pickup from Joshimath (20 km, 45 min–1 hr). Register at the trek check-post." },
       { time: "Morning", title: "Start the trek", desc: "Cross the bridge and follow the Lakshman Ganga through forest and waterfalls." },
@@ -558,7 +558,7 @@ const DAYINFO = {
     eyebrow: "DAY 02 · VALLEY OF FLOWERS",
     title: "A full day among the wildflowers",
     subtitle: "About 4 km each way into the national park, back in Ghangaria by evening",
-    photo: "/itineraries/uttarakhand-tours/images/ValleyOfFlowers.jpg",
+    photo: "/itineraries/uttarakhand-tours/images/flower vally.jpg",
     moments: [
       { time: "Early morning", title: "Breakfast & entry permit", desc: "Show ID and get your ticket at the forest check-post. Carry a packed lunch, water and rain gear." },
       { time: "Morning", title: "Valley entry & river trail", desc: "Gentle climb beside the Pushpawati river, crossing bridges and passing waterfalls." },
@@ -571,7 +571,7 @@ const DAYINFO = {
     eyebrow: "DAY 03 · GHANGARIA → GOVINDGHAT",
     title: "Trek down & drop",
     subtitle: "13 km downhill trek back to Govindghat, then onward transfer",
-    photo: "/itineraries/uttarakhand-tours/images/Govindghat.jpg",
+    photo: "/itineraries/uttarakhand-tours/images/GhangariaBase.webp",
     moments: [
       { time: "Morning", title: "Breakfast & checkout", desc: "Leave early so you reach Govindghat before the afternoon." },
       { time: "Day", title: "Trek down", desc: "About 13 km · 4–5 hrs downhill via Bhyundar and Pulna, or ride a pony / take the helicopter (pay directly)." },
@@ -582,9 +582,9 @@ const DAYINFO = {
 };
 
 const DAY_CARDS = [
-  { key: "day1", tag: "Day 1", title: "Govindghat → Ghangaria", meta: "13 km trek · 5–7 hrs", desc: "Climb through forest, waterfalls and villages to the base camp of the valley.", photo: "/itineraries/uttarakhand-tours/images/Ghangaria.jpg" },
-  { key: "day2", tag: "Day 2", title: "Valley of Flowers", meta: "~4 km each way · full day", desc: "Walk into the alpine valley, follow the river and roam the flower meadows.", photo: "/itineraries/uttarakhand-tours/images/ValleyOfFlowers.jpg" },
-  { key: "day3", tag: "Day 3", title: "Ghangaria → Govindghat", meta: "13 km downhill · 4–5 hrs", desc: "Trek back down and drop at Govindghat for your onward journey.", photo: "/itineraries/uttarakhand-tours/images/Govindghat.jpg" }
+  { key: "day1", tag: "Day 1", title: "Govindghat → Ghangaria", meta: "13 km trek · 5–7 hrs", desc: "Climb through forest, waterfalls and villages to the base camp of the valley.", photo: "/itineraries/uttarakhand-tours/images/Govindghat.webp" },
+  { key: "day2", tag: "Day 2", title: "Valley of Flowers", meta: "~4 km each way · full day", desc: "Walk into the alpine valley, follow the river and roam the flower meadows.", photo: "/itineraries/uttarakhand-tours/images/vally.jpg" },
+  { key: "day3", tag: "Day 3", title: "Ghangaria → Govindghat", meta: "13 km downhill · 4–5 hrs", desc: "Trek back down and drop at Govindghat for your onward journey.", photo: "/itineraries/uttarakhand-tours/images/GhangariaBase.webp" }
 ];
 
 const TIPS = [

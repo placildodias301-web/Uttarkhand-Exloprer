@@ -8,19 +8,19 @@ const ITINERARIES = [
     image: "/itineraries/honeymoon/images/Chopta.jpg",
   },
   {
-    title: "Chopta – Auli (Dark theme)",
+    title: "Chopta – Auli ",
     desc: "Same route map in the dark interactive style.",
     href: "/itineraries/honeymoon/chopta-auli-dark.html",
     image: "/itineraries/honeymoon/images/Auli.jpg",
   },
   {
-    title: "Nainital Honeymoon",
+    title: "Nainital ",
     desc: "Romantic Nainital and nearby lakes circuit.",
     href: "/itineraries/honeymoon/nainital-honeymoon.html",
     image: "/itineraries/honeymoon/images/BhimtalLake.webp",
   },
   {
-    title: "Delhi – Kumaon Honeymoon",
+    title: "Delhi – Kumaon ",
     desc: "Extended Kumaon honeymoon route from Delhi.",
     href: "/itineraries/honeymoon/delhi-kumaon.html",
     image: "/itineraries/honeymoon/images/Kausani.webp",
