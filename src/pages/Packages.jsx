@@ -108,7 +108,7 @@ const ALL_PACKAGES = [
     title: "Tehri Lake Honeymoon",
     desc: "Lakeside stay at New Tehri, Tehri Dam, Surkanda Devi and quiet Dhanaulti in 3 days.",
     href: "/itineraries/honeymoon/tehri-honeymoon.html",
-    image: "/itineraries/honeymoon/images/TehriLake.jpg",
+    image: "/itineraries/honeymoon/images/TehriDam.webp",
   },
   // Uttarakhand tours
   {
