@@ -1,12 +1,9 @@
-import SmartImage from "../../components/SmartImage";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Plus, X } from "lucide-react";
 import { destinationsStore, useDestinations } from "../../services/content";
 import { Field, TextInput, TextArea, Select } from "../components/FormFields";
 import ImageUploadBox from "../components/ImageUploadBox";
-import { prepareImage } from "../../utils/images";
-import { CONTENT_STATUSES } from "../../services/content";
 import RichTextLite from "../components/RichTextLite";
 import TagListInput from "../components/TagListInput";
 import NameDescListInput from "../components/NameDescListInput";
@@ -18,7 +15,6 @@ const emptyForm = {
   name: "",
   tagline: "",
   region: "Uttarakhand",
-  location: "",
   shortDescription: "",
   description: "",
   image: null,
@@ -31,7 +27,6 @@ const emptyForm = {
   howToReach: "",
   attractions: [],
   activities: [],
-  highlights: [],
   status: "Published",
 };
 
@@ -49,10 +44,9 @@ export default function DestinationForm() {
   );
 
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
-  const [error, setError] = useState("");
 
   const onSave = () => {
-    if (!form.name.trim()) return setError("Add a destination name before saving.");
+    if (!form.name.trim()) return;
     if (isEdit) {
       destinationsStore.update(id, form);
     } else {
@@ -74,16 +68,13 @@ export default function DestinationForm() {
     <div className="max-w-4xl">
       <h1 className="font-display text-2xl text-mist-100 mb-6">{isEdit ? "Edit Destination" : "Add New Destination"}</h1>
 
-      <div className="grid lg:grid-cols-[1fr_320px] gap-6 [&>*]:min-w-0">
+      <div className="grid lg:grid-cols-[1fr_320px] gap-6">
         <div className="space-y-5">
           <div className="rounded-2xl border border-white/5 bg-ink-850 p-5 space-y-4">
             <Field label="Destination Name" required>
               <TextInput value={form.name} onChange={(e) => set({ name: e.target.value })} placeholder="e.g. Haridwar" />
             </Field>
-            <Field label="Location" hint="e.g. Dehradun district, Uttarakhand — shown on cards and the destination page">
-              <TextInput value={form.location || ""} onChange={(e) => set({ location: e.target.value })} placeholder="Town, district or area" />
-            </Field>
-            <Field label="Destination group (region)" required>
+            <Field label="Region" required>
               <Select value={form.region} onChange={(e) => set({ region: e.target.value })}>
                 {regionNames.map((n) => (
                   <option key={n}>{n}</option>
@@ -115,8 +106,6 @@ export default function DestinationForm() {
 
           <div className="rounded-2xl border border-white/5 bg-ink-850 p-5 space-y-5">
             <NameDescListInput label="Attractions" items={form.attractions} onChange={(v) => set({ attractions: v })} addLabel="Add Attraction" />
-            <TagListInput label="Highlights" items={form.highlights || []} onChange={(v) => set({ highlights: v })} placeholder="e.g. Evening Ganga Aarti" />
-            <p className="text-mist-400 text-xs font-body -mt-3">Leave empty to show the attraction names as highlights.</p>
             <TagListInput label="Activities" items={form.activities} onChange={(v) => set({ activities: v })} placeholder="e.g. River Rafting" />
           </div>
 
@@ -125,7 +114,7 @@ export default function DestinationForm() {
             <div className="grid grid-cols-3 gap-3">
               {form.gallery.map((src, i) => (
                 <div key={i} className="relative aspect-square">
-                  <SmartImage src={src} alt="" className="h-full w-full object-cover rounded-lg" />
+                  <img src={src} alt="" className="h-full w-full object-cover rounded-lg" />
                   <button
                     type="button"
                     onClick={() => set({ gallery: form.gallery.filter((_, idx) => idx !== i) })}
@@ -145,8 +134,9 @@ export default function DestinationForm() {
                   onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-                    const dataUrl = await prepareImage(file);
-                    setForm((f) => ({ ...f, gallery: [...f.gallery, dataUrl] }));
+                    const reader = new FileReader();
+                    reader.onload = () => set({ gallery: [...form.gallery, reader.result] });
+                    reader.readAsDataURL(file);
                   }}
                 />
               </label>
@@ -161,13 +151,13 @@ export default function DestinationForm() {
 
           <div className="rounded-2xl border border-white/5 bg-ink-850 p-5">
             <label className="block text-mist-300 font-body text-sm mb-2">Status</label>
-            <div className="flex gap-1.5">
-              {CONTENT_STATUSES.map((s) => (
+            <div className="flex gap-2">
+              {["Published", "Draft"].map((s) => (
                 <button
                   key={s}
                   type="button"
                   onClick={() => set({ status: s })}
-                  className={`flex-1 py-2 rounded-lg text-xs sm:text-sm font-body font-semibold border transition-colors ${
+                  className={`flex-1 py-2 rounded-lg text-sm font-body font-semibold border transition-colors ${
                     form.status === s ? "bg-moss-500 text-ink-950 border-moss-500" : "border-white/10 text-mist-300"
                   }`}
                 >
@@ -177,7 +167,6 @@ export default function DestinationForm() {
             </div>
           </div>
 
-          {error && <p role="alert" className="text-rose-300 text-sm font-body">{error}</p>}
           <button
             onClick={onSave}
             className="w-full py-3 rounded-full bg-moss-500 text-ink-950 font-body font-semibold hover:bg-moss-400 transition-colors"

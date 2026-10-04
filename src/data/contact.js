@@ -4,7 +4,7 @@
 export const WHATSAPP_NUMBER = "";
 
 export const WHATSAPP_DEFAULT_MESSAGE =
-  "Hi! I'm planning a trip with Peak & Palm and had a few questions.";
+  "Hi! I'm planning a trip to Uttarakhand and had a few questions.";
 
 export function getWhatsAppLink(message = WHATSAPP_DEFAULT_MESSAGE) {
   if (!WHATSAPP_NUMBER) return null;

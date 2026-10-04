@@ -1,14 +1,8 @@
-import { useParams, Navigate, Link } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import {
   Star, Clock, Mountain, Thermometer, Tag, MapPin, Plus, Check,
-  Compass, Bed, UtensilsCrossed, Car, Sparkles, CalendarDays,
+  ArrowRight, Compass, Bed, UtensilsCrossed, Car,
 } from "lucide-react";
-import SmartImage from "../components/SmartImage";
-import RegionBadge from "../components/RegionBadge";
-import { useOverlayHeader } from "../hooks/useOverlayHeader";
-import { usePublicPackages, getDestinationHighlights, isPublished } from "../services/content";
-import { useItineraries } from "../services/itineraries";
-import { regionLabel } from "../data/regions";
 import Button from "../components/Button";
 import SectionHeader from "../components/SectionHeader";
 import DestinationCard from "../components/DestinationCard";
@@ -17,37 +11,26 @@ import { useDestinations } from "../services/content";
 import { useItinerary } from "../context/ItineraryContext";
 
 export default function DestinationDetail() {
-  useOverlayHeader();
   const { id } = useParams();
   const destinations = useDestinations();
-  const destination = destinations.find((d) => d.id === id && isPublished(d));
+  const destination = destinations.find((d) => d.id === id);
   const { ids, addDestination } = useItinerary();
-  const packages = usePublicPackages("all");
-  const itineraries = useItineraries("all");
 
   if (!destination) return <Navigate to="/destinations" replace />;
   const d = destination;
   const added = ids.includes(d.id);
-  const location = d.location || regionLabel(d.region);
-  const highlights = getDestinationHighlights(d, 6);
-  // Same region first; published only.
-  const related = destinations.filter((x) => x.id !== d.id && x.region === d.region && isPublished(x)).slice(0, 3);
-  const relatedPackages = packages.filter((p) => (p.destinations || []).includes(d.id));
-  const relatedItineraries = itineraries.filter((it) => it.kind === "template" && it.destinationIds.includes(d.id));
+  const related = destinations.filter((x) => x.id !== d.id).slice(0, 3);
 
   return (
     <div>
-      <section className="relative isolate min-h-[66vh] flex items-end">
-        <SmartImage src={d.image} fallbackSrc={d.gallery?.[0]} alt={`${d.name}, ${location}`} priority className="absolute inset-0 -z-10 h-full w-full object-cover" />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink-950 via-ink-950/50 to-ink-950/30" />
-        <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 pt-40 pb-12 w-full">
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            <RegionBadge region={d.region} onImage />
-            <span className="inline-flex items-center gap-1 text-mist-200 text-xs font-body">
-              <MapPin size={12} aria-hidden="true" /> {location}
-            </span>
-          </div>
-          <h1 className="font-display text-5xl sm:text-6xl text-mist-100 mb-3">{d.name}</h1>
+      <section className="relative h-[56vh] min-h-[380px] flex items-end">
+        <img src={d.image} alt={d.name} className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/50 to-transparent" />
+        <div className="relative max-w-[1200px] mx-auto px-5 sm:px-8 pb-12 w-full">
+          <span className="inline-block px-3 py-1 rounded-full text-xs font-body font-bold text-ink-950 mb-4" style={{ backgroundColor: d.accent }}>
+            Stop {d.order} of 6
+          </span>
+          <h1 className="font-display text-4xl sm:text-5xl text-mist-100 mb-3">{d.name}</h1>
           <p className="text-mist-300 font-body text-lg mb-3">{d.tagline}</p>
           <div className="flex items-center gap-1 text-gold-400 text-sm font-body font-semibold">
             <Star size={14} fill="currentColor" /> {d.rating} <span className="text-mist-400 font-normal">({d.reviews} reviews)</span>
@@ -58,22 +41,7 @@ export default function DestinationDetail() {
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8 py-12 grid lg:grid-cols-[1fr_320px] gap-12">
         <div>
           <h2 className="font-display text-2xl text-mist-100 mb-4">About {d.name}</h2>
-          <p className="text-mist-200 font-body text-[17px] leading-[1.8] mb-8">{d.description}</p>
-
-          {highlights.length > 0 && (
-            <div className="mb-12">
-              <h2 className="font-display text-2xl text-mist-100 mb-4 flex items-center gap-2">
-                <Sparkles size={18} className="text-gold-400" aria-hidden="true" /> Highlights
-              </h2>
-              <ul className="flex flex-wrap gap-2">
-                {highlights.map((h) => (
-                  <li key={h} className="px-3.5 py-2 rounded-full border border-white/10 bg-ink-850/70 text-mist-100 text-sm font-body">
-                    {h}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <p className="text-mist-300 font-body leading-relaxed mb-10">{d.description}</p>
 
           <h2 className="font-display text-2xl text-mist-100 mb-5 flex items-center gap-2">
             <Compass size={19} className="text-moss-400" /> Attractions
@@ -96,11 +64,10 @@ export default function DestinationDetail() {
             ))}
           </div>
 
-          {(d.hotels || []).length > 0 && (<>
           <h2 className="font-display text-2xl text-mist-100 mb-5 flex items-center gap-2">
             <Bed size={19} className="text-moss-400" /> Where to Stay
           </h2>
-          <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-10">
+          <div className="grid sm:grid-cols-3 gap-4 mb-10">
             {(d.hotels || []).map((h) => (
               <div key={h.name} className="p-4 rounded-xl border border-white/5 bg-ink-850">
                 <div className="flex items-center justify-between mb-1">
@@ -116,9 +83,7 @@ export default function DestinationDetail() {
               </div>
             ))}
           </div>
-          </>)}
 
-          {(d.cuisine || []).length > 0 && (<>
           <h2 className="font-display text-2xl text-mist-100 mb-5 flex items-center gap-2">
             <UtensilsCrossed size={19} className="text-moss-400" /> Local Food to Try
           </h2>
@@ -131,20 +96,16 @@ export default function DestinationDetail() {
             ))}
           </div>
 
-          </>)}
-
-          {(d.gallery || []).length > 0 && (<>
           <h2 className="font-display text-2xl text-mist-100 mb-5">Photo Gallery</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-10">
-            {d.gallery.map((g, i) => (
-              <SmartImage key={g} src={g} alt={`${d.name}, photo ${i + 1}`} className="aspect-square w-full object-cover rounded-xl" />
+          <div className="grid grid-cols-3 gap-3 mb-10">
+            {(d.gallery || []).map((g, i) => (
+              <img key={i} src={g} alt={`${d.name} ${i + 1}`} loading="lazy" className="aspect-square object-cover rounded-xl" />
             ))}
           </div>
-          </>)}
         </div>
 
         <aside className="space-y-5">
-          <div className="lg:sticky lg:top-36 space-y-5">
+          <div className="sticky top-24 space-y-5">
             <div className="rounded-2xl border border-white/5 bg-ink-850 p-5">
               <h3 className="font-display text-lg text-mist-100 mb-4">Trip Facts</h3>
               <div className="space-y-3 text-sm font-body">
@@ -160,7 +121,7 @@ export default function DestinationDetail() {
               <h3 className="font-display text-lg text-mist-100 mb-3 flex items-center gap-2">
                 <Car size={16} className="text-moss-400" /> How to Reach
               </h3>
-              <p className="text-mist-400 text-[13px] font-body leading-relaxed">{d.howToReach || "Ask us for the best route from your city."}</p>
+              <p className="text-mist-400 text-[13px] font-body leading-relaxed">{d.howToReach}</p>
             </div>
 
             <div className="rounded-2xl border border-white/5 bg-ink-850 p-5 space-y-3">
@@ -174,53 +135,28 @@ export default function DestinationDetail() {
                 disabled={added}
                 className="w-full"
               >
-                {added ? <><Check size={15} /> Added to your trip</> : <><Plus size={15} /> Add to Plan My Trip</>}
+                {added ? <><Check size={15} /> Added to Itinerary</> : <><Plus size={15} /> Add to My Itinerary</>}
               </Button>
             </div>
           </div>
         </aside>
       </div>
 
-      {(relatedPackages.length > 0 || relatedItineraries.length > 0) && (
-        <section className="border-t border-white/5 py-16">
-          <div className="max-w-[1200px] mx-auto px-5 sm:px-8">
-            <SectionHeader kicker="Plans that include it" title={`Packages and itineraries visiting ${d.name}`} />
-            <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[...relatedPackages.map((p) => ({ id: p.id, to: `/packages/${p.id}`, name: p.name, image: p.image, meta: `Package · ${p.days}D / ${p.nights}N` })),
-                ...relatedItineraries.map((it) => ({ id: it.id, to: `/itinerary/${it.id}`, name: it.name, image: it.cover, meta: `Itinerary · ${it.duration}` }))].map((x) => (
-                <li key={x.id}>
-                  <Link to={x.to} className="group flex items-center gap-4 rounded-2xl border border-white/[0.08] bg-ink-850/80 p-3 hover:border-white/20 transition-colors">
-                    <SmartImage src={x.image} alt="" className="h-16 w-20 rounded-xl object-cover shrink-0" />
-                    <div className="min-w-0">
-                      <p className="flex items-center gap-1 text-mist-400 text-xs font-body mb-0.5"><CalendarDays size={11} aria-hidden="true" /> {x.meta}</p>
-                      <p className="font-display text-lg text-mist-100 leading-snug group-hover:text-moss-400 transition-colors">{x.name}</p>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      )}
-
-      {related.length > 0 && (
-      <section className="bg-ink-900/60 border-t border-white/5 py-16">
+      <section className="bg-ink-900 border-t border-white/5 py-16">
         <div className="max-w-[1200px] mx-auto px-5 sm:px-8">
-          <SectionHeader kicker={`More in ${regionLabel(d.region)}`} title="Related destinations" />
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5">
+          <SectionHeader title="Related Destinations" align="left" />
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
             {related.map((r) => (
               <DestinationCard key={r.id} destination={r} />
             ))}
           </div>
         </div>
       </section>
-      )}
     </div>
   );
 }
 
 function Fact({ icon: Icon, label, value }) {
-  if (!value) return null;
   return (
     <div className="flex items-start gap-2.5">
       <Icon size={14} className="text-moss-400 mt-0.5 shrink-0" />

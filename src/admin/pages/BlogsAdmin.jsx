@@ -1,4 +1,3 @@
-import SmartImage from "../../components/SmartImage";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
@@ -60,7 +59,7 @@ export default function BlogsAdmin() {
           <tbody>
             {filtered.map((b) => (
               <tr key={b.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
-                <td className="py-2.5 px-4"><SmartImage src={b.coverImage} alt="" className="h-10 w-14 rounded-md object-cover" /></td>
+                <td className="py-2.5 px-4"><img src={b.coverImage} alt="" className="h-10 w-14 rounded-md object-cover" /></td>
                 <td className="py-2.5 px-4 text-mist-100 font-semibold">{b.title}</td>
                 <td className="py-2.5 px-4 text-mist-400">{b.category}</td>
                 <td className="py-2.5 px-4"><StatusBadge status={b.status} /></td>

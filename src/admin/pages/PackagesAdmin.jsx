@@ -1,12 +1,9 @@
-import SmartImage from "../../components/SmartImage";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { usePackages, packagesStore } from "../../services/content";
 import StatusBadge from "../components/StatusBadge";
 import RegionFilter from "../components/RegionFilter";
-import StatusToggle from "../components/StatusToggle";
-import { contentRegionNames, normalizeRegion } from "../../data/regions";
 
 export default function PackagesAdmin() {
   const packages = usePackages();
@@ -15,7 +12,7 @@ export default function PackagesAdmin() {
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   const filtered = packages.filter(
-    (p) => p.name.toLowerCase().includes(query.toLowerCase()) && (regionFilter === "All" || normalizeRegion(p.region) === normalizeRegion(regionFilter))
+    (p) => p.name.toLowerCase().includes(query.toLowerCase()) && (regionFilter === "All" || p.region === regionFilter)
   );
 
   return (
@@ -40,7 +37,7 @@ export default function PackagesAdmin() {
             className="w-full bg-transparent outline-none text-sm font-body text-mist-100 placeholder:text-mist-400"
           />
         </div>
-        <RegionFilter value={regionFilter} onChange={setRegionFilter} options={contentRegionNames} />
+        <RegionFilter value={regionFilter} onChange={setRegionFilter} />
       </div>
 
       <div className="rounded-2xl border border-white/5 bg-ink-850 overflow-x-auto">
@@ -59,19 +56,18 @@ export default function PackagesAdmin() {
           <tbody>
             {filtered.map((p) => (
               <tr key={p.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
-                <td className="py-2.5 px-4"><SmartImage src={p.image} alt="" className="h-10 w-14 rounded-md object-cover" /></td>
+                <td className="py-2.5 px-4"><img src={p.image} alt="" className="h-10 w-14 rounded-md object-cover" /></td>
                 <td className="py-2.5 px-4 text-mist-100 font-semibold">{p.name}</td>
                 <td className="py-2.5 px-4 text-mist-400">{p.region}</td>
-                <td className="py-2.5 px-4 text-mist-400">{p.days}D / {p.nights}N<span className="block text-[11px] text-mist-400/70">{(p.itinerary || []).length} days planned</span></td>
+                <td className="py-2.5 px-4 text-mist-400">{p.days}D / {p.nights}N</td>
                 <td className="py-2.5 px-4 text-mist-400">{p.priceFrom}</td>
                 <td className="py-2.5 px-4"><StatusBadge status={p.status || "Published"} /></td>
                 <td className="py-2.5 px-4">
                   <div className="flex items-center justify-end gap-1.5">
-                    <StatusToggle item={p} onChange={(status) => packagesStore.setStatus(p.id, status)} />
-                    <Link to={`/admin/packages/${p.id}/edit`} aria-label={`Edit ${p.name}`} className="h-8 w-8 rounded-full flex items-center justify-center text-mist-300 hover:text-moss-300 hover:bg-white/5">
+                    <Link to={`/admin/packages/${p.id}/edit`} className="h-8 w-8 rounded-full flex items-center justify-center text-mist-300 hover:text-moss-300 hover:bg-white/5">
                       <Pencil size={14} />
                     </Link>
-                    <button onClick={() => setConfirmDeleteId(p.id)} aria-label={`Delete ${p.name}`} className="h-8 w-8 rounded-full flex items-center justify-center text-mist-300 hover:text-rose-400 hover:bg-white/5">
+                    <button onClick={() => setConfirmDeleteId(p.id)} className="h-8 w-8 rounded-full flex items-center justify-center text-mist-300 hover:text-rose-400 hover:bg-white/5">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -79,7 +75,7 @@ export default function PackagesAdmin() {
               </tr>
             ))}
             {filtered.length === 0 && (
-              <tr><td colSpan={7} className="text-center py-10 text-mist-400">No packages match these filters.</td></tr>
+              <tr><td colSpan={7} className="text-center py-10 text-mist-400">No packages match "{query}".</td></tr>
             )}
           </tbody>
         </table>

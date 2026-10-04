@@ -4,63 +4,44 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Peak & Palm design tokens (Phase 1). Added alongside the existing
-        // ink/mist/moss/gold scales so pages not yet migrated keep their look.
-        pp: {
-          deep: "#061E24", // primary background
-          teal: "#0B3036", // secondary background
-          glass: "#123F48", // glass panels (use with opacity)
-          accent: "#2DE2C5", // primary accent
-          aqua: "#55F0D7", // hover accent
-          text: "#F5F7F6", // main text
-          muted: "#B7C8C9", // secondary text
-          sand: "#E7C98B", // warm accent
-        },
-        // Legacy scale names, now mapped onto the Peak & Palm palette so every
-        // existing component picks up the new design without class rewrites.
         ink: {
-          950: "#061E24", // primary background
-          900: "#08262C",
-          850: "#0B3036", // secondary background
-          800: "#0E373E",
-          700: "#123F48", // glass blue-teal
-          600: "#1B4F59",
+          950: "#080c0b",
+          900: "#0b1210",
+          850: "#0e1614",
+          800: "#121c19",
+          700: "#1a2622",
+          600: "#26352f",
         },
         mist: {
-          100: "#F5F7F6", // main text
-          200: "#E4ECEB",
-          300: "#B7C8C9", // secondary text
-          400: "#8DA5A7",
+          400: "#8fa39c",
+          300: "#aebdb7",
+          200: "#cdd8d3",
         },
         moss: {
-          300: "#8AF3E2",
-          400: "#55F0D7", // hover accent
-          500: "#2DE2C5", // primary accent
-          600: "#1FC2A8",
-          700: "#16917E",
+          300: "#7fe2b8",
+          400: "#4fd4a3",
+          500: "#2fbd8c",
+          600: "#1f9c72",
+          700: "#187a59",
         },
         gold: {
-          300: "#F0DDB2",
-          400: "#E7C98B", // warm sand accent
-          500: "#D2AF6B",
+          300: "#f2cf8a",
+          400: "#e8b95c",
+          500: "#d6a03f",
         },
       },
       fontFamily: {
-        display: ["\"Playfair Display\"", "Georgia", "serif"],
-        body: ["\"Inter\"", "system-ui", "sans-serif"],
-        heading: ["\"Playfair Display\"", "Georgia", "serif"],
-        ui: ["\"Inter\"", "system-ui", "sans-serif"],
+        display: ["\"Fraunces\"", "serif"],
+        body: ["\"Manrope\"", "sans-serif"],
       },
       boxShadow: {
-        glow: "0 0 20px rgba(45, 226, 197, 0.35)",
+        glow: "0 0 24px rgba(79, 212, 163, 0.45)",
         card: "0 20px 60px -20px rgba(0,0,0,0.6)",
-        "pp-glass": "0 12px 40px -18px rgba(0,0,0,0.65)",
-        "pp-active": "0 0 0 1px rgba(45,226,197,0.45), 0 8px 24px -12px rgba(45,226,197,0.55)",
       },
       keyframes: {
         pulseGlow: {
-          "0%, 100%": { boxShadow: "0 0 0 0 rgba(45,226,197,0.45)" },
-          "50%": { boxShadow: "0 0 0 12px rgba(45,226,197,0)" },
+          "0%, 100%": { boxShadow: "0 0 0 0 rgba(79,212,163,0.55)" },
+          "50%": { boxShadow: "0 0 0 12px rgba(79,212,163,0)" },
         },
         fadeUp: {
           "0%": { opacity: 0, transform: "translateY(14px)" },

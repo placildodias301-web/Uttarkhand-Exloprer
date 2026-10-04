@@ -1,11 +1,19 @@
 import { useState } from "react";
 import { Mail, Phone, MapPin, Send, Check } from "lucide-react";
-import PageIntro from "../components/PageIntro";
-import { InputField, TextAreaField } from "../components/FormControls";
-import { addInquiry, INQUIRY_SOURCES } from "../services/inquiries";
+import SectionHeader from "../components/SectionHeader";
+import Button from "../components/Button";
+import { addInquiry } from "../services/inquiries";
 import { useSiteSettings } from "../services/siteSettings";
 
-const emptyForm = { name: "", email: "", phone: "", message: "" };
+const emptyForm = {
+  name: "",
+  email: "",
+  phone: "",
+  inquiryType: "General Inquiry",
+  destination: "",
+  travelDate: "",
+  message: "",
+};
 
 export default function Contact() {
   const { settings } = useSiteSettings();
@@ -15,63 +23,84 @@ export default function Contact() {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    addInquiry({ ...form, source: INQUIRY_SOURCES.contact, inquiryType: "General Inquiry" });
+    addInquiry(form);
     setSent(true);
     setForm(emptyForm);
   };
 
-  const activePhones = settings.contact.phones.filter((p) => p.enabled && p.number);
+  const activePhones = settings.contact.phones.filter((p) => p.enabled);
 
   return (
-    <div className="max-w-[1200px] mx-auto px-5 sm:px-8 py-14 sm:py-20">
-      <PageIntro
+    <div className="max-w-[1100px] mx-auto px-5 sm:px-8 py-16 sm:py-20">
+      <SectionHeader
         kicker="Contact"
-        title="Ask us anything"
-        description="Questions about a destination, a package or your dates — send a message and we'll reply by email or phone."
+        title="Planning something custom?"
+        description="Tell us roughly what you're after — dates, number of travellers, must-see stops — and we'll help shape a route."
       />
 
-      <div className="grid lg:grid-cols-[1fr_340px] gap-8 lg:gap-10 items-start">
-        {sent ? (
-          <div className="rounded-2xl border border-white/[0.08] bg-ink-850/80 p-8 text-center" role="status">
-            <span className="inline-flex h-12 w-12 rounded-full bg-moss-500/15 text-moss-400 items-center justify-center mb-4">
-              <Check size={22} />
-            </span>
-            <p className="font-display text-2xl text-mist-100 mb-2">Message sent</p>
-            <p className="text-mist-300 font-body text-sm mb-6">Thanks — we'll be in touch soon.</p>
-            <button onClick={() => setSent(false)} className="text-moss-400 hover:text-moss-300 text-sm font-body font-semibold">
-              Send another message
-            </button>
+      <div className="grid lg:grid-cols-[1fr_320px] gap-10">
+        <form onSubmit={onSubmit} className="rounded-2xl border border-white/5 bg-ink-850 p-6 sm:p-8 space-y-5">
+          <div className="grid sm:grid-cols-2 gap-5">
+            <Field label="Full Name" required value={form.name} onChange={(e) => set({ name: e.target.value })} placeholder="Your name" />
+            <Field label="Email" type="email" required value={form.email} onChange={(e) => set({ email: e.target.value })} placeholder="you@example.com" />
           </div>
-        ) : (
-          <form onSubmit={onSubmit} className="rounded-2xl border border-white/[0.08] bg-ink-850/80 p-6 sm:p-8 space-y-5">
-            <div className="grid sm:grid-cols-2 gap-5">
-              <InputField label="Name" required value={form.name} onChange={(e) => set({ name: e.target.value })} autoComplete="name" />
-              <InputField label="Email" type="email" required value={form.email} onChange={(e) => set({ email: e.target.value })} autoComplete="email" />
+          <div className="grid sm:grid-cols-2 gap-5">
+            <Field label="Phone" type="tel" value={form.phone} onChange={(e) => set({ phone: e.target.value })} placeholder="+91 98765 43210" />
+            <div>
+              <label className="block text-mist-300 font-body text-sm mb-2">Inquiry Type</label>
+              <select
+                value={form.inquiryType}
+                onChange={(e) => set({ inquiryType: e.target.value })}
+                className="w-full rounded-xl bg-ink-800 border border-white/10 px-4 py-3 text-mist-100 font-body text-sm outline-none focus:border-moss-500/50"
+              >
+                <option>General Inquiry</option>
+                <option>Trip Planning</option>
+                <option>Package Inquiry</option>
+                <option>Support</option>
+              </select>
             </div>
-            <InputField label="Phone" type="tel" value={form.phone} onChange={(e) => set({ phone: e.target.value })} autoComplete="tel" placeholder="+91" />
-            <TextAreaField label="Message" required rows={6} value={form.message} onChange={(e) => set({ message: e.target.value })} />
-            <button
-              type="submit"
-              className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-moss-500 px-7 py-3 font-body font-semibold text-ink-950 hover:bg-moss-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-moss-400 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-850"
-            >
-              <Send size={15} aria-hidden="true" /> Send message
-            </button>
-          </form>
-        )}
+          </div>
+          <div className="grid sm:grid-cols-2 gap-5">
+            <Field label="Preferred Destination" value={form.destination} onChange={(e) => set({ destination: e.target.value })} placeholder="e.g. Chopta, Auli" />
+            <Field label="Travel Date" type="date" value={form.travelDate} onChange={(e) => set({ travelDate: e.target.value })} />
+          </div>
+          <div>
+            <label className="block text-mist-300 font-body text-sm mb-2">Message</label>
+            <textarea
+              rows={5}
+              required
+              value={form.message}
+              onChange={(e) => set({ message: e.target.value })}
+              placeholder="Tell us about your trip…"
+              className="w-full rounded-xl bg-ink-800 border border-white/10 px-4 py-3 text-mist-100 font-body text-sm placeholder:text-mist-400 outline-none focus:border-moss-500/50"
+            />
+          </div>
+          <Button type="submit" size="md" className="w-full sm:w-auto">
+            {sent ? <><Check size={15} /> Message Sent</> : <><Send size={15} /> Send Message</>}
+          </Button>
+        </form>
 
-        {settings.system.showContactInfo !== false && (
-          <aside className="rounded-2xl border border-white/[0.08] bg-ink-850/80 p-6 space-y-5">
-            <h2 className="font-display text-xl text-mist-100">Reach us directly</h2>
-            {settings.contact.address && <ContactRow icon={MapPin} label="Office" value={settings.contact.address} />}
-            {activePhones.map((p, i) => (
-              <ContactRow key={`${p.number}-${i}`} icon={Phone} label={p.label} value={p.number} href={`tel:${p.number.replace(/\s+/g, "")}`} />
-            ))}
-            {settings.contact.email && (
-              <ContactRow icon={Mail} label="Email" value={settings.contact.email} href={`mailto:${settings.contact.email}`} />
-            )}
-          </aside>
-        )}
+        <aside className="rounded-2xl border border-white/5 bg-ink-850 p-6 space-y-5 h-fit">
+          <h3 className="font-display text-lg text-mist-100 mb-1">Reach us directly</h3>
+          <ContactRow icon={MapPin} label="Office" value={settings.contact.address} />
+          {activePhones.map((p, i) => (
+            <ContactRow key={`${p.number}-${i}`} icon={Phone} label={p.label} value={p.number} href={`tel:${p.number.replace(/\s+/g, "")}`} />
+          ))}
+          <ContactRow icon={Mail} label="Email" value={settings.contact.email} href={`mailto:${settings.contact.email}`} />
+        </aside>
       </div>
+    </div>
+  );
+}
+
+function Field({ label, ...props }) {
+  return (
+    <div>
+      <label className="block text-mist-300 font-body text-sm mb-2">{label}</label>
+      <input
+        {...props}
+        className="w-full rounded-xl bg-ink-800 border border-white/10 px-4 py-3 text-mist-100 font-body text-sm placeholder:text-mist-400 outline-none focus:border-moss-500/50"
+      />
     </div>
   );
 }
@@ -79,12 +108,12 @@ export default function Contact() {
 function ContactRow({ icon: Icon, label, value, href }) {
   const content = (
     <>
-      <span className="h-10 w-10 rounded-full bg-moss-500/10 flex items-center justify-center text-moss-400 shrink-0">
-        <Icon size={16} aria-hidden="true" />
+      <span className="h-9 w-9 rounded-full bg-moss-500/10 flex items-center justify-center text-moss-400 shrink-0">
+        <Icon size={15} />
       </span>
-      <div className="min-w-0">
+      <div>
         <p className="text-mist-400 text-xs font-body">{label}</p>
-        <p className="text-mist-100 font-body text-sm font-semibold break-words">{value}</p>
+        <p className="text-mist-100 font-body text-sm font-semibold">{value}</p>
       </div>
     </>
   );

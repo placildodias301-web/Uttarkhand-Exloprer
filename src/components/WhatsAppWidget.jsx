@@ -1,13 +1,10 @@
 import { useState } from "react";
 import { MessageCircle, X, Send, Mountain } from "lucide-react";
 import { getWhatsAppLink, WHATSAPP_DEFAULT_MESSAGE } from "../data/contact";
-import { useSiteSettings } from "../services/siteSettings";
 
 export default function WhatsAppWidget() {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState("");
-  const { settings } = useSiteSettings();
-  const siteName = settings.general.siteName;
   const link = getWhatsAppLink(draft.trim() || WHATSAPP_DEFAULT_MESSAGE);
 
   const onSend = (e) => {
@@ -19,12 +16,12 @@ export default function WhatsAppWidget() {
     <div className="fixed bottom-5 left-5 z-[200] flex flex-col items-start gap-3">
       {open && (
         <div className="w-[300px] sm:w-[320px] rounded-2xl overflow-hidden border border-white/10 bg-[#ece5dd] shadow-card animate-floatIn">
-          <div className="bg-ink-800 px-4 py-3 flex items-center gap-3">
+          <div className="bg-moss-600 px-4 py-3 flex items-center gap-3">
             <span className="h-8 w-8 rounded-full bg-ink-950/20 flex items-center justify-center text-mist-100 shrink-0">
               <Mountain size={16} />
             </span>
             <div className="min-w-0">
-              <p className="text-mist-100 font-body text-sm font-semibold leading-tight truncate">{siteName}</p>
+              <p className="text-mist-100 font-body text-sm font-semibold leading-tight truncate">Uttarakhand Explorer</p>
               <p className="text-mist-200/80 font-body text-[11px] leading-tight">Welcomes You</p>
             </div>
             <button
@@ -39,7 +36,7 @@ export default function WhatsAppWidget() {
           <div className="p-4 min-h-[140px] flex flex-col justify-end">
             <div className="bg-white rounded-2xl rounded-tl-sm px-3.5 py-2.5 max-w-[85%] shadow-sm">
               <p className="text-ink-900 text-[13px] font-body leading-relaxed">
-                Welcome to {siteName}! How can we help you plan your trip?
+                Welcome to Uttarakhand Explorer! How can we help you plan your trip?
               </p>
             </div>
           </div>
