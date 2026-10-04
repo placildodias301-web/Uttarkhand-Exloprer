@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Outlet } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar";
 import AdminTopbar from "./AdminTopbar";
@@ -26,7 +26,9 @@ export default function AdminLayout() {
       <div className="flex-1 min-w-0 flex flex-col">
         <AdminTopbar onMenuClick={() => setMobileOpen(true)} />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-          <Outlet />
+          <Suspense fallback={<p className="text-mist-400 font-body text-sm py-10 text-center">Loading…</p>}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

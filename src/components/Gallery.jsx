@@ -1,109 +1,125 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Users } from "lucide-react";
-import { useDestinations } from "../services/content";
-import { useGallerySubmissions } from "../services/gallerySubmissions";
 import Modal from "./Modal";
+import SmartImage from "./SmartImage";
+import RegionBadge from "./RegionBadge";
+import { useGallery } from "../services/gallery";
+import { matchesRegion } from "../data/regions";
 
-export default function Gallery() {
-  const destinations = useDestinations();
-  const { approved } = useGallerySubmissions();
-  const [filter, setFilter] = useState("All");
+const FILTERS = [
+  { id: "all", label: "All" },
+  { id: "uttarakhand", label: "Uttarakhand" },
+  { id: "goa", label: "Goa" },
+];
+
+// Public gallery: destination photos + approved visitor photos, filterable
+// by region, in a masonry layout with a lightbox.
+export default function Gallery({ initialRegion = "all" }) {
+  const startFilter = FILTERS.some((f) => f.id === initialRegion) ? initialRegion : "all";
+  const [filter, setFilter] = useState(startFilter);
   const [activeIndex, setActiveIndex] = useState(null);
+  const allImages = useGallery("all");
 
-  const allImages = useMemo(() => {
-    const fromDestinations = destinations.flatMap((d) =>
-      d.gallery.map((src, i) => ({ src, destination: d.name, id: `${d.id}-${i}` }))
-    );
-    // Visitor-submitted photos the admin has approved show up alongside the
-    // official destination galleries, tagged by whichever place the visitor named.
-    const fromCommunity = approved.map((sub) => ({
-      src: sub.image,
-      destination: sub.place || "Community",
-      id: sub.id,
-      isCommunity: true,
-      caption: sub.caption,
-    }));
-    return [...fromDestinations, ...fromCommunity];
-  }, [destinations, approved]);
-
-  const filterOptions = useMemo(
-    () => ["All", ...destinations.map((d) => d.name), ...(approved.length ? ["Community"] : [])],
-    [destinations, approved]
+  const filtered = useMemo(() => allImages.filter((img) => matchesRegion(img.region, filter)), [allImages, filter]);
+  const counts = useMemo(
+    () => Object.fromEntries(FILTERS.map((f) => [f.id, allImages.filter((img) => matchesRegion(img.region, f.id)).length])),
+    [allImages]
   );
 
-  const filtered = useMemo(() => {
-    if (filter === "All") return allImages;
-    if (filter === "Community") return allImages.filter((img) => img.isCommunity);
-    return allImages.filter((img) => img.destination === filter);
-  }, [filter, allImages]);
-
-  const openAt = (i) => setActiveIndex(i);
   const close = () => setActiveIndex(null);
-  const next = () => setActiveIndex((i) => (i + 1) % filtered.length);
-  const prev = () => setActiveIndex((i) => (i - 1 + filtered.length) % filtered.length);
+  const next = useCallback(() => setActiveIndex((i) => (i + 1) % filtered.length), [filtered.length]);
+  const prev = useCallback(() => setActiveIndex((i) => (i - 1 + filtered.length) % filtered.length), [filtered.length]);
+
+  useEffect(() => {
+    if (activeIndex === null) return;
+    const onKey = (e) => {
+      if (e.key === "ArrowRight") next();
+      if (e.key === "ArrowLeft") prev();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [activeIndex, next, prev]);
+
+  const active = activeIndex !== null ? filtered[activeIndex] : null;
 
   return (
     <div>
-      <div className="flex flex-wrap gap-2 mb-8">
-        {filterOptions.map((label) => (
+      <div role="tablist" aria-label="Filter gallery by region" className="flex flex-wrap gap-2 mb-8">
+        {FILTERS.map((f) => (
           <button
-            key={label}
-            onClick={() => setFilter(label)}
-            className={`px-4 py-2 rounded-full text-sm font-body font-semibold border transition-colors ${
-              filter === label
-                ? "bg-moss-500 text-ink-950 border-moss-500"
-                : "border-white/10 text-mist-300 hover:border-moss-500/40 hover:text-moss-300"
+            key={f.id}
+            role="tab"
+            aria-selected={filter === f.id}
+            onClick={() => setFilter(f.id)}
+            className={`px-4 py-2 rounded-full text-sm font-body font-semibold border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-moss-500/70 ${
+              filter === f.id
+                ? "bg-moss-500/[0.14] text-moss-400 border-moss-500/40"
+                : "border-white/10 text-mist-300 hover:border-white/25 hover:text-mist-100"
             }`}
           >
-            {label}
+            {f.label} <span className="text-mist-400 font-normal">({counts[f.id]})</span>
           </button>
         ))}
       </div>
 
-      <div className="columns-2 sm:columns-3 lg:columns-4 gap-4 [&>*]:mb-4">
-        {filtered.map((img, i) => (
-          <button
-            key={img.id}
-            onClick={() => openAt(i)}
-            className="block w-full rounded-xl overflow-hidden border border-white/5 group relative"
-          >
-            <img
-              src={img.src}
-              alt={img.destination}
-              loading="lazy"
-              className="w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            <span className="absolute bottom-0 left-0 right-0 p-2.5 bg-gradient-to-t from-ink-950/90 to-transparent text-mist-100 text-xs font-body font-semibold text-left opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-              {img.isCommunity && <Users size={11} />} {img.destination}
-            </span>
-          </button>
-        ))}
-        {filtered.length === 0 && (
-          <p className="text-mist-400 font-body text-sm col-span-full">No images in this category yet.</p>
-        )}
-      </div>
+      {filtered.length === 0 ? (
+        <p className="text-mist-400 font-body text-sm">No photos here yet.</p>
+      ) : (
+        <ul className="columns-2 md:columns-3 xl:columns-4 gap-3 sm:gap-4 [&>li]:mb-3 sm:[&>li]:mb-4">
+          {filtered.map((img, i) => (
+            <li key={img.id} className="break-inside-avoid">
+              <button
+                onClick={() => setActiveIndex(i)}
+                className="group relative block w-full overflow-hidden rounded-xl border border-white/[0.08] focus:outline-none focus-visible:ring-2 focus-visible:ring-moss-500/70"
+                aria-label={`Open photo: ${img.title}${img.place ? `, ${img.place}` : ""}`}
+              >
+                <SmartImage
+                  src={img.src}
+                  alt={img.title}
+                  className={`w-full object-cover transition-transform duration-700 group-hover:scale-[1.04] ${
+                    i % 3 === 0 ? "aspect-[3/4]" : i % 3 === 1 ? "aspect-[4/3]" : "aspect-square"
+                  }`}
+                />
+                <span className="absolute inset-x-0 bottom-0 p-3 pt-10 bg-gradient-to-t from-ink-950/90 to-transparent text-left opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                  <span className="block font-display text-sm sm:text-base text-mist-100 leading-tight">{img.title}</span>
+                  <span className="flex items-center gap-1 text-mist-300 text-[11px] font-body mt-0.5">
+                    {img.kind === "visitor" && <Users size={11} aria-hidden="true" />}
+                    {img.kind === "visitor" ? `Shared by ${img.visitorName || "a visitor"}` : img.place}
+                  </span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
 
-      <Modal open={activeIndex !== null} onClose={close} className="sm:max-w-4xl bg-ink-950">
-        {activeIndex !== null && (
-          <div className="relative">
-            <img src={filtered[activeIndex].src} alt="" className="w-full max-h-[80vh] object-contain" />
-            <div className="p-4 flex items-center justify-between">
-              <span className="font-body text-mist-200 text-sm font-semibold">
-                {filtered[activeIndex].destination}
-                {filtered[activeIndex].caption && (
-                  <span className="block text-mist-400 text-xs font-normal mt-0.5">{filtered[activeIndex].caption}</span>
-                )}
-              </span>
-              <div className="flex gap-2">
-                <button onClick={prev} className="h-9 w-9 rounded-full border border-white/10 flex items-center justify-center text-mist-200 hover:text-moss-400">
-                  <ChevronLeft size={16} />
+      <Modal open={Boolean(active)} onClose={close} className="sm:max-w-5xl bg-ink-950" label={active?.title}>
+        {active && (
+          <figure>
+            <div className="bg-black/40 flex items-center justify-center">
+              <SmartImage src={active.src} alt={active.title} className="w-full max-h-[72vh] object-contain" showLabel />
+            </div>
+            <figcaption className="p-4 sm:p-5 flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <p className="font-display text-lg text-mist-100">{active.title}</p>
+                  <RegionBadge region={active.region} />
+                </div>
+                <p className="text-mist-300 text-sm font-body">
+                  {active.kind === "visitor" ? `${active.place ? `${active.place} — ` : ""}shared by ${active.visitorName || "a visitor"}` : active.place}
+                </p>
+                {active.caption && <p className="text-mist-400 text-sm font-body mt-1.5">{active.caption}</p>}
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <button onClick={prev} aria-label="Previous photo" className="h-10 w-10 rounded-full border border-white/10 flex items-center justify-center text-mist-200 hover:text-moss-400">
+                  <ChevronLeft size={17} />
                 </button>
-                <button onClick={next} className="h-9 w-9 rounded-full border border-white/10 flex items-center justify-center text-mist-200 hover:text-moss-400">
-                  <ChevronRight size={16} />
+                <button onClick={next} aria-label="Next photo" className="h-10 w-10 rounded-full border border-white/10 flex items-center justify-center text-mist-200 hover:text-moss-400">
+                  <ChevronRight size={17} />
                 </button>
               </div>
-            </div>
-          </div>
+            </figcaption>
+          </figure>
         )}
       </Modal>
     </div>

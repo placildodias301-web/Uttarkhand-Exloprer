@@ -1,6 +1,8 @@
 import { createStore } from "./createStore";
 import { useStore } from "../hooks/useStore";
 import { pushNotification } from "./notifications";
+import { normalizeRegion } from "../data/regions";
+import { useDestinations } from "./content";
 
 const SEED = [
   {
@@ -10,6 +12,7 @@ const SEED = [
     coverImage: "https://commons.wikimedia.org/wiki/Special:FilePath/Auli,_India.jpg?width=1200",
     category: "Travel Guide",
     destinationId: "auli",
+    region: "Uttarakhand",
     author: "Uttarakhand Explorer Team",
     tags: ["Auli", "Skiing", "Winter"],
     content:
@@ -24,6 +27,7 @@ const SEED = [
     coverImage: "https://commons.wikimedia.org/wiki/Special:FilePath/Rishikesh,_Lakshman_Jhula.jpg?width=1200",
     category: "Travel Guide",
     destinationId: "rishikesh",
+    region: "Uttarakhand",
     author: "Uttarakhand Explorer Team",
     tags: ["Rishikesh", "Adventure", "Yoga"],
     content:
@@ -35,9 +39,12 @@ const SEED = [
     id: "10-places-in-goa",
     title: "10 Places in Goa",
     subtitle: "A first look, as we start building out this region",
-    coverImage: "https://commons.wikimedia.org/wiki/Special:FilePath/Auli,_India.jpg?width=1200",
+    // Previously used the Auli photo by mistake; now the project's existing
+    // Palolem image (also used in src/data/goaDestinations.js).
+    coverImage: "https://commons.wikimedia.org/wiki/Special:FilePath/Palolem_Beach,_south_Goa.jpg?width=1200",
     category: "Beach",
     destinationId: null,
+    region: "Goa",
     author: "Uttarakhand Explorer Team",
     tags: ["Goa"],
     content: "Goa coverage is on its way — check back soon for a full regional guide.",
@@ -48,19 +55,37 @@ const SEED = [
 
 const store = createStore("uk_blogs", SEED);
 
+// One-off fix for browsers that saved the seed earlier: the Goa draft kept
+// the Auli cover by mistake. Only that exact old value is replaced.
+const WRONG_GOA_COVER = "https://commons.wikimedia.org/wiki/Special:FilePath/Auli,_India.jpg?width=1200";
+if (store.getState().some((b) => b.id === "10-places-in-goa" && b.coverImage === WRONG_GOA_COVER)) {
+  const fixed = SEED.find((b) => b.id === "10-places-in-goa").coverImage;
+  store.setState((list) => list.map((b) => (b.id === "10-places-in-goa" && b.coverImage === WRONG_GOA_COVER ? { ...b, coverImage: fixed } : b)));
+}
+
+function uniqueSlug(title) {
+  const base = slugify(title);
+  const taken = new Set(store.getState().map((b) => b.id));
+  let id = base;
+  for (let n = 2; taken.has(id); n++) id = `${base}-${n}`;
+  return id;
+}
+
 function slugify(title) {
   return title.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
 export function addBlog(data) {
-  const id = data.id || slugify(data.title || "untitled");
+  const id = data.id || uniqueSlug(data.title || "untitled");
   const entry = { status: "draft", publishDate: null, tags: [], ...data, id };
   if (entry.status === "published" && !entry.publishDate) {
     entry.publishDate = new Date().toISOString().slice(0, 10);
   }
   store.setState((list) => [entry, ...list]);
   if (entry.status === "published") {
-    pushNotification({ title: "Blog published", message: `"${entry.title}"`, link: "/admin/blogs" });
+    pushNotification({ type: "blog", title: "Blog published", message: `"${entry.title}"`, link: "/admin/blogs" });
+  } else {
+    pushNotification({ type: "blog", title: "Blog draft saved", message: `"${entry.title}"`, link: "/admin/blogs" });
   }
   return entry;
 }
@@ -78,10 +103,13 @@ export function updateBlog(id, patch) {
       return next;
     })
   );
-  if (wasJustPublished) {
-    const blog = store.getState().find((b) => b.id === id);
-    pushNotification({ title: "Blog published", message: `"${blog?.title}"`, link: "/admin/blogs" });
-  }
+  const blog = store.getState().find((b) => b.id === id);
+  pushNotification({
+    type: "blog",
+    title: wasJustPublished ? "Blog published" : patch.status === "draft" ? "Blog unpublished" : "Blog updated",
+    message: `"${blog?.title}"`,
+    link: "/admin/blogs",
+  });
 }
 
 export function deleteBlog(id) {
@@ -102,4 +130,32 @@ export function useBlogs() {
 
 export function getBlog(id) {
   return store.getState().find((b) => b.id === id) || null;
+}
+
+// ---------------------------------------------------------------------------
+// Region for a blog: explicit `region` field, else the region of its linked
+// destination, else a tag matching a region name. null = general (ALL only).
+// ---------------------------------------------------------------------------
+export function getBlogRegion(blog, destinations = []) {
+  if (blog?.region) return normalizeRegion(blog.region);
+  const dest = destinations.find((d) => d.id === blog?.destinationId);
+  if (dest) return normalizeRegion(dest.region);
+  const tag = (blog?.tags || []).map(normalizeRegion).find(Boolean);
+  return tag || null;
+}
+
+// Published posts for the public site, newest first, scoped to a region.
+export function getPublicBlogs(region = "all", destinations = []) {
+  const want = normalizeRegion(region) || "all";
+  return store
+    .getState()
+    .filter((b) => b.status === "published")
+    .filter((b) => want === "all" || getBlogRegion(b, destinations) === want)
+    .sort((a, b) => String(b.publishDate || "").localeCompare(String(a.publishDate || "")));
+}
+
+export function usePublicBlogs(region = "all") {
+  useStore(store);
+  const destinations = useDestinations();
+  return getPublicBlogs(region, destinations);
 }

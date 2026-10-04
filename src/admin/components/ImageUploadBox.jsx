@@ -1,31 +1,29 @@
+import SmartImage from "../../components/SmartImage";
+import { prepareImage } from "../../utils/images";
 import { useRef, useState } from "react";
 import { ImagePlus, X } from "lucide-react";
 
 // Reads a File into a data URL so it can be stored in localStorage (there's
 // no backend/file storage yet — see src/services/*.js for where this will
 // eventually be swapped for a real upload call).
-function fileToDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-export default function ImageUploadBox({ value, onChange, label = "Main Image", hint = "Recommended size 1200x800px" }) {
+export default function ImageUploadBox({ value, onChange, label = "Main Image", hint = "Recommended size 1200x800px", required = false }) {
   const inputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
 
   const handleFile = async (file) => {
     if (!file || !file.type.startsWith("image/")) return;
-    const dataUrl = await fileToDataUrl(file);
+    const dataUrl = await prepareImage(file);
     onChange(dataUrl);
   };
 
   return (
     <div>
-      {label && <label className="block text-mist-300 font-body text-sm mb-2">{label}</label>}
+      {label && (
+        <p className="block text-mist-300 font-body text-sm mb-2">
+          {label}
+          {required && <span className="text-gold-400 ml-0.5" aria-hidden="true">*</span>}
+        </p>
+      )}
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -38,13 +36,22 @@ export default function ImageUploadBox({ value, onChange, label = "Main Image", 
           handleFile(e.dataTransfer.files?.[0]);
         }}
         onClick={() => inputRef.current?.click()}
-        className={`relative rounded-xl border-2 border-dashed cursor-pointer overflow-hidden flex flex-col items-center justify-center text-center py-8 px-4 transition-colors ${
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            inputRef.current?.click();
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={value ? `Change ${label || "image"}` : `Upload ${label || "image"}`}
+        className={`relative rounded-xl border-2 border-dashed cursor-pointer overflow-hidden flex flex-col items-center justify-center text-center py-8 px-4 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-moss-500/70 ${
           dragging ? "border-moss-400 bg-moss-500/5" : "border-white/10 bg-ink-800 hover:border-white/20"
         }`}
       >
         {value ? (
           <>
-            <img src={value} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            <SmartImage src={value} alt="" className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0 bg-ink-950/50" />
             <button
               type="button"

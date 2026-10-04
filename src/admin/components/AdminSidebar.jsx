@@ -5,6 +5,9 @@ import {
 } from "lucide-react";
 import { useAdminSession } from "../../services/adminAuth";
 import { useSiteSettings } from "../../services/siteSettings";
+import { useNotifications } from "../../services/notifications";
+import { useGallerySubmissions } from "../../services/gallerySubmissions";
+import { useInquiries } from "../../services/inquiries";
 
 const links = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -23,6 +26,15 @@ export default function AdminSidebar({ onNavigate }) {
   const navigate = useNavigate();
   const { logout } = useAdminSession();
   const { settings } = useSiteSettings();
+  const { unreadCount } = useNotifications();
+  const { pending } = useGallerySubmissions();
+  const { inquiries } = useInquiries();
+  // Counts shown next to sidebar links.
+  const badges = {
+    "/admin/notifications": unreadCount,
+    "/admin/gallery": pending.length,
+    "/admin/inquiries": inquiries.filter((i) => i.status === "New").length,
+  };
 
   const doLogout = () => {
     logout();
@@ -33,7 +45,11 @@ export default function AdminSidebar({ onNavigate }) {
     <div className="h-full flex flex-col bg-ink-950 border-r border-white/5">
       <div className="h-16 flex items-center justify-between px-5 border-b border-white/5 shrink-0">
         <div className="flex items-center gap-2 min-w-0">
-          <Mountain size={20} className="text-moss-400 shrink-0" />
+          {settings.general.logoDataUrl ? (
+            <img src={settings.general.logoDataUrl} alt="" className="h-7 w-7 rounded-md object-cover shrink-0" />
+          ) : (
+            <Mountain size={20} className="text-moss-400 shrink-0" />
+          )}
           <span className="font-display text-[15px] text-mist-200 truncate">{settings.general.siteName}</span>
         </div>
         <button onClick={onNavigate} className="lg:hidden text-mist-400 hover:text-mist-200" aria-label="Close menu">
@@ -54,7 +70,12 @@ export default function AdminSidebar({ onNavigate }) {
             }
           >
             <l.icon size={16} className="shrink-0" />
-            {l.label}
+            <span className="flex-1">{l.label}</span>
+            {badges[l.to] > 0 && (
+              <span className="min-w-5 h-5 px-1.5 rounded-full bg-moss-500 text-ink-950 text-[11px] font-bold flex items-center justify-center" aria-label={`${badges[l.to]} new`}>
+                {badges[l.to] > 99 ? "99+" : badges[l.to]}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>

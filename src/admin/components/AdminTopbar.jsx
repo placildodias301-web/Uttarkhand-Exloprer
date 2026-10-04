@@ -1,19 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Bell, Menu, ChevronDown, UserCircle, LogOut, Check } from "lucide-react";
+import { Bell, Menu, ChevronDown, UserCircle, LogOut, Check, ExternalLink } from "lucide-react";
 import { useNotifications } from "../../services/notifications";
 import { useAdminProfile } from "../../services/adminAuth";
 import { useAdminSession } from "../../services/adminAuth";
 
-function timeAgo(iso) {
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "Just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  return `${Math.floor(hrs / 24)}d ago`;
-}
+import { timeAgo } from "../utils/timeAgo";
 
 export default function AdminTopbar({ onMenuClick }) {
   const { notifications, unreadCount, markRead, markAllRead } = useNotifications();
@@ -45,13 +37,9 @@ export default function AdminTopbar({ onMenuClick }) {
         <Menu size={20} />
       </button>
 
-      <div className="flex-1 max-w-md hidden sm:flex items-center gap-2 rounded-lg bg-ink-800 border border-white/10 px-3 py-2">
-        <Search size={15} className="text-mist-400 shrink-0" />
-        <input
-          placeholder="Search anything…"
-          className="w-full bg-transparent outline-none text-sm font-body text-mist-100 placeholder:text-mist-400"
-        />
-      </div>
+      <Link to="/all" className="hidden sm:inline-flex items-center gap-1.5 text-xs font-body font-semibold text-mist-300 hover:text-moss-400" target="_blank" rel="noreferrer">
+        <ExternalLink size={13} aria-hidden="true" /> View website
+      </Link>
 
       <div className="ml-auto flex items-center gap-2 sm:gap-3">
         <div className="relative" ref={bellRef}>
