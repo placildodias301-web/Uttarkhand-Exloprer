@@ -51,16 +51,25 @@ function slugify(name) {
   return name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
+// Day objects: { day, title, description, destinationId?, location?,
+// activities?: string[], image?, stay?, food?, notes? }. The seed days above
+// only carry day/title/description and are shown exactly as written.
+
 export function addItineraryTemplate(data) {
-  const id = data.id || slugify(data.name || "itinerary");
+  const base = data.id || slugify(data.name || "itinerary");
+  const taken = new Set(store.getState().map((t) => t.id));
+  let id = base;
+  for (let n = 2; taken.has(id); n++) id = `${base}-${n}`;
   const entry = { status: "draft", days: [], ...data, id };
   store.setState((list) => [entry, ...list]);
-  pushNotification({ title: "New itinerary added", message: `"${entry.name}"`, link: "/admin/itineraries" });
+  pushNotification({ type: "itinerary", title: "New itinerary added", message: `"${entry.name}"`, link: "/admin/itineraries" });
   return entry;
 }
 
 export function updateItineraryTemplate(id, patch) {
   store.setState((list) => list.map((it) => (it.id === id ? { ...it, ...patch } : it)));
+  const name = store.getState().find((t) => t.id === id)?.name || id;
+  pushNotification({ type: "itinerary", title: "Itinerary updated", message: `"${name}"`, link: "/admin/itineraries" });
 }
 
 export function deleteItineraryTemplate(id) {

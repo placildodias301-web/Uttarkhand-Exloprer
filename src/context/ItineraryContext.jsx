@@ -84,7 +84,7 @@ export function ItineraryProvider({ children }) {
 
   const items = useMemo(
     () => ids.map((id) => getDestination(id)).filter(Boolean),
-    [ids]
+    [ids, getDestination]
   );
 
   const totalDistanceKm = useMemo(() => estimateDistance(ids), [ids]);

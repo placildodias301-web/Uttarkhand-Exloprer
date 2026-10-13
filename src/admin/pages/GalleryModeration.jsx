@@ -1,11 +1,13 @@
+import SmartImage from "../../components/SmartImage";
 import { useState } from "react";
-import { Check, X, Eye } from "lucide-react";
+import { Check, X, Eye, Trash2 } from "lucide-react";
 import { useGallerySubmissions } from "../../services/gallerySubmissions";
 import StatusBadge from "../components/StatusBadge";
 import Modal from "../../components/Modal";
 
 export default function GalleryModeration() {
-  const { submissions, pending, approved, rejected, approveSubmission, rejectSubmission } = useGallerySubmissions();
+  const { submissions, pending, approved, rejected, approveSubmission, rejectSubmission, deleteSubmission } = useGallerySubmissions();
+  const [deleting, setDeleting] = useState(null);
   const [tab, setTab] = useState("pending");
   const [viewing, setViewing] = useState(null);
   const [rejecting, setRejecting] = useState(null);
@@ -22,11 +24,12 @@ export default function GalleryModeration() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+      <div className="mb-6">
         <h1 className="font-display text-2xl text-mist-100">Gallery</h1>
+        <p className="text-mist-400 text-sm font-body mt-1">Visitor photos. Only approved photos appear in the public gallery.</p>
       </div>
 
-      <div className="flex gap-1.5 mb-5">
+      <div className="flex flex-wrap gap-1.5 mb-5">
         {["all", "pending", "approved", "rejected"].map((t) => (
           <button
             key={t}
@@ -44,15 +47,16 @@ export default function GalleryModeration() {
         {list.map((s) => (
           <div key={s.id} className="rounded-2xl border border-white/5 bg-ink-850 overflow-hidden">
             <div className="relative h-36">
-              <img src={s.image} alt="" className="h-full w-full object-cover" />
+              <SmartImage src={s.image} alt="" className="h-full w-full object-cover" />
               <div className="absolute top-2 right-2"><StatusBadge status={s.status} /></div>
             </div>
             <div className="p-4">
               <p className="font-body font-semibold text-mist-100 text-sm mb-0.5 truncate">{s.title || "Untitled"}</p>
-              <p className="text-mist-400 text-xs font-body mb-0.5">{s.place}</p>
-              <p className="text-mist-400 text-xs font-body mb-3">By {s.visitorName} · {new Date(s.date).toLocaleDateString()}</p>
+              <p className="text-mist-400 text-xs font-body mb-0.5">{s.place}{s.region ? ` · ${s.region}` : ""}</p>
+              <p className="text-mist-400 text-xs font-body mb-0.5 truncate">By {s.visitorName} ({s.email})</p>
+              <p className="text-mist-400 text-xs font-body mb-3">Submitted {new Date(s.date).toLocaleDateString()}</p>
               <div className="flex items-center gap-1.5">
-                <button onClick={() => setViewing(s)} className="h-8 w-8 rounded-full flex items-center justify-center text-mist-300 hover:text-moss-300 hover:bg-white/5 border border-white/10">
+                <button onClick={() => setViewing(s)} aria-label="View details" className="h-8 w-8 rounded-full flex items-center justify-center text-mist-300 hover:text-moss-300 hover:bg-white/5 border border-white/10">
                   <Eye size={13} />
                 </button>
                 {s.status !== "approved" && (
@@ -65,6 +69,9 @@ export default function GalleryModeration() {
                     <X size={12} className="inline mr-1" /> Reject
                   </button>
                 )}
+                <button onClick={() => setDeleting(s)} aria-label="Delete submission" className="h-8 w-8 rounded-full flex items-center justify-center text-mist-400 hover:text-rose-400 hover:bg-white/5 shrink-0">
+                  <Trash2 size={13} />
+                </button>
               </div>
             </div>
           </div>
@@ -75,16 +82,40 @@ export default function GalleryModeration() {
       <Modal open={Boolean(viewing)} onClose={() => setViewing(null)} className="sm:max-w-lg">
         {viewing && (
           <div>
-            <img src={viewing.image} alt="" className="w-full max-h-[60vh] object-contain bg-ink-950" />
+            <SmartImage src={viewing.image} alt="" className="w-full max-h-[60vh] object-contain bg-ink-950" />
             <div className="p-5">
               <p className="font-display text-lg text-mist-100 mb-1">{viewing.title}</p>
-              <p className="text-mist-400 text-sm font-body mb-3">{viewing.place} · by {viewing.visitorName} ({viewing.email})</p>
+              <p className="text-mist-400 text-sm font-body mb-1">{viewing.place}{viewing.region ? ` · ${viewing.region}` : ""}</p>
+              <p className="text-mist-400 text-sm font-body mb-3">
+                {viewing.visitorName} ({viewing.email}) · {new Date(viewing.date).toLocaleString()} · <span className="capitalize">{viewing.status}</span>
+              </p>
               {viewing.caption && <p className="text-mist-300 text-sm font-body mb-3">"{viewing.caption}"</p>}
               {viewing.rejectionReason && (
                 <p className="text-rose-300 text-xs font-body bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2">
                   Rejected: {viewing.rejectionReason}
                 </p>
               )}
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      <Modal open={Boolean(deleting)} onClose={() => setDeleting(null)} className="sm:max-w-sm" label="Delete submission">
+        {deleting && (
+          <div className="p-5">
+            <p className="font-body font-semibold text-mist-100 mb-1.5 pr-10">Delete this submission?</p>
+            <p className="text-mist-400 text-sm font-body mb-4">The photo is removed permanently, including from the public gallery.</p>
+            <div className="flex gap-2">
+              <button onClick={() => setDeleting(null)} className="flex-1 py-2 rounded-full border border-white/10 text-mist-200 text-sm font-body">Cancel</button>
+              <button
+                onClick={() => {
+                  deleteSubmission(deleting.id);
+                  setDeleting(null);
+                }}
+                className="flex-1 py-2 rounded-full bg-rose-500 text-white text-sm font-body font-semibold"
+              >
+                Delete
+              </button>
             </div>
           </div>
         )}

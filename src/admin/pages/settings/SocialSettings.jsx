@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { useSiteSettings } from "../../../services/siteSettings";
 import { TextInput, Toggle } from "../../components/FormFields";
-import { getSocialIcon } from "../../../utils/socialIcons";
+import { getSocialIcon, SUGGESTED_PLATFORMS } from "../../../utils/socialIcons";
 
 export default function SocialSettings() {
   const { settings, addSocialPlatform, updateSocialPlatform, removeSocialPlatform } = useSiteSettings();
@@ -31,6 +31,7 @@ export default function SocialSettings() {
               <div className="flex-1 min-w-0 space-y-1.5">
                 <p className="text-mist-100 font-body text-sm font-semibold">{s.platform}</p>
                 <TextInput
+                  aria-label={`${s.platform} URL`}
                   value={s.url}
                   onChange={(e) => updateSocialPlatform(s.id, { url: e.target.value })}
                   className="!py-1.5 text-xs"
@@ -48,6 +49,29 @@ export default function SocialSettings() {
 
       <div className="rounded-2xl border border-white/5 bg-ink-850 p-5">
         <p className="font-body font-semibold text-mist-100 text-sm mb-3">Add Social Platform</p>
+        {(() => {
+          const have = new Set(settings.social.map((s) => s.platform.toLowerCase()));
+          const missing = SUGGESTED_PLATFORMS.filter((p) => !have.has(p.platform.toLowerCase()));
+          if (missing.length === 0) return null;
+          return (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {missing.map((p) => {
+                const Icon = getSocialIcon(p.platform);
+                return (
+                  <button
+                    key={p.platform}
+                    type="button"
+                    onClick={() => addSocialPlatform({ ...p, enabled: false })}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 text-mist-200 text-xs font-body font-semibold hover:border-moss-500/40"
+                  >
+                    <Icon size={13} /> Add {p.platform}
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })()}
+        <p className="text-mist-400 text-xs font-body mb-3">Presets are added switched off — enter the profile URL, then enable. Or add any other platform:</p>
         <div className="flex flex-col sm:flex-row gap-2">
           <TextInput value={newPlatform} onChange={(e) => setNewPlatform(e.target.value)} placeholder="Platform — e.g. LinkedIn" className="sm:flex-1" />
           <TextInput value={newUrl} onChange={(e) => setNewUrl(e.target.value)} placeholder="Profile URL" className="sm:flex-1" />

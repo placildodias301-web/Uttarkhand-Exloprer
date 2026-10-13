@@ -15,3 +15,8 @@ export function useRegion() {
   const region = regions.find((r) => r.id === id) || regions[0];
   return { region, regions, setRegion };
 }
+
+// Non-React read of the current region id (used by the travel-section sync).
+export function getRegionId() {
+  return store.getState();
+}

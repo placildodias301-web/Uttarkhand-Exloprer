@@ -71,3 +71,37 @@ export const regions = [
 
 export const regionNames = regions.map((r) => r.name);
 export const DEFAULT_REGION = "Uttarakhand";
+
+// ---------------------------------------------------------------------------
+// Region keys shared by every content type.
+//
+// Stored records keep the human-readable names used since the start of the
+// project ("Uttarakhand", "Goa"), plus "Combo" for combined journeys. All
+// comparisons go through normalizeRegion() so "Goa", "goa" and " GOA " match.
+// ---------------------------------------------------------------------------
+export const COMBO_REGION = "Combo";
+
+// Regions a piece of content can belong to (destinations only use the first two).
+export const contentRegionNames = [...regionNames, COMBO_REGION];
+
+export function normalizeRegion(value) {
+  if (!value) return null;
+  const key = String(value).trim().toLowerCase();
+  if (key === "uttarakhand" || key === "goa" || key === "combo") return key;
+  if (key === "all") return "all";
+  return null;
+}
+
+export function regionLabel(value) {
+  const key = normalizeRegion(value);
+  if (key === "combo") return COMBO_REGION;
+  return regions.find((r) => r.id === key)?.name || value || "";
+}
+
+// True when an item's region matches the requested key. "all" (or no key)
+// matches everything; "combo" matches only Combo content.
+export function matchesRegion(itemRegion, requested) {
+  const want = normalizeRegion(requested);
+  if (!want || want === "all") return true;
+  return normalizeRegion(itemRegion) === want;
+}
