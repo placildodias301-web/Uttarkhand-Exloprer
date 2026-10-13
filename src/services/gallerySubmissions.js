@@ -8,7 +8,7 @@ function makeId() {
   return `sub_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 }
 
-// data: { image (data URL), place, title, visitorName, email, caption }
+// data: { image (data URL), place, title, visitorName, email, caption, region }
 export function addSubmission(data) {
   const entry = {
     id: makeId(),
@@ -19,6 +19,7 @@ export function addSubmission(data) {
   };
   store.setState((list) => [entry, ...list]);
   pushNotification({
+    type: "gallery",
     title: "New gallery image submitted",
     message: `"${data.title || "Untitled"}" from ${data.visitorName || "a visitor"}`,
     link: "/admin/gallery",
@@ -28,6 +29,10 @@ export function addSubmission(data) {
 
 export function approveSubmission(id) {
   store.setState((list) => list.map((s) => (s.id === id ? { ...s, status: "approved" } : s)));
+}
+
+export function deleteSubmission(id) {
+  store.setState((list) => list.filter((s) => s.id !== id));
 }
 
 export function rejectSubmission(id, reason = "") {
@@ -46,5 +51,6 @@ export function useGallerySubmissions() {
     addSubmission,
     approveSubmission,
     rejectSubmission,
+    deleteSubmission,
   };
 }

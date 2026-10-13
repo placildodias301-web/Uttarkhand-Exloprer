@@ -1,15 +1,19 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { packagesStore, usePackages, useDestinations } from "../../services/content";
-import { Field, TextInput, Select } from "../components/FormFields";
+import { Field, TextInput, TextArea, Select } from "../components/FormFields";
 import ImageUploadBox from "../components/ImageUploadBox";
 import TagListInput from "../components/TagListInput";
-import { regionNames, DEFAULT_REGION } from "../../data/regions";
+import DayEditor from "../components/DayEditor";
+import { PACKAGE_KEYS } from "../utils/dayKeys";
+import { contentRegionNames, DEFAULT_REGION, normalizeRegion, COMBO_REGION } from "../../data/regions";
+import { CONTENT_STATUSES } from "../../services/content";
 
 const emptyForm = {
   region: DEFAULT_REGION,
   name: "",
   subtitle: "",
+  description: "",
   days: 3,
   nights: 2,
   destinations: [],
@@ -19,6 +23,7 @@ const emptyForm = {
   priceUnit: "per person",
   theme: "classic",
   status: "Published",
+  itinerary: [],
 };
 
 export default function PackageForm() {
@@ -29,8 +34,14 @@ export default function PackageForm() {
   const isEdit = Boolean(id);
   const existing = isEdit ? packages.find((p) => p.id === id) : null;
 
-  const [form, setForm] = useState(() => (existing ? { ...emptyForm, ...existing } : emptyForm));
+  const [form, setForm] = useState(() =>
+    existing ? { ...emptyForm, ...existing, status: existing.status || "Published", itinerary: existing.itinerary || [] } : emptyForm
+  );
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
+  const [error, setError] = useState("");
+  const isCombo = normalizeRegion(form.region) === "combo";
+  // Combo packages can cover destinations from both regions.
+  const selectable = destinations.filter((d) => isCombo || normalizeRegion(d.region) === normalizeRegion(form.region));
 
   const toggleDestination = (destId) => {
     set({
@@ -41,25 +52,25 @@ export default function PackageForm() {
   };
 
   const onSave = () => {
-    if (!form.name.trim()) return;
+    if (!form.name.trim()) return setError("Add a package name before saving.");
     if (isEdit) {
       packagesStore.update(id, form);
     } else {
-      packagesStore.add({ ...form, itinerary: [] });
+      packagesStore.add(form);
     }
     navigate("/admin/packages");
   };
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-5xl">
       <h1 className="font-display text-2xl text-mist-100 mb-6">{isEdit ? "Edit Package" : "Add New Package"}</h1>
 
-      <div className="grid lg:grid-cols-[1fr_300px] gap-6">
+      <div className="grid lg:grid-cols-[1fr_300px] gap-6 [&>*]:min-w-0">
         <div className="space-y-5">
           <div className="rounded-2xl border border-white/5 bg-ink-850 p-5 space-y-4">
             <Field label="Region" required>
               <Select value={form.region} onChange={(e) => set({ region: e.target.value, destinations: [] })}>
-                {regionNames.map((n) => (
+                {contentRegionNames.map((n) => (
                   <option key={n}>{n}</option>
                 ))}
               </Select>
@@ -69,6 +80,9 @@ export default function PackageForm() {
             </Field>
             <Field label="Subtitle">
               <TextInput value={form.subtitle} onChange={(e) => set({ subtitle: e.target.value })} placeholder="e.g. Meadows, snow peaks and quiet hillside stays" />
+            </Field>
+            <Field label="Description" hint="Shown at the top of the package page">
+              <TextArea rows={3} value={form.description || ""} onChange={(e) => set({ description: e.target.value })} placeholder="A short overview of the trip" />
             </Field>
             <div className="grid grid-cols-2 gap-4">
               <Field label="Days"><TextInput type="number" min={1} value={form.days} onChange={(e) => set({ days: Number(e.target.value) })} /></Field>
@@ -87,9 +101,11 @@ export default function PackageForm() {
           </div>
 
           <div className="rounded-2xl border border-white/5 bg-ink-850 p-5">
-            <label className="block text-mist-300 font-body text-sm mb-2">Destinations Covered ({form.region})</label>
+            <label className="block text-mist-300 font-body text-sm mb-2">
+              Destinations covered ({isCombo ? `${COMBO_REGION}: Uttarakhand + Goa` : form.region})
+            </label>
             <div className="flex flex-wrap gap-2">
-              {destinations.filter((d) => d.region === form.region).map((d) => (
+              {selectable.map((d) => (
                 <button
                   key={d.id}
                   type="button"
@@ -100,10 +116,14 @@ export default function PackageForm() {
                       : "border-white/10 text-mist-300 hover:border-moss-500/40"
                   }`}
                 >
-                  {d.name}
+                  {d.name}{isCombo ? ` · ${d.region}` : ""}
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/5 bg-ink-850 p-5">
+            <DayEditor days={form.itinerary || []} onChange={(v) => set({ itinerary: v })} destinations={destinations} keys={PACKAGE_KEYS} />
           </div>
 
           <div className="rounded-2xl border border-white/5 bg-ink-850 p-5">
@@ -117,7 +137,7 @@ export default function PackageForm() {
           </div>
 
           <div className="rounded-2xl border border-white/5 bg-ink-850 p-5 space-y-4">
-            <Field label="Starting Price"><TextInput value={form.priceFrom} onChange={(e) => set({ priceFrom: e.target.value })} placeholder="₹14,999" /></Field>
+            <Field label="Starting Price" hint='Or "On request"'><TextInput value={form.priceFrom} onChange={(e) => set({ priceFrom: e.target.value })} placeholder="₹14,999" /></Field>
             <Field label="Price Unit">
               <Select value={form.priceUnit} onChange={(e) => set({ priceUnit: e.target.value })}>
                 <option value="per person">per person</option>
@@ -129,13 +149,13 @@ export default function PackageForm() {
 
           <div className="rounded-2xl border border-white/5 bg-ink-850 p-5">
             <label className="block text-mist-300 font-body text-sm mb-2">Status</label>
-            <div className="flex gap-2">
-              {["Published", "Draft"].map((s) => (
+            <div className="flex gap-1.5">
+              {CONTENT_STATUSES.map((s) => (
                 <button
                   key={s}
                   type="button"
                   onClick={() => set({ status: s })}
-                  className={`flex-1 py-2 rounded-lg text-sm font-body font-semibold border transition-colors ${
+                  className={`flex-1 py-2 rounded-lg text-xs sm:text-sm font-body font-semibold border transition-colors ${
                     form.status === s ? "bg-moss-500 text-ink-950 border-moss-500" : "border-white/10 text-mist-300"
                   }`}
                 >
@@ -145,6 +165,7 @@ export default function PackageForm() {
             </div>
           </div>
 
+          {error && <p role="alert" className="text-rose-300 text-sm font-body">{error}</p>}
           <button onClick={onSave} className="w-full py-3 rounded-full bg-moss-500 text-ink-950 font-body font-semibold hover:bg-moss-400 transition-colors">
             Save Package
           </button>

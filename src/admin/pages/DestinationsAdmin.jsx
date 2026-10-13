@@ -1,9 +1,11 @@
+import SmartImage from "../../components/SmartImage";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { useDestinations, destinationsStore } from "../../services/content";
 import StatusBadge from "../components/StatusBadge";
 import RegionFilter from "../components/RegionFilter";
+import StatusToggle from "../components/StatusToggle";
 
 export default function DestinationsAdmin() {
   const destinations = useDestinations();
@@ -62,21 +64,27 @@ export default function DestinationsAdmin() {
             {filtered.map((d) => (
               <tr key={d.id} className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
                 <td className="py-2.5 px-4">
-                  <img src={d.image} alt="" className="h-10 w-14 rounded-md object-cover" />
+                  <SmartImage src={d.image} alt="" className="h-10 w-14 rounded-md object-cover" />
                 </td>
-                <td className="py-2.5 px-4 text-mist-100 font-semibold">{d.name}</td>
+                <td className="py-2.5 px-4">
+                  <p className="text-mist-100 font-semibold">{d.name}</p>
+                  {d.location && <p className="text-mist-400 text-xs">{d.location}</p>}
+                </td>
                 <td className="py-2.5 px-4 text-mist-400">{d.region}</td>
                 <td className="py-2.5 px-4"><StatusBadge status={d.status || "Published"} /></td>
                 <td className="py-2.5 px-4">
                   <div className="flex items-center justify-end gap-1.5">
+                    <StatusToggle item={d} onChange={(status) => destinationsStore.setStatus(d.id, status)} />
                     <Link
                       to={`/admin/destinations/${d.id}/edit`}
+                      aria-label={`Edit ${d.name}`}
                       className="h-8 w-8 rounded-full flex items-center justify-center text-mist-300 hover:text-moss-300 hover:bg-white/5"
                     >
                       <Pencil size={14} />
                     </Link>
                     <button
                       onClick={() => setConfirmDeleteId(d.id)}
+                      aria-label={`Delete ${d.name}`}
                       className="h-8 w-8 rounded-full flex items-center justify-center text-mist-300 hover:text-rose-400 hover:bg-white/5"
                     >
                       <Trash2 size={14} />
@@ -87,7 +95,7 @@ export default function DestinationsAdmin() {
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} className="text-center py-10 text-mist-400">No destinations match "{query}".</td>
+                <td colSpan={5} className="text-center py-10 text-mist-400">No destinations match these filters.</td>
               </tr>
             )}
           </tbody>
@@ -98,7 +106,7 @@ export default function DestinationsAdmin() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/70 p-5" onClick={() => setConfirmDeleteId(null)}>
           <div onClick={(e) => e.stopPropagation()} className="w-full max-w-sm rounded-2xl border border-white/10 bg-ink-900 p-5">
             <p className="text-mist-100 font-body font-semibold mb-1.5">Delete this destination?</p>
-            <p className="text-mist-400 text-sm font-body mb-5">This removes it from the public site. You can't undo this from here.</p>
+            <p className="text-mist-400 text-sm font-body mb-5">This removes it from the public site. To hide it temporarily, use the eye icon instead.</p>
             <div className="flex gap-2">
               <button onClick={() => setConfirmDeleteId(null)} className="flex-1 py-2 rounded-full border border-white/10 text-mist-200 text-sm font-body">Cancel</button>
               <button onClick={() => doDelete(confirmDeleteId)} className="flex-1 py-2 rounded-full bg-rose-500 text-white text-sm font-body font-semibold">Delete</button>

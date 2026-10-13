@@ -6,13 +6,18 @@ import { Field, TextInput, Select } from "../components/FormFields";
 import ImageUploadBox from "../components/ImageUploadBox";
 import RichTextLite from "../components/RichTextLite";
 import TagListInput from "../components/TagListInput";
+import { regionNames } from "../../data/regions";
+import { useSiteSettings } from "../../services/siteSettings";
+
+const CATEGORIES = ["Travel Guide", "Adventure", "Beach", "Heritage", "Seasonal", "Food", "Spiritual"];
 
 const emptyForm = {
   title: "",
   subtitle: "",
   category: "Travel Guide",
   destinationId: "",
-  author: "Uttarakhand Explorer Team",
+  region: "",
+  author: "",
   tags: [],
   content: "",
   coverImage: null,
@@ -28,12 +33,20 @@ export default function BlogForm() {
   const isEdit = Boolean(id);
   const existing = isEdit ? blogs.find((b) => b.id === id) : null;
 
-  const [form, setForm] = useState(() => (existing ? { ...emptyForm, ...existing } : emptyForm));
+  const { settings } = useSiteSettings();
+  const [form, setForm] = useState(() =>
+    existing
+      ? { ...emptyForm, ...existing, publishDate: existing.publishDate ? existing.publishDate.slice(0, 10) : "" }
+      : { ...emptyForm, author: `${settings.general.siteName} Team`, publishDate: new Date().toISOString().slice(0, 10) }
+  );
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
+  const [error, setError] = useState("");
 
   const save = (status) => {
-    if (!form.title.trim()) return;
-    const payload = { ...form, status };
+    if (!form.title.trim()) return setError("Add a title before saving.");
+    // Same YYYY-MM-DD format as the seed posts.
+    const publishDate = form.publishDate || (status === "published" ? new Date().toISOString().slice(0, 10) : null);
+    const payload = { ...form, status, publishDate, region: form.region || undefined };
     if (isEdit) {
       updateBlog(id, payload);
     } else {
@@ -46,7 +59,7 @@ export default function BlogForm() {
     <div className="max-w-4xl">
       <h1 className="font-display text-2xl text-mist-100 mb-6">{isEdit ? "Edit Blog" : "Create New Blog"}</h1>
 
-      <div className="grid lg:grid-cols-[1fr_280px] gap-6">
+      <div className="grid lg:grid-cols-[1fr_280px] gap-6 [&>*]:min-w-0">
         <div className="space-y-5">
           <div className="rounded-2xl border border-white/5 bg-ink-850 p-5 space-y-4">
             <Field label="Title" required>
@@ -69,11 +82,17 @@ export default function BlogForm() {
           <div className="rounded-2xl border border-white/5 bg-ink-850 p-5 space-y-4">
             <Field label="Category">
               <Select value={form.category} onChange={(e) => set({ category: e.target.value })}>
-                <option>Travel Guide</option>
-                <option>Adventure</option>
-                <option>Beach</option>
-                <option>Seasonal</option>
-                <option>Food</option>
+                {[...new Set([...CATEGORIES, form.category].filter(Boolean))].map((c) => (
+                  <option key={c}>{c}</option>
+                ))}
+              </Select>
+            </Field>
+            <Field label="Region" hint="Controls which section pages show the post">
+              <Select value={form.region || ""} onChange={(e) => set({ region: e.target.value })}>
+                <option value="">From destination / general</option>
+                {regionNames.map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
               </Select>
             </Field>
             <Field label="Destination">
@@ -87,10 +106,14 @@ export default function BlogForm() {
             <Field label="Author">
               <TextInput value={form.author} onChange={(e) => set({ author: e.target.value })} />
             </Field>
+            <Field label="Date">
+              <TextInput type="date" value={form.publishDate || ""} onChange={(e) => set({ publishDate: e.target.value })} />
+            </Field>
             <TagListInput label="Tags" items={form.tags} onChange={(v) => set({ tags: v })} placeholder="e.g. Winter" />
           </div>
 
           <div className="space-y-2">
+            {error && <p role="alert" className="text-rose-300 text-sm font-body">{error}</p>}
             <button onClick={() => save("published")} className="w-full py-3 rounded-full bg-moss-500 text-ink-950 font-body font-semibold hover:bg-moss-400 transition-colors">
               Publish
             </button>
